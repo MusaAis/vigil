@@ -1,6 +1,6 @@
 # Vigil — Build Specification (normative, for the AI builder)
 
-> **Commit this file as `docs/SPEC.md`.**
+> **Commit this file as `docs/SPEC.md`.** It is public-safe: it contains no strategy, no secrets, no private notes.
 > **Project:** Vigil — a payment-ops agent that fixes payment failures and proves every fix.
 > **Event:** neatHack (neatlogs), Oct 10–12, 2026. All code is written during the event.
 

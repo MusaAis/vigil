@@ -1,0 +1,10 @@
+version: 1
+currency: NGN                      # SIMULATED; amounts are integer minor units (kobo)
+limits:
+  max_refund_per_incident_minor: 5000000     # NGN 50,000
+  max_refund_per_day_minor: 50000000         # NGN 500,000
+  max_write_actions_per_incident: 4
+allowed_actions: [issue_refund, replay_webhook, retry_payout, escalate]
+duplicate_charge: {window_hours: 24}
+credit_grace_seconds: 120
+payout_sla_seconds: 900

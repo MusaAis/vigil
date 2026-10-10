@@ -1,14 +1,14 @@
-# Plan. Tick only when done and verified on the server.
+# Plan (SPEC section 15). Tick only when done and verified on the server.
 
 - [x] T-01 Repo, Makefile, .env.example, tracing wired, first trace visible (Doctor probe PASS; vigil-hello trace visible)
 - [x] T-02 Canonical JSON + hash utilities (sandbox: tests green; server: 34 tests pass)
 - [x] T-03 Decision chain + test vectors (sandbox: 9.7 vectors reproduce; server: 34 tests pass)
 - [x] T-04 Tamper tests + verify_chain + anchor (sandbox: green; server: 34 tests pass)
-- [ ] T-05 Simulator
-- [ ] T-06 Detector
-- [ ] T-07 Tools
-- [ ] T-08 Policy gate
-- [ ] T-09 Verifier
+- [ ] T-05 Simulator (sandbox: tested; server run pending)
+- [ ] T-06 Detector (sandbox: tested; server run pending)
+- [ ] T-07 Tools (sandbox: tested; server run pending)
+- [ ] T-08 Policy gate (sandbox: tested, mutation-checked; server run pending)
+- [ ] T-09 Verifier (sandbox: tested, mutation-checked; server run pending)
 - [ ] T-10 Invariant property tests
 - [ ] T-11 Agent loop (offline stub first)
 - [ ] T-12 Receipts + verify_receipt
