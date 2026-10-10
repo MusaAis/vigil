@@ -20,6 +20,7 @@ Symptom: commit `dc0b24d` was made through OpenCode 2.0.26, but Entire shows 0 c
 `entire session attach` fails with "OpenCode could not export session". OpenCode 2.0.26 has `opencode session export`
 but no top-level `opencode export`. Hypothesis: Entire's integration calls the old command.
 Update 14:00: the shim worked: batch 1 -> checkpoint 01M4JHV41G3A3SRKC5C8ETWGWY, batch 2 -> 01M4JYYS4PAB86K9FFD5E9F6FE. Still open: the second checkpoint was created with a 'no user prompts parsed' warning; asking organisers (#neathack-help) whether that is acceptable evidence. Fallback if not: switch to another Entire-supported agent for later commits.
+Update 14:37: the duplicate trailer on the batch-2 commit was removed by amending; both checkpoints appear in `entire checkpoint list` and the checkpoint refs were pushed to origin together with main.
 Original plan: try a one-command shim (`opencode export` -> `opencode session export`) for `attach`; if that fails, switch to
 another Entire-supported agent. Logged as E2/E3 in FEEDBACK.md. Not claimed fixed until a checkpoint ID exists.
 

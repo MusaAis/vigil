@@ -12,7 +12,7 @@ Python 3.12.3, SQLite. Planned: FastAPI, neatlogs Python SDK (>=1.4.26), Entire 
 
 ## Tools: how each is used and evidence
 - neatlogs: SDK 1.4.26; Doctor probe PASS; first trace id 9f8b58522abae5f0fc5f4ef444ef6b03 (workflow vigil-hello, 3 spans) confirmed in dashboard 2026-10-10. Public evidence link: PENDING (dashboard links need login)
-- Entire: CLI 0.11.4; enabled with the OpenCode agent. Checkpoints (all on branch main): `01M4JHV41G3A3SRKC5C8ETWGWY` (commit 35155c5, batch 1) and `01M4JYYS4PAB86K9FFD5E9F6FE` (batch 2; created with a shim, Entire warned that no user prompts were parsed — see FEEDBACK E3/E5). Checkpoint links: PENDING
+- Entire: CLI 0.11.4; enabled with the OpenCode agent. Checkpoints (all on branch main): `01M4JHV41G3A3SRKC5C8ETWGWY` (commit 35155c5, batch 1) and `01M4JYYS4PAB86K9FFD5E9F6FE` (commit 7e5510f, batch 2; created with a shim, Entire warned that no user prompts were parsed — see FEEDBACK E3/E5). Both are listed by `entire checkpoint list` and pushed to origin. Checkpoint links: PENDING
 - cfo.ai: account created. Business plan: PENDING
 
 ## Build log
@@ -41,5 +41,4 @@ PENDING
 See PLAN.md. The decision chain is tamper-evident, not tamper-proof.
 
 ## Submission
-Requirements are re-checked against neatlogs.com/hackathon and #neathack-announcements before submitting.
-Format, judging weights and prizes: PENDING confirmation from official pages.
+Added at submission time.
