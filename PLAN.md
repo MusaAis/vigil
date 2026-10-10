@@ -1,0 +1,30 @@
+# Plan. Tick only when done and verified on the server.
+
+- [x] T-01 Repo, Makefile, .env.example, tracing wired, first trace visible (Doctor probe PASS; vigil-hello trace visible)
+- [x] T-02 Canonical JSON + hash utilities (sandbox: tests green; server: 34 tests pass)
+- [x] T-03 Decision chain + test vectors (sandbox: 9.7 vectors reproduce; server: 34 tests pass)
+- [x] T-04 Tamper tests + verify_chain + anchor (sandbox: green; server: 34 tests pass)
+- [ ] T-05 Simulator
+- [ ] T-06 Detector
+- [ ] T-07 Tools
+- [ ] T-08 Policy gate
+- [ ] T-09 Verifier
+- [ ] T-10 Invariant property tests
+- [ ] T-11 Agent loop (offline stub first)
+- [ ] T-12 Receipts + verify_receipt
+- [ ] T-13 Eval runner, record/replay
+- [ ] T-14 Baseline v0 (live)
+- [ ] T-15 Improvement loops v1, v2
+- [ ] T-16 Remaining scenarios
+- [ ] T-17 API + SSE
+- [ ] T-18 Dashboard, /proof, /status
+- [ ] T-19 make demo, make eval-check
+- [ ] T-20 Deploy public URL
+- [ ] T-21 Reviewer docs, evidence pack
+- [ ] T-22 Tier B
+- [ ] T-23 README, FEEDBACK, hackathon.md final
+- [ ] T-24 Final run, anchor, freeze
+
+## Cut list (drop in this order if behind)
+dashboard polish → X4/X5/X6 → P1/P2 variants → third improvement loop → extra docs.
+Never cut: gate + tests, verifier, receipts, baseline→improvement evidence, recovery trace, neatlogs/Entire/cfo.ai evidence, demo.

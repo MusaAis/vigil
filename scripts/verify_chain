@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Verify the decision chain. Exit 0 = OK, 1 = BROKEN, 2 = cannot run."""
+import argparse, os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from vigil.chain import verify  # noqa: E402
+
+p = argparse.ArgumentParser()
+p.add_argument("--db", default=os.environ.get("VIGIL_DB_PATH", "data/vigil.db"))
+p.add_argument("--anchors", default="anchors.txt")
+a = p.parse_args()
+if not os.path.exists(a.db):
+    print(f"ERROR: database not found: {a.db}")
+    sys.exit(2)
+res = verify(a.db, a.anchors)
+print(res.line())
+sys.exit(0 if res.ok else 1)

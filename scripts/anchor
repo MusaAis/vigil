@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Append the current chain head to anchors.txt (publish it in posts too)."""
+import argparse, os, subprocess, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from vigil.chain import Chain, append_anchor  # noqa: E402
+from vigil.clock import SystemClock  # noqa: E402
+
+p = argparse.ArgumentParser()
+p.add_argument("--db", default=os.environ.get("VIGIL_DB_PATH", "data/vigil.db"))
+p.add_argument("--anchors", default="anchors.txt")
+p.add_argument("--run", required=True, help="run label, e.g. v0")
+p.add_argument("--git", default=None)
+a = p.parse_args()
+git = a.git
+if git is None:
+    try:
+        git = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+    except Exception:
+        git = "nogit"
+print(append_anchor(Chain(a.db, SystemClock()), a.anchors, a.run, git))

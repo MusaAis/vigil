@@ -1,0 +1,1 @@
+# Vigil chain-head anchors (append-only). Format: <ts> run=<label> seq=<n> head=sha256:<hex> git=<sha>
