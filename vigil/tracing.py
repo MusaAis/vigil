@@ -9,6 +9,8 @@ from __future__ import annotations
 import os
 from typing import Any, Callable, Optional
 
+from .config import load_env_file
+
 
 class Tracer:
     def __init__(self, neatlogs_module: Any = None) -> None:
@@ -21,6 +23,8 @@ class Tracer:
 
     @classmethod
     def from_env(cls, workflow_name: str = "vigil", env: Optional[dict] = None) -> "Tracer":
+        if env is None:
+            load_env_file()
         e = os.environ if env is None else env
         key = e.get("NEATLOGS_API_KEY")
         if not key:

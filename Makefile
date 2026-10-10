@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup test invariants verify hello
+.PHONY: setup test invariants verify hello live-smoke
 setup:
 	python3 -m venv .venv
 	$(PY) -m pip install -q -U pip
@@ -18,5 +18,8 @@ verify:
 
 hello:
 	$(PY) scripts/hello_trace.py
+
+live-smoke:
+	$(PY) scripts/live_smoke.py
 
 # Targets still to come (SPEC 14): eval, eval-check, demo, anchor, serve, evidence

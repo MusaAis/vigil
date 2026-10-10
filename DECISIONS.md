@@ -62,10 +62,11 @@ INV-3 is checked per charge (each charge credited at most once); a duplicate pai
 - Unknown tools, malformed arguments and responses with no tool call are logged and fed back; they never reach a write tool.
 - The model sees `untrusted` blocks (as SPEC 7.4 expects) and is told not to follow them; the gate and verifier cannot read them.
 
-## D-009 Live model adapter and tracing — 2026-10-10 (UNVERIFIED against the real services)
+## D-009 Live model adapter and tracing — 2026-10-10 (plain call verified 2026-10-10; tool-calling and neatlogs spans still unverified)
 `vigil/llm.py` talks to an OpenAI-compatible endpoint (the event LiteLLM gateway) with `tool_choice="auto"`, temperature 0.
 Key variable: `LLM_API_KEY`, with `LITELLM_API_KEY` as a fallback name. Default model `claude-haiku`. Not yet run against the
-real endpoint (no key in the build sandbox); tests use a fake client.
+real endpoint from the build sandbox (no key there); tests use a fake client. `make live-smoke` makes one real call from the server.
+Configuration is read from the environment; `.env` is loaded by a small built-in loader that never overrides values already set in the shell.
 `vigil/tracing.py` uses only SDK calls documented in the neatlogs setup guide (`init`, `span` with kinds WORKFLOW, AGENT, TOOL,
 `inject_trace_context`, `flush`, `shutdown`). Span attributes (`incident_id`, `scenario_id`, `run_label`, `outcome`, `git_sha`)
 are NOT attached yet: the exact SDK call is still to be read from the docs. Without a key the agent runs untraced with ids `offline-<n>`.

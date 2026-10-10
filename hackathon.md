@@ -31,9 +31,9 @@ Python 3.12.3, SQLite. Planned: FastAPI, neatlogs Python SDK (>=1.4.26), Entire 
 - Not done: agent loop, receipts, eval, API/dashboard, demo, deploy.
 
 ### 2026-10-10 15:19 (WAT)
-- Written in Claude chat and tested in its sandbox (144 tests pass there with a minimal stand-in test runner because the sandbox has no pytest; NOT yet run on the build server): T-10 invariant property tests, T-11 agent loop with an offline model, T-12 receipts and `scripts/verify_receipt`.
+- Written in Claude chat and tested in its sandbox, then verified on the build server (`make test`: 147 passed; `make invariants` at 300 cases: 8 passed; `make live-smoke`: one real call to claude-haiku through the team gateway worked): T-10 invariant property tests, T-11 agent loop with an offline model, T-12 receipts and `scripts/verify_receipt`.
 - The property tests found and fixed two defects in our own code (gate crashed on malformed arguments; repeated `escalate` leaked a raw exception). See DECISIONS D-007.
-- Live LLM adapter and neatlogs span wiring are written but unverified against the real services (D-009). Span attributes are not attached yet.
+- A plain completion through the team gateway works. Tool-calling through the gateway and the neatlogs span wiring are not yet verified (D-009). Span attributes are not attached yet.
 - Not done: eval runner and baseline, API/dashboard, demo, deploy, business plan.
 
 ## Build in public
