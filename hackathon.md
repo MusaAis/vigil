@@ -30,6 +30,12 @@ Python 3.12.3, SQLite. Planned: FastAPI, neatlogs Python SDK (>=1.4.26), Entire 
 - Entire: batch 1 has checkpoint 01M4JHV41G3A3SRKC5C8ETWGWY; batch 2 has 01M4JYYS4PAB86K9FFD5E9F6FE after attaching the session with an `opencode export` shim.
 - Not done: agent loop, receipts, eval, API/dashboard, demo, deploy.
 
+### 2026-10-10 15:19 (WAT)
+- Written in Claude chat and tested in its sandbox (144 tests pass there with a minimal stand-in test runner because the sandbox has no pytest; NOT yet run on the build server): T-10 invariant property tests, T-11 agent loop with an offline model, T-12 receipts and `scripts/verify_receipt`.
+- The property tests found and fixed two defects in our own code (gate crashed on malformed arguments; repeated `escalate` leaked a raw exception). See DECISIONS D-007.
+- Live LLM adapter and neatlogs span wiring are written but unverified against the real services (D-009). Span attributes are not attached yet.
+- Not done: eval runner and baseline, API/dashboard, demo, deploy, business plan.
+
 ## Build in public
 - 2026-10-10 14:20 WAT — first #neatHack post (idea, first neatlogs trace, repo) and a reply on tests/gate and the Entire+OpenCode snag: https://x.com/musa_ais/status/2108910440721813529
 - Next planned: failing baseline trace; first published chain-head hash.

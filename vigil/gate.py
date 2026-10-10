@@ -10,6 +10,7 @@ from .canonical import sha256_json
 from .chain import Chain
 from .incidents import IncidentStore
 from .policy import Policy
+from .tools import validate
 from sim.world import TrustedView
 
 ACTION_NAME = {"issue_refund": "refund", "replay_webhook": "replay", "retry_payout": "retry"}
@@ -31,8 +32,14 @@ class Gate:
         # 1. allowed action
         if tool not in p.allowed_actions:
             return self._v("DENY", "ACTION_NOT_ALLOWED")
-        # 2. escalate is always allowed
+        # Arguments must be an object before any later check reads them.
+        if not isinstance(args, dict):
+            return self._v("DENY", "INVALID_ARGUMENT", {"detail": "arguments must be an object"})
+        # 2. escalate is always allowed by policy; its arguments must still be well-formed
         if tool == "escalate":
+            bad = validate(tool, args)
+            if bad:
+                return self._v("DENY", "INVALID_ARGUMENT", {"detail": bad["message"][:80]})
             return self._v("ALLOW", "OK")
         # 3. incident must not be terminal
         if self.store.is_terminal(iid):
@@ -47,6 +54,10 @@ class Gate:
         import re
         if not isinstance(key, str) or not re.match(rf"^{re.escape(iid)}:{action}:[1-9][0-9]*$", key):
             return self._v("DENY", "MISSING_IDEMPOTENCY_KEY")
+        # 5b. schema: types, ranges and id formats. Later checks only ever see well-formed arguments.
+        bad = validate(tool, args)
+        if bad:
+            return self._v("DENY", "INVALID_ARGUMENT", {"detail": bad["message"][:80]})
         # 6. no repeat of an already-committed identical intent
         h = sha256_json(args)
         if any(e["body"].get("tool") == tool and e["body"].get("args_sha256") == h for e in prior):

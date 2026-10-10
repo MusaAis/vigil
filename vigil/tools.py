@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from .canonical import MAX_INT
 from .incidents import IncidentStore
 from sim.world import World, err, ok
 
@@ -41,7 +42,7 @@ def _valid(kind: str, v: Any) -> bool:
     if kind == "str":
         return isinstance(v, str) and 0 < len(v) <= 80
     if kind == "pos_int":
-        return isinstance(v, int) and not isinstance(v, bool) and v > 0
+        return isinstance(v, int) and not isinstance(v, bool) and 0 < v <= MAX_INT
     if kind == "ids":
         return isinstance(v, list) and len(v) <= 10 and all(isinstance(x, str) and ID_RE.match(x) for x in v)
     if kind == "reason":
@@ -150,6 +151,11 @@ class Tools:
         if bad:
             return bad
         if tool == "escalate":
+            inc = self.store.get(incident_id)
+            if inc is None:
+                return err("NOT_FOUND", f"{incident_id} not found")
+            if self.store.is_terminal(incident_id):
+                return err("INCIDENT_CLOSED", f"{incident_id} is already {inc['status']}", False)
             pkt = self.store.escalate(incident_id, args["reason_code"], args["summary"], args["evidence_refs"])
             return ok({"escalated": True, "incident_id": incident_id, "evidence_refs": pkt["evidence_refs"]})
         key = args["idempotency_key"]

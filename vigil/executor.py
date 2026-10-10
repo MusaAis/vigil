@@ -23,6 +23,7 @@ class Executor:
     def __init__(self, tools: Tools, chain: Chain, sleep: Optional[Callable[[float], None]] = None) -> None:
         self.tools, self.chain = tools, chain
         self.sleep = sleep or (lambda s: None)
+        self.last_attempts = 0
 
     def commit_intent(self, incident_id: str, step: int, tool: str, args: dict,
                       expected_effect: str, trace_id: str) -> dict:
@@ -39,6 +40,7 @@ class Executor:
             raise IntentMissing("no committed ACTION_INTENT for this exact call (INV-5)")
         resp: dict = {}
         for attempt in range(1, MAX_ATTEMPTS + 1):
+            self.last_attempts = attempt
             resp = self.tools.write(tool, args, incident_id)
             self.chain.append(incident_id, "ACTION_RESULT",
                               {"step": step, "tool": tool, "attempt": attempt, "ok": resp["ok"],

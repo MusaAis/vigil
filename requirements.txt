@@ -1,3 +1,4 @@
 neatlogs>=1.4.26
 pytest>=8
 pyyaml>=6
+openai>=1.40

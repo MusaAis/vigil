@@ -38,3 +38,39 @@ another Entire-supported agent. Logged as E2/E3 in FEEDBACK.md. Not claimed fixe
 Customer memos and webhook notes live in a separate untrusted store. Detector, gate and verifier only receive a
 `TrustedView` that has no method returning them; read tools expose them only under an `untrusted` key. Tests compare
 detector and gate output with and without an injection string and require identical results (INV-6).
+
+## D-007 Property tests use seeded `random`, not Hypothesis — 2026-10-10
+The sandbox that builds the code has no network, so Hypothesis could not be installed or run. `tests/test_invariants.py`
+generates adversarial proposal streams with `random.Random(seed)`: every failure is reproducible from its seed and there
+is no extra dependency. `VIGIL_PROP_CASES` raises the case count (`make invariants` uses 300).
+The tests found two real defects, both fixed: (1) the gate raised on malformed arguments (missing or mistyped fields,
+unhashable ids, non-iterable evidence) and could ALLOW an `escalate` whose arguments the tool layer then rejected;
+(2) a second `escalate` on a closed incident leaked a raw RuntimeError across the tool boundary (SPEC 2.6).
+Changes: the gate returns `DENY INVALID_ARGUMENT` for non-object arguments and, after check 5, for arguments that fail the
+tool schema; `escalate` arguments are schema-checked before the always-allow rule; `pos_int` is capped at 2^53; writing
+`escalate` to a closed incident returns `INCIDENT_CLOSED`. Check order 1-11 is otherwise unchanged.
+Known overlaps found by mutation checks: removing `REFUND_EXCEEDS_CHARGE` is masked by `ALREADY_REFUNDED`, and removing the
+duplicate-delivery ignore in the simulator is masked by the ledger's idempotency key. Both are independent guards.
+INV-3 is checked per charge (each charge credited at most once); a duplicate pair legitimately has two credits until refunded.
+
+## D-008 Agent loop choices where SPEC is silent — 2026-10-10
+- Each read appends `DECISION(INVESTIGATE)` then `OBSERVATION`, so every step has a rationale in the chain.
+- `OBSERVATION` carries two extra fields, `untrusted_fields` and `injection_suspected` (a regex flag, never an input to any decision). Untrusted text itself is never written to the chain.
+- A skip appends a `VERIFICATION` entry (`no_action_needed`); an escalation appends one too (`verify_escalation`).
+- Code-initiated escalations (gate ESCALATE verdict, exhausted step budget) go through the same gate and ACTION_INTENT path as any write.
+- A model-proposed `escalate` keeps only evidence refs that exist, falling back to the incident's related ids; the DECISION entry records `args_normalized`.
+- Unknown tools, malformed arguments and responses with no tool call are logged and fed back; they never reach a write tool.
+- The model sees `untrusted` blocks (as SPEC 7.4 expects) and is told not to follow them; the gate and verifier cannot read them.
+
+## D-009 Live model adapter and tracing — 2026-10-10 (UNVERIFIED against the real services)
+`vigil/llm.py` talks to an OpenAI-compatible endpoint (the event LiteLLM gateway) with `tool_choice="auto"`, temperature 0.
+Key variable: `LLM_API_KEY`, with `LITELLM_API_KEY` as a fallback name. Default model `claude-haiku`. Not yet run against the
+real endpoint (no key in the build sandbox); tests use a fake client.
+`vigil/tracing.py` uses only SDK calls documented in the neatlogs setup guide (`init`, `span` with kinds WORKFLOW, AGENT, TOOL,
+`inject_trace_context`, `flush`, `shutdown`). Span attributes (`incident_id`, `scenario_id`, `run_label`, `outcome`, `git_sha`)
+are NOT attached yet: the exact SDK call is still to be read from the docs. Without a key the agent runs untraced with ids `offline-<n>`.
+
+## D-010 Receipt cross-checks beyond SPEC 10 — 2026-10-10
+`verify_receipt` also recomputes each listed entry's hash from the stored chain row and compares outcome, verification result
+and action hashes with the chain. A receipt that is edited and re-digested therefore still fails. Each action also records
+`executed`. The digest still detects edits only; it is not a signature.

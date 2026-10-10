@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""Verify receipts against the decision chain. Exit 0 = all OK, 1 = at least one BROKEN, 2 = cannot run.
+
+Usage: verify_receipt [--db data/vigil.db] <receipt.json | directory> [...]
+"""
+import argparse, glob, os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from vigil.receipts import load_receipt, verify_receipt  # noqa: E402
+
+p = argparse.ArgumentParser()
+p.add_argument("paths", nargs="+")
+p.add_argument("--db", default=os.environ.get("VIGIL_DB_PATH", "data/vigil.db"))
+a = p.parse_args()
+if not os.path.exists(a.db):
+    print(f"ERROR: database not found: {a.db}")
+    sys.exit(2)
+files = []
+for path in a.paths:
+    files += sorted(glob.glob(os.path.join(path, "*.json"))) if os.path.isdir(path) else [path]
+if not files:
+    print("ERROR: no receipt files found")
+    sys.exit(2)
+broken = 0
+for f in files:
+    res = verify_receipt(load_receipt(f), a.db)
+    print(f"{os.path.basename(f)}: {res.line()}")
+    broken += 0 if res.ok else 1
+sys.exit(1 if broken else 0)

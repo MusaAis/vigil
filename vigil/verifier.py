@@ -60,12 +60,17 @@ class Verifier:
             checks.append(self._c("no_second_successful_payout", len(same) <= 1, f"{len(same)} paid in group"))
             checks.append(self._c("ledger_balanced", self.view.ledger_balanced()))
         elif t == "evidence_conflict":
-            pkt = self.store.escalations.get(incident["incident_id"])
-            checks.append(self._c("escalation_recorded", pkt is not None))
-            checks.append(self._c("evidence_packet_complete",
-                                  bool(pkt) and bool(pkt["summary"]) and len(pkt["evidence_refs"]) >= 1))
+            return self.verify_escalation(incident)
         else:
             checks.append(self._c("known_incident_type", False, t))
+        return {"ok": all(c["passed"] for c in checks), "checks": checks}
+
+    def verify_escalation(self, incident: dict) -> dict:
+        """An escalation is valid only if a complete evidence packet is on record."""
+        pkt = self.store.escalations.get(incident["incident_id"])
+        checks = [self._c("escalation_recorded", pkt is not None),
+                  self._c("evidence_packet_complete",
+                          bool(pkt) and bool(pkt["summary"]) and len(pkt["evidence_refs"]) >= 1)]
         return {"ok": all(c["passed"] for c in checks), "checks": checks}
 
     # ---- may the agent legitimately skip?

@@ -9,9 +9,9 @@
 - [x] T-07 Tools (sandbox + server: 102 tests pass)
 - [x] T-08 Policy gate (sandbox + server: 102 tests pass)
 - [x] T-09 Verifier (sandbox + server: 102 tests pass)
-- [ ] T-10 Invariant property tests
-- [ ] T-11 Agent loop (offline stub first)
-- [ ] T-12 Receipts + verify_receipt
+- [x] T-10 Invariant property tests (sandbox: 7 seeded property tests pass, mutation-checked; server run pending)
+- [x] T-11 Agent loop, offline model (sandbox: D1/W1/W3/P3/X1/X2/X3/D2 paths pass; live adapter tested with a fake client only; server run pending)
+- [x] T-12 Receipts + verify_receipt (sandbox: 11 tests pass; server run pending)
 - [ ] T-13 Eval runner, record/replay
 - [ ] T-14 Baseline v0 (live)
 - [ ] T-15 Improvement loops v1, v2
