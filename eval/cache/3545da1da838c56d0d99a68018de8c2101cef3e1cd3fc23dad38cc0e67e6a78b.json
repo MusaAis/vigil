@@ -1,0 +1,20 @@
+{
+ "key": "sha256:3545da1da838c56d0d99a68018de8c2101cef3e1cd3fc23dad38cc0e67e6a78b",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0002",
+   "evidence_refs": [
+    "ch_0001",
+    "ch_0002",
+    "ord_0001"
+   ],
+   "idempotency_key": "inc_0001:refund:1"
+  },
+  "kind": "tool",
+  "rationale": "Refunding duplicate charge ch_0002 (2,500,000 NGN) for order ord_0001; ch_0001 is the legitimate charge.",
+  "tokens_in": 3714,
+  "tokens_out": 326,
+  "tool": "issue_refund"
+ }
+}

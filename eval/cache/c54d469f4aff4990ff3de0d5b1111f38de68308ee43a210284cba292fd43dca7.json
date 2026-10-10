@@ -1,0 +1,21 @@
+{
+ "key": "sha256:c54d469f4aff4990ff3de0d5b1111f38de68308ee43a210284cba292fd43dca7",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "ch_0001",
+    "ch_0002",
+    "ord_0001",
+    "ord_0002"
+   ],
+   "reason_code": "DUPLICATE_CHARGE_REVIEW",
+   "summary": "Two charges of 2,500,000 NGN for customer cust_01 on separate orders (ord_0001 and ord_0002) created 40 seconds apart. Both succeeded at provider. Requires verification of whether both orders are legitimate or if one charge should be refunded."
+  },
+  "kind": "tool",
+  "rationale": "Two charges exist on different orders for same customer and amount; human review needed to determine if both are legitimate or if one should be refunded.",
+  "tokens_in": 4016,
+  "tokens_out": 486,
+  "tool": "escalate"
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "key": "sha256:3e266f889c30bc4d78c4b7a7b5c4aec86e62aad43190783d88fcd8f2c6061f38",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_ref": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Checking webhook events for order ord_0001 to understand charge processing sequence.",
+  "tokens_in": 3747,
+  "tokens_out": 93,
+  "tool": "get_webhook_events"
+ }
+}

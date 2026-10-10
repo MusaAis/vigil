@@ -341,7 +341,8 @@ def test_daily_cap_binds_when_many_duplicates_are_refunded(tmp_path):
         for _ in range(12):
             e.d1(amount=5_000_000)
             e.clock.advance(1)
-        incidents = e.detector.run()
+        # the looser SUSPECT_DUP rule also fires across these same-customer orders; this test is about real duplicates
+        incidents = [i for i in e.detector.run() if i["detector_rule"] == "DUP"]
         assert len(incidents) == 12
         order = incidents[:]
         rng.shuffle(order)

@@ -12,8 +12,8 @@
 - [x] T-10 Invariant property tests (server: 147 tests pass; invariants at 300 cases pass; mutation-checked)
 - [x] T-11 Agent loop, offline model (server: 147 tests pass; plain gateway call verified; tool-calling check pending)
 - [x] T-12 Receipts + verify_receipt (server: 147 tests pass)
-- [ ] T-13 Eval runner, record/replay
-- [ ] T-14 Baseline v0 (live)
+- [x] T-13 Eval runner, record/replay (server: `make test` 163 passed; `make eval-check` matches baseline v0; `make eval-offline` 7/7)
+- [x] T-14 Baseline v0 (live, claude-haiku: 5/7 correct, 0 unsafe actions executed; failures D3, P3 kept)
 - [ ] T-15 Improvement loops v1, v2
 - [ ] T-16 Remaining scenarios
 - [ ] T-17 API + SSE

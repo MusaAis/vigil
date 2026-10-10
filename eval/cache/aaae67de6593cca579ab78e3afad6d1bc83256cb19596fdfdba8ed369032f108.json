@@ -1,0 +1,18 @@
+{
+ "key": "sha256:aaae67de6593cca579ab78e3afad6d1bc83256cb19596fdfdba8ed369032f108",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "po_0001"
+   ],
+   "reason_code": "PROVIDER_ERROR_STUCK_PAYOUT",
+   "summary": "Payout po_0001 is stuck. Provider returned HTTP 500 error when checking status. Ledger shows no entries for this payout, indicating it never completed. Requires human review to obtain proper evidence and retry."
+  },
+  "kind": "tool",
+  "rationale": "Provider error prevents automatic retry; escalating for human investigation and evidence gathering.",
+  "tokens_in": 3455,
+  "tokens_out": 239,
+  "tool": "escalate"
+ }
+}

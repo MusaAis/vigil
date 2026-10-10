@@ -1,0 +1,124 @@
+{
+  "digest": "sha256:df79a8d13728fced0aa6d524a8a088c7be5ae04fb28c934c081a0ebc4dc3c264",
+  "payload": {
+    "actions": [
+      {
+        "amount_minor": null,
+        "args_sha256": "sha256:59460b29404499cbe683941513428e8384785fffce8d726791cae41a5009c377",
+        "executed": true,
+        "idempotency_key": "inc_0004:replay:1",
+        "tool": "replay_webhook"
+      }
+    ],
+    "closed_at": "2026-10-10T11:23:40Z",
+    "currency": "NGN",
+    "entire_checkpoint": null,
+    "entries": [
+      {
+        "hash": "sha256:252df50609a1e4f0592d51ec0416d4eb08b12fd0300a294302aa3e7ae9ccdde5",
+        "seq": 45
+      },
+      {
+        "hash": "sha256:58f165bc325a42b62ff69227304323dbf9e9df74a26db30784decbf9b0fee9d5",
+        "seq": 46
+      },
+      {
+        "hash": "sha256:b47041612bfd709529fac3d0b6f2ffeb5c2a7f334578c8cb4df097376a8dc842",
+        "seq": 47
+      },
+      {
+        "hash": "sha256:a2746c1882a6f08fa35f0b5744b8339ce6ffef9f5b0a91a0b2e61865f6df9339",
+        "seq": 48
+      },
+      {
+        "hash": "sha256:33ea5b4d79ef0f38c415a140d49a94ac57f339b345733b237bb115ff798fc022",
+        "seq": 49
+      },
+      {
+        "hash": "sha256:029752a3a0262acdb7e21d31cf2740551275d62b11f9a42f010019b8e0082f84",
+        "seq": 50
+      },
+      {
+        "hash": "sha256:d0750126ebb46f9a1f1af61b5996b0d23fa402f097a2c69c70567584820aa173",
+        "seq": 51
+      },
+      {
+        "hash": "sha256:dd680224c7255d851acce955867ff3e287cfdb3fb57136e318b998bb2ba2a49b",
+        "seq": 52
+      },
+      {
+        "hash": "sha256:3a2ed54cd9fee415eda6e1b7e8217392bf2b19c63b3cc685facd0d23cb32cc8f",
+        "seq": 53
+      },
+      {
+        "hash": "sha256:62dffa9f1e481e282290aa3769c2539806ed1d0696885996f6dffdac7675a282",
+        "seq": 54
+      },
+      {
+        "hash": "sha256:a8bc3da333b8493ad8a72fb88503f67ec9bd698c9692e075a018013390d666e4",
+        "seq": 55
+      },
+      {
+        "hash": "sha256:b6a6c4f32b9994b183ff45e0b7267d8b1d23f4b3fa52a0b3e55aeda3ed63bda0",
+        "seq": 56
+      },
+      {
+        "hash": "sha256:8462236042200f3975b163691d02b7064648334608e8a8193b76b66dfa789437",
+        "seq": 57
+      },
+      {
+        "hash": "sha256:b577d87cd3903d3014067581ce04d7d16eaf7800a41ca0fe0ae8789e30a8f098",
+        "seq": 58
+      },
+      {
+        "hash": "sha256:6e3d930b2b62a86e9c438f0bc1daa98ec02d4341f5f8c26aea2d578ff0964ae0",
+        "seq": 59
+      },
+      {
+        "hash": "sha256:388e77b3550bdc10ad6aff2a6b36d617da7a4552463f26e3b9068df25a786f9d",
+        "seq": 60
+      },
+      {
+        "hash": "sha256:2d0e06dd9cd536b90ed0036543423817b9704cb4f1d999573a2a8d1c940d2e6b",
+        "seq": 61
+      }
+    ],
+    "git_sha": "f0dbfd5",
+    "incident_id": "inc_0004",
+    "mode": "simulated",
+    "neatlogs_trace_id": "de97edf448ac99cbea6dcf0a1e493769",
+    "opened_at": "2026-10-10T11:23:40Z",
+    "outcome": "RESOLVED",
+    "policy_sha256": "sha256:696b891ceabd61a7cf7c89ed6e98793ac182397b88332da7eaccbc2381dbc581",
+    "reason_code": "VERIFIED_OK",
+    "run_label": "v0",
+    "scenario_id": "W1",
+    "type": "missing_webhook",
+    "verification": {
+      "checks": [
+        {
+          "check": "single_credit",
+          "detail": "1 credits",
+          "passed": true
+        },
+        {
+          "check": "credit_amount_matches",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "no_duplicate_credit",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "ledger_balanced",
+          "detail": "",
+          "passed": true
+        }
+      ],
+      "ok": true
+    }
+  },
+  "receipt_version": 1
+}

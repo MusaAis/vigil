@@ -17,7 +17,24 @@ def test_d3_two_different_orders_same_amount_not_a_duplicate(tmp_path):
     e.world.create_charge(o1, AMOUNT)
     e.clock.advance(40)
     e.world.create_charge(o2, AMOUNT)
+    got = e.detector.run()
+    # DUP must not match (order_ref differs); only the looser SUSPECT_DUP rule opens an incident to examine
+    assert [i["detector_rule"] for i in got] == ["SUSPECT_DUP"]
     assert e.detector.run() == []
+
+
+def test_suspect_dup_never_allows_a_refund(tmp_path):
+    e = Env(tmp_path)
+    o1 = e.world.create_order("cust_01", AMOUNT)
+    o2 = e.world.create_order("cust_01", AMOUNT)
+    e.world.create_charge(o1, AMOUNT)
+    e.clock.advance(40)
+    b = e.world.create_charge(o2, AMOUNT)
+    inc = e.detector.run()[0]
+    v = e.gate.evaluate(inc, "issue_refund", {"charge_id": b, "idempotency_key": f"{inc['incident_id']}:refund:1",
+                                              "evidence_refs": [b]})
+    assert (v["verdict"], v["code"]) == ("DENY", "NOT_DUPLICATE")
+    assert e.verifier.confirm_no_action(inc)["ok"] is True
 
 
 def test_dup_outside_window_not_detected(tmp_path):

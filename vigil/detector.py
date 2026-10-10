@@ -35,6 +35,16 @@ class Detector:
                     if gap <= window:
                         open_("duplicate_charge", [a["charge_id"], b["charge_id"]], "DUP")
 
+        # SUSPECT_DUP (looser, SPEC 4 trap D3): same customer and amount but a DIFFERENT order_ref, within the window.
+        # It only opens an incident for the agent to examine; the gate refuses any refund because DUP does not hold.
+        for i, a in enumerate(ok_charges):
+            for b in ok_charges[i + 1:]:
+                if a["order_ref"] != b["order_ref"] and \
+                        (a["customer_id"], a["amount_minor"]) == (b["customer_id"], b["amount_minor"]):
+                    gap = abs((parse_ts(b["created_at"]) - parse_ts(a["created_at"])).total_seconds())
+                    if gap <= window:
+                        open_("duplicate_charge", [a["charge_id"], b["charge_id"]], "SUSPECT_DUP")
+
         # MISSING_CREDIT: succeeded charge with no ledger credit after the grace period
         for c in ok_charges:
             if not self.view.revenue_credits(c["charge_id"]) and \

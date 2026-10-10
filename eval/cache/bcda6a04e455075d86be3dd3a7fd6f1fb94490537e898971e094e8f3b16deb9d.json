@@ -1,0 +1,14 @@
+{
+ "key": "sha256:bcda6a04e455075d86be3dd3a7fd6f1fb94490537e898971e094e8f3b16deb9d",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "incident_id": "inc_0007"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve the incident details to understand the evidence conflict.",
+  "tokens_in": 3007,
+  "tokens_out": 115,
+  "tool": "get_incident"
+ }
+}

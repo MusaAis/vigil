@@ -1,0 +1,14 @@
+{
+ "key": "sha256:c2297b41b8a123921f7a2a694aef083c502a45152680075e3f81cf70601000c0",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "ref": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve ledger entries for payout po_0001 to understand the transaction history.",
+  "tokens_in": 3111,
+  "tokens_out": 121,
+  "tool": "get_ledger_entries"
+ }
+}

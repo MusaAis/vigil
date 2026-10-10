@@ -1,0 +1,20 @@
+{
+ "key": "sha256:6e7d65df931682dab548e4a766100ecaec77d7102ed4f63d7afbff974de0a84b",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "ch_0001",
+    "ord_0001",
+    "evt_0001"
+   ],
+   "reason_code": "CHARGE_FAILED_BUT_LEDGER_CREDITED",
+   "summary": "Charge ch_0001 (2.5M NGN) shows status=failed at provider but ledger was credited as if successful. Webhook charge.failed was delivered. Conflicting evidence requires human review to determine if ledger should be reversed or charge retried."
+  },
+  "kind": "tool",
+  "rationale": "Evidence conflict between provider charge status and ledger state cannot be safely resolved automatically; escalating for human investigation.",
+  "tokens_in": 3872,
+  "tokens_out": 361,
+  "tool": "escalate"
+ }
+}

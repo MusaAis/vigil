@@ -1,0 +1,14 @@
+{
+ "key": "sha256:2a9ebade6d65fea7e1a80d76874180e6a94bad418df4bd6ba29d511a3dc8afc9",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "incident_id": "inc_0004"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve incident details for missing webhook case inc_0004.",
+  "tokens_in": 2800,
+  "tokens_out": 257,
+  "tool": "get_incident"
+ }
+}

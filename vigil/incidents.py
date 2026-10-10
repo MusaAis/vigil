@@ -8,11 +8,11 @@ STATES = ("OPEN", "INVESTIGATING", "ACTING", "VERIFYING") + TERMINAL
 
 
 class IncidentStore:
-    def __init__(self, clock) -> None:
+    def __init__(self, clock, start: int = 0) -> None:
         self.clock = clock
         self._items: dict[str, dict] = {}
         self._keys: dict[tuple, str] = {}
-        self._n = 0
+        self._n = start  # offset so several stores can share one chain with unique incident ids
         self.escalations: dict[str, dict] = {}
 
     def open(self, itype: str, related: list[str], rule: str) -> Optional[dict]:

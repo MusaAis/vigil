@@ -1,0 +1,14 @@
+{
+ "key": "sha256:45305bb20057055646c522f478f2cb36a87e41c672b88318b50b9f7ccc996760",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0002"
+  },
+  "kind": "tool",
+  "rationale": "Checking ledger for order ord_0002 to verify charge ch_0002 was credited.",
+  "tokens_in": 3533,
+  "tokens_out": 99,
+  "tool": "get_ledger_entries"
+ }
+}

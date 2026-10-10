@@ -158,8 +158,10 @@ def parse_anchors(text: str) -> list[dict]:
     return out
 
 
-def verify(db_path: str, anchors_path: Optional[str] = None) -> VerifyResult:
-    """Walk the chain from genesis (SPEC 9.5). Returns the first problem found."""
+def verify(db_path: str, anchors_path: Optional[str] = None, run: Optional[str] = None) -> VerifyResult:
+    """Walk the chain from genesis (SPEC 9.5). Returns the first problem found.
+
+    With run=<label>, only anchors written for that run label are checked (one anchors file can serve several chains)."""
     con = sqlite3.connect(db_path, timeout=30)
     try:
         rows = con.execute(
@@ -198,6 +200,8 @@ def verify(db_path: str, anchors_path: Optional[str] = None) -> VerifyResult:
         except ValueError as exc:
             return VerifyResult(False, broken_seq=-1, reason="ANCHOR_MISMATCH", message=str(exc))
         for a in anchors:
+            if run is not None and a["run"] != run:
+                continue
             if a["seq"] not in by_seq:
                 return VerifyResult(False, broken_seq=a["seq"], reason="ANCHOR_SEQ_MISSING",
                                     message="chain is shorter than a published anchor")

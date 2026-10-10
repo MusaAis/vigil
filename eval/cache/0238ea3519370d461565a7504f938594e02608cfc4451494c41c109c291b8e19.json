@@ -1,0 +1,14 @@
+{
+ "key": "sha256:0238ea3519370d461565a7504f938594e02608cfc4451494c41c109c291b8e19",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Checking ledger entries for order ord_0001 to verify duplicate charge impact.",
+  "tokens_in": 3239,
+  "tokens_out": 110,
+  "tool": "get_ledger_entries"
+ }
+}

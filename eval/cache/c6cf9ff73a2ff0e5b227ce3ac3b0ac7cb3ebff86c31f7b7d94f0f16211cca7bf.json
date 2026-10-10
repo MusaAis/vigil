@@ -1,0 +1,14 @@
+{
+ "key": "sha256:c6cf9ff73a2ff0e5b227ce3ac3b0ac7cb3ebff86c31f7b7d94f0f16211cca7bf",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check ledger entries to identify discrepancies between charge status and ledger state.",
+  "tokens_in": 3551,
+  "tokens_out": 94,
+  "tool": "get_ledger_entries"
+ }
+}

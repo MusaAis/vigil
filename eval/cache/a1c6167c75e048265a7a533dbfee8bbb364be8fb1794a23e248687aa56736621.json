@@ -1,0 +1,14 @@
+{
+ "key": "sha256:a1c6167c75e048265a7a533dbfee8bbb364be8fb1794a23e248687aa56736621",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve charge details to understand the transaction status.",
+  "tokens_in": 2955,
+  "tokens_out": 178,
+  "tool": "get_provider_charge"
+ }
+}

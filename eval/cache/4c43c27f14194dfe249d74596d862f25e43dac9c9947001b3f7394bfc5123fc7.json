@@ -1,0 +1,18 @@
+{
+ "key": "sha256:4c43c27f14194dfe249d74596d862f25e43dac9c9947001b3f7394bfc5123fc7",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "inc_0003"
+   ],
+   "idempotency_key": "inc_0003:retry:1",
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retry stuck payout po_0001 after provider returned 500 error; payout has no ledger entries indicating it never completed.",
+  "tokens_in": 3246,
+  "tokens_out": 213,
+  "tool": "retry_payout"
+ }
+}

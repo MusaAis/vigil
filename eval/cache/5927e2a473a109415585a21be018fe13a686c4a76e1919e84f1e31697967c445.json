@@ -1,0 +1,14 @@
+{
+ "key": "sha256:5927e2a473a109415585a21be018fe13a686c4a76e1919e84f1e31697967c445",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check webhook events for charge ch_0001 to confirm if webhook was delivered.",
+  "tokens_in": 3152,
+  "tokens_out": 93,
+  "tool": "get_webhook_events"
+ }
+}

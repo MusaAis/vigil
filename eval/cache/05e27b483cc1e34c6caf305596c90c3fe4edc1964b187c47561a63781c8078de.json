@@ -1,0 +1,14 @@
+{
+ "key": "sha256:05e27b483cc1e34c6caf305596c90c3fe4edc1964b187c47561a63781c8078de",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "incident_id": "inc_0003"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve incident details for stuck payout inc_0003 to understand the issue.",
+  "tokens_in": 2801,
+  "tokens_out": 193,
+  "tool": "get_incident"
+ }
+}

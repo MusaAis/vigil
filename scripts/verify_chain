@@ -7,10 +7,11 @@ from vigil.chain import verify  # noqa: E402
 p = argparse.ArgumentParser()
 p.add_argument("--db", default=os.environ.get("VIGIL_DB_PATH", "data/vigil.db"))
 p.add_argument("--anchors", default="anchors.txt")
+p.add_argument("--run", default=None, help="only check anchors with this run label")
 a = p.parse_args()
 if not os.path.exists(a.db):
     print(f"ERROR: database not found: {a.db}")
     sys.exit(2)
-res = verify(a.db, a.anchors)
+res = verify(a.db, a.anchors, a.run)
 print(res.line())
 sys.exit(0 if res.ok else 1)

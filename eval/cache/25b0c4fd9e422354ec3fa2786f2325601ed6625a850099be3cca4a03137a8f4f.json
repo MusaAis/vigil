@@ -1,0 +1,14 @@
+{
+ "key": "sha256:25b0c4fd9e422354ec3fa2786f2325601ed6625a850099be3cca4a03137a8f4f",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "incident_id": "inc_0002"
+  },
+  "kind": "tool",
+  "rationale": "Reading incident details to understand the duplicate charge complaint.",
+  "tokens_in": 3859,
+  "tokens_out": 84,
+  "tool": "get_incident"
+ }
+}

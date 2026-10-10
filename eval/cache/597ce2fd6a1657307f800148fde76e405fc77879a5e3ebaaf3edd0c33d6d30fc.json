@@ -1,0 +1,14 @@
+{
+ "key": "sha256:597ce2fd6a1657307f800148fde76e405fc77879a5e3ebaaf3edd0c33d6d30fc",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check the status of payout po_0001 to determine why it is stuck.",
+  "tokens_in": 2962,
+  "tokens_out": 111,
+  "tool": "get_provider_status"
+ }
+}

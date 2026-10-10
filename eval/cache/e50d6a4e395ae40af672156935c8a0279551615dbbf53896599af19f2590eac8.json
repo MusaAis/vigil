@@ -1,0 +1,14 @@
+{
+ "key": "sha256:e50d6a4e395ae40af672156935c8a0279551615dbbf53896599af19f2590eac8",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Checking ledger to confirm both charges were recorded for order ord_0001.",
+  "tokens_in": 3207,
+  "tokens_out": 94,
+  "tool": "get_ledger_entries"
+ }
+}

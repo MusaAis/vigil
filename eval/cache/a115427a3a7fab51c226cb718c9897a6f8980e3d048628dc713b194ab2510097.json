@@ -1,0 +1,14 @@
+{
+ "key": "sha256:a115427a3a7fab51c226cb718c9897a6f8980e3d048628dc713b194ab2510097",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check ledger to see if the charge has been credited to the merchant.",
+  "tokens_in": 3354,
+  "tokens_out": 92,
+  "tool": "get_ledger_entries"
+ }
+}

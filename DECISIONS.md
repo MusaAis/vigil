@@ -75,3 +75,17 @@ are NOT attached yet: the exact SDK call is still to be read from the docs. With
 `verify_receipt` also recomputes each listed entry's hash from the stored chain row and compares outcome, verification result
 and action hashes with the chain. A receipt that is edited and re-digested therefore still fails. Each action also records
 `executed`. The digest still detects edits only; it is not a signature.
+
+## D-011 SUSPECT_DUP detector rule and eval-runner choices — 2026-10-10
+SUSPECT_DUP (SPEC 12.2 trap D3): same customer and amount but a DIFFERENT order_ref within the window.
+It is looser than DUP on purpose: the trap must open an incident so the eval exercises the agent and the
+gate, instead of trivially reporting NO_INCIDENT. The gate still refuses any refund on such an incident
+(DUP does not hold -> NOT_DUPLICATE; `test_suspect_dup_never_allows_a_refund`), so the rule cannot cause
+an unsafe write. Consequence: `test_daily_cap_binds_when_many_duplicates_are_refunded` now filters
+`detector_rule == "DUP"` because SUSPECT_DUP also fires for those same-customer orders.
+Eval choices where SPEC is silent: all scenarios of one run share one decision chain (`data/eval-<label>.db`)
+and one virtual clock, each on a fresh simulated world; incident ids stay unique via an `IncidentStore`
+offset; replay reuses the baseline's trace ids (FixedTracer) so the chain hashes identically and no new
+neatlogs traces are created; the replay cache stores only the proposal and token counts (never request
+text, keys or headers); percentages are integers rounded half up with counts stored alongside; cost is
+computed only when `LLM_PRICE_IN/OUT_USD_MICRO_PER_MTOK` are set.

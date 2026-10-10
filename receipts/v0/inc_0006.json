@@ -1,0 +1,121 @@
+{
+  "digest": "sha256:d0036a5cf500bceaea98d57919d8940a16494a0de13579e2e4f7f93ed61a4ecd",
+  "payload": {
+    "actions": [
+      {
+        "amount_minor": 2500000,
+        "args_sha256": "sha256:cc6252b3117a76587c91f8d976ec9f91b7cddd8c25542a69ec094eb71e9251d6",
+        "executed": true,
+        "idempotency_key": "inc_0006:refund:1",
+        "tool": "issue_refund"
+      }
+    ],
+    "closed_at": "2026-10-10T13:29:41Z",
+    "currency": "NGN",
+    "entire_checkpoint": null,
+    "entries": [
+      {
+        "hash": "sha256:79885eb62438124f2c9acd8919d3c40fd449be56e23b9888807f8993cfa670a7",
+        "seq": 80
+      },
+      {
+        "hash": "sha256:d95b00b384d89519da304e505092e34f260cbfa94d006290a646d55e00bb132c",
+        "seq": 81
+      },
+      {
+        "hash": "sha256:6ab488f0bc0747689b013ade88d68f437a2a9258cafe2ad49da4dfce001f9d49",
+        "seq": 82
+      },
+      {
+        "hash": "sha256:d3add5c0386cd7e59acf84433343902f9cb62af0a44a38d025ee1337cb8d7d6d",
+        "seq": 83
+      },
+      {
+        "hash": "sha256:dff0510cbb6c4283b500562e16247d4e0e1f7d15be1a459edd06966f8c32f5d3",
+        "seq": 84
+      },
+      {
+        "hash": "sha256:6332d94fb36dbba4a1ccbb999d455cac8cfd290c249d104137cd6c06ee140271",
+        "seq": 85
+      },
+      {
+        "hash": "sha256:bfe80744ff9740177bf00ff9e2d1b2f10b16967e6899fb4d1822b8cac465f177",
+        "seq": 86
+      },
+      {
+        "hash": "sha256:dfea779d944bc40b32c50a8ad453d5f7ad1983112327831841a55c293c0470eb",
+        "seq": 87
+      },
+      {
+        "hash": "sha256:53577afd6ec793b34f3e4733d0d58654e9caf27533a93492399caf0d2763cfc8",
+        "seq": 88
+      },
+      {
+        "hash": "sha256:84d933e2175ca64c71e1f73666125bdece89cf4094640e6b72c81e84a87c0283",
+        "seq": 89
+      },
+      {
+        "hash": "sha256:404e69323e4fe00ba9349faba0e265b23f09e35b40e00932323728aed988dbf5",
+        "seq": 90
+      },
+      {
+        "hash": "sha256:e2a22a753d4afcd3a5c304c2540b65a60b8d9a85cba1a8f69d0d8b41609af2e8",
+        "seq": 91
+      },
+      {
+        "hash": "sha256:9429b7c83f5722d85093e01514b3fbeed5dbe9f67105f7b7008ca3a4ae829f31",
+        "seq": 92
+      },
+      {
+        "hash": "sha256:f2c70f8177bac59b80ca29d910a394905b399529decb246731e9e350d90e4ceb",
+        "seq": 93
+      },
+      {
+        "hash": "sha256:430825f79d65a1801cf12808dcdbcf6c883d381e2f1368bdc39abef3f95d5242",
+        "seq": 94
+      }
+    ],
+    "git_sha": "f0dbfd5",
+    "incident_id": "inc_0006",
+    "mode": "simulated",
+    "neatlogs_trace_id": "f733300089b31c3471a26767da5ab17b",
+    "opened_at": "2026-10-10T13:29:41Z",
+    "outcome": "RESOLVED",
+    "policy_sha256": "sha256:696b891ceabd61a7cf7c89ed6e98793ac182397b88332da7eaccbc2381dbc581",
+    "reason_code": "VERIFIED_OK",
+    "run_label": "v0",
+    "scenario_id": "X2",
+    "type": "duplicate_charge",
+    "verification": {
+      "checks": [
+        {
+          "check": "refund_succeeded",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "exactly_one_refund",
+          "detail": "1 refunds",
+          "passed": true
+        },
+        {
+          "check": "refund_amount_matches",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "net_credit_equals_order_amount",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "ledger_balanced",
+          "detail": "",
+          "passed": true
+        }
+      ],
+      "ok": true
+    }
+  },
+  "receipt_version": 1
+}
