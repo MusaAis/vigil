@@ -15,11 +15,12 @@ happened in Claude chat. This is stated in README/hackathon.md; we do not claim 
 (W3C `traceparent`). A direct OpenTelemetry `get_current_span()` lookup returned no valid span, so it is not used.
 STATUS: CONFIRMED 2026-10-10: the printed id 9f8b58522abae5f0fc5f4ef444ef6b03 matches the dashboard trace URL.
 
-## D-004 Entire + OpenCode capture problem — 2026-10-10 (OPEN)
+## D-004 Entire + OpenCode capture problem — 2026-10-10 (PARTLY RESOLVED)
 Symptom: commit `dc0b24d` was made through OpenCode 2.0.26, but Entire shows 0 checkpoints and "No sessions".
 `entire session attach` fails with "OpenCode could not export session". OpenCode 2.0.26 has `opencode session export`
 but no top-level `opencode export`. Hypothesis: Entire's integration calls the old command.
-Plan: try a one-command shim (`opencode export` -> `opencode session export`) for `attach`; if that fails, switch to
+Update 14:00: the shim worked: batch 1 -> checkpoint 01M4JHV41G3A3SRKC5C8ETWGWY, batch 2 -> 01M4JYYS4PAB86K9FFD5E9F6FE. Still open: the second checkpoint was created with a 'no user prompts parsed' warning; asking organisers (#neathack-help) whether that is acceptable evidence. Fallback if not: switch to another Entire-supported agent for later commits.
+Original plan: try a one-command shim (`opencode export` -> `opencode session export`) for `attach`; if that fails, switch to
 another Entire-supported agent. Logged as E2/E3 in FEEDBACK.md. Not claimed fixed until a checkpoint ID exists.
 
 ## D-005 Choices where SPEC is silent (batch 2) — 2026-10-10

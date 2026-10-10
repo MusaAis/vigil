@@ -12,7 +12,7 @@ Python 3.12.3, SQLite. Planned: FastAPI, neatlogs Python SDK (>=1.4.26), Entire 
 
 ## Tools: how each is used and evidence
 - neatlogs: SDK 1.4.26; Doctor probe PASS; first trace id 9f8b58522abae5f0fc5f4ef444ef6b03 (workflow vigil-hello, 3 spans) confirmed in dashboard 2026-10-10. Public evidence link: PENDING (dashboard links need login)
-- Entire: CLI installed and logged in; enabled in the repo; first commit made. Checkpoints: PENDING
+- Entire: CLI 0.11.4; enabled with the OpenCode agent. Checkpoints (all on branch main): `01M4JHV41G3A3SRKC5C8ETWGWY` (commit 35155c5, batch 1) and `01M4JYYS4PAB86K9FFD5E9F6FE` (batch 2; created with a shim, Entire warned that no user prompts were parsed — see FEEDBACK E3/E5). Checkpoint links: PENDING
 - cfo.ai: account created. Business plan: PENDING
 
 ## Build log
@@ -25,9 +25,14 @@ Python 3.12.3, SQLite. Planned: FastAPI, neatlogs Python SDK (>=1.4.26), Entire 
 - Not done: everything else in PLAN.md.
 
 ### 2026-10-10 later (WAT)
-- Written in Claude chat, tested in its sandbox (not yet run on the server): T-05..T-09 — simulator, detector, typed tools, policy gate, verifier, executor. 99 tests pass in the sandbox; mutation spot-checks found and closed two test gaps.
+- Written in Claude chat, tested in its sandbox, then verified on the server (102 tests pass; committed via OpenCode; the hash changed with later amends, see the checkpoint list): T-05..T-09 — simulator, detector, typed tools, policy gate, verifier, executor. 99 tests pass in the sandbox; mutation spot-checks found and closed two test gaps.
 - FEEDBACK.md started (neatlogs / Entire / cfo.ai / organisers).
+- Entire: batch 1 has checkpoint 01M4JHV41G3A3SRKC5C8ETWGWY; batch 2 has 01M4JYYS4PAB86K9FFD5E9F6FE after attaching the session with an `opencode export` shim.
 - Not done: agent loop, receipts, eval, API/dashboard, demo, deploy.
+
+## Build in public
+- 2026-10-10 14:20 WAT — first #neatHack post (idea, first neatlogs trace, repo) and a reply on tests/gate and the Entire+OpenCode snag: https://x.com/musa_ais/status/2108910440721813529
+- Next planned: failing baseline trace; first published chain-head hash.
 
 ## Demo
 PENDING

@@ -4,11 +4,11 @@
 - [x] T-02 Canonical JSON + hash utilities (sandbox: tests green; server: 34 tests pass)
 - [x] T-03 Decision chain + test vectors (sandbox: 9.7 vectors reproduce; server: 34 tests pass)
 - [x] T-04 Tamper tests + verify_chain + anchor (sandbox: green; server: 34 tests pass)
-- [ ] T-05 Simulator (sandbox: tested; server run pending)
-- [ ] T-06 Detector (sandbox: tested; server run pending)
-- [ ] T-07 Tools (sandbox: tested; server run pending)
-- [ ] T-08 Policy gate (sandbox: tested, mutation-checked; server run pending)
-- [ ] T-09 Verifier (sandbox: tested, mutation-checked; server run pending)
+- [x] T-05 Simulator (sandbox + server: 102 tests pass)
+- [x] T-06 Detector (sandbox + server: 102 tests pass)
+- [x] T-07 Tools (sandbox + server: 102 tests pass)
+- [x] T-08 Policy gate (sandbox + server: 102 tests pass)
+- [x] T-09 Verifier (sandbox + server: 102 tests pass)
 - [ ] T-10 Invariant property tests
 - [ ] T-11 Agent loop (offline stub first)
 - [ ] T-12 Receipts + verify_receipt
