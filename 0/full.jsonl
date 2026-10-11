@@ -1,0 +1,610 @@
+{
+  "info": {
+    "id": "ses_ed640beb8ffeQdYq1VCkyay1ug",
+    "projectID": "4d23e4f15b0e54d1fc2d1daa331865fcc6f60d4a",
+    "agent": "build",
+    "model": {
+      "id": "ling-3.1-flash-free",
+      "providerID": "opencode",
+      "variant": "default"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 15645,
+      "output": 727,
+      "reasoning": 1634,
+      "cache": {
+        "read": 71296,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1791701764095,
+      "updated": 1791701939491,
+      "idle": 1791701939595
+    },
+    "location": {
+      "directory": "/home/ubuntu/vigil"
+    }
+  },
+  "messages": [
+    {
+      "id": "msg_129bf421a001QOTulZuyTcucor",
+      "time": {
+        "created": 1791701766283
+      },
+      "text": "\"Commit only. Do NOT push. Do NOT edit any docs or markdown. Use exactly this message: …\" with the message below, and don't stage .opencode/.\n\ncommit message:\nfeat: prompt v1 + versioned prompts, baseline v1 (T-15)\n- vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it\n- v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND)\n- fix: append_anchor only checks anchors of its own run label\n- baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6)\n- server: make test 168 passed; make eval-check matches v0 and v1 ",
+      "files": [],
+      "agents": [],
+      "type": "user"
+    },
+    {
+      "id": "msg_129bf51d3001gNl5W2JQqEllbk",
+      "time": {
+        "created": 1791701774989,
+        "streamed": 1791701780498,
+        "completed": 1791701781681
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The user wants me to commit with a specific message, without pushing, without editing docs, and not staging .opencode/. Let me check the git status first to see what's there.\n\nThe user's request:\n- Commit only. Do NOT push. Do NOT edit any docs or markdown.\n- Use exactly the given commit message\n- Don't stage .opencode/\n\nLet me check git status first.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The user wants me to commit with a specific message, without pushing, without editing docs, and not staging .opencode/. Let me check the git status first to see what's there.\n\nThe user's request:\n- Commit only. Do NOT push. Do NOT edit any docs or markdown.\n- Use exactly the given commit message\n- Don't stage .opencode/\n\nLet me check git status first.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701778199,
+            "completed": 1791701780291
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_4766856f7e9c435ab1465a47",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git status --short && echo \"---\" && git log --oneline -3"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": " M anchors.txt\n M eval/run.py\n M tests/test_eval.py\n M vigil/chain.py\n M vigil/llm.py\n M vigil/prompt.py\n M vigil/replay.py\n?? .opencode/skills/\n?? eval/baselines/v1.json\n?? eval/cache/0daf5be784dc5a8404e59676732c6bc714442db3656060f47221c42a09445212.json\n?? eval/cache/16c09457893a89c101acab4c8cf2cfefe87f184c3c46455f8d5dc58cee48e691.json\n?? eval/cache/16f9b61db855566a35ce03504cae178f10acc101239099e13d4b848213c8884c.json\n?? eval/cache/1a092c6752b5e285a62e9e7bf8df46a1e30120753d08c40c92ba16bdd4775ec2.json\n?? eval/cache/2122f49bd6e82c41617ccff82dafaaec0af06b52bb2fb61d951249032ec4ff13.json\n?? eval/cache/23634fe906b650a49a9e5d55aa410f5ac989a4efda6f5114074385ba3e10d1b2.json\n?? eval/cache/38889662e56e7549ef967b83dfa5b33c25df5f84e8630c70b60b68fbf158b223.json\n?? eval/cache/3ab9d9e0152eeabd0c3a8c5e70434e5b357325fe8069e00279bf3f8c59194d2f.json\n?? eval/cache/42231619d721cceb1b509ea4c7a3346bfd4e3edc5055e4a3a7a75f74fa6c54ef.json\n?? eval/cache/4547a45d3b696d925f874f00bef5c1c36383f51b6545b52169eb3ac79e9e499b.json\n?? eval/cache/4c22c6d8ab56ff2aedb19ede05623f5624615e2dc3031f57a966d295e413b997.json\n?? eval/cache/59e593f2ac5409993048ebe3339e8217f51209f14a9bd14973e67d146a73fb8f.json\n?? eval/cache/77fd53733a46fe93d5626cc5c33465fc435c546bd65e471c948ab83720973893.json\n?? eval/cache/7da5433651b1ac478913c4debc3937575af0bd87cec4ed4b7b23a364e9819469.json\n?? eval/cache/8a08ce4bad251ac884f15f8fa3f7b94414a7578f858df45a1bcb7862a8710891.json\n?? eval/cache/8e046ace6d322cc47e1f0270dad69193aa2cfac00567593ea8703aa1cc65e0e2.json\n?? eval/cache/949fa98c56c2647bbce324d4cb0f9f3ec859811b595fc01c0caab61bceb4e131.json\n?? eval/cache/9856473a83b569f07308a20603330f91f854650b1ee144af8824e36d187911dd.json\n?? eval/cache/9c313746a0d0ab2e457c64f4e2936f350172414e7e240b22f0e97253724221de.json\n?? eval/cache/ae670b303cf1fb2a6ce4fd94260bba74b2abcaf41ef84fc7c8069e446734992f.json\n?? eval/cache/ba8b55feb9d4149492d8beccce1502582e6858506bf53b5ef759bca1ac85651c.json\n?? eval/cache/cdbc7e618ad953db162250fdc676f21363ba3616d2d24075acaf97c7a7b7f410.json\n?? eval/cache/d779f833b3d5f0cb27b26db4de17a3b9b6f3978da16af07206db7863d3803c4c.json\n?? eval/cache/e00e4ec4588b8cd3baf8a24036c770c885a641cc5b324ed3662d9509d8b67046.json\n?? eval/cache/e5e246663a210484de1ce934ba0c4c79db27fe47c8f7740a5259d625900de123.json\n?? eval/cache/f708b8713abd8d36afd724d52bbd49ada2bf7aaab9f21098f828541d97d42bad.json\n?? eval/cache/f78622e634ffbd2fadac5ab72e419f5ec543ffdee041a506e560a2127ebf27e2.json\n?? eval/results/v1.json\n?? receipts/v1/\n---\n6bfd45d feat: eval runner with record/replay, 7 starred scenarios, baseline v0 (T-13, T-14)\nf0dbfd5 verify batch 3 on server; live smoke checks. don't push\n46e201b T-10..T-12: invariant property tests, agent loop with offline model and live adapter, receipts and verify_receipt\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701779981,
+            "ran": 1791701780488,
+            "completed": 1791701781274
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 6403,
+        "output": 27,
+        "reasoning": 91,
+        "cache": {
+          "read": 320,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129bf8d790017cSBJM63v5w7Wt",
+      "time": {
+        "created": 1791701806789,
+        "streamed": 1791701844077,
+        "completed": 1791701845480
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The user wants me to commit with the exact message, not push, not edit docs, and not stage .opencode/.\n\nLet me check:\n1. Modified files: anchors.txt, eval/run.py, tests/test_eval.py, vigil/chain.py, vigil/llm.py, vigil/prompt.py, vigil/replay.py\n2. Untracked: .opencode/skills/ (don't stage), eval/baselines/v1.json, eval/cache/*.json (many files), eval/results/v1.json, receipts/v1/\n\nWait — I should check whether eval/cache should be committed. Let me check .gitignore and whether cache was committed before. Let me check git ls-files to see what's tracked.\n\nAlso, the commit message mentions \"baseline v1\" which is eval/baselines/v1.json, and eval/results/v1.json, receipts/v1/. The cache files — are they normally committed? Let me check if previous baseline v0 committed cache files.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The user wants me to commit with the exact message, not push, not edit docs, and not stage .opencode/.\n\nLet me check:\n1. Modified files: anchors.txt, eval/run.py, tests/test_eval.py, vigil/chain.py, vigil/llm.py, vigil/prompt.py, vigil/replay.py\n2. Untracked: .opencode/skills/ (don't stage), eval/baselines/v1.json, eval/cache/*.json (many files), eval/results/v1.json, receipts/v1/\n\nWait — I should check whether eval/cache should be committed. Let me check .gitignore and whether cache was committed before. Let me check git ls-files to see what's tracked.\n\nAlso, the commit message mentions \"baseline v1\" which is eval/baselines/v1.json, and eval/results/v1.json, receipts/v1/. The cache files — are they normally committed? Let me check if previous baseline v0 committed cache files.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701807986,
+            "completed": 1791701843795
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_26a4491b69e5479f9cfea7db",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cat .gitignore 2>/dev/null; echo \"---\"; git ls-files eval/cache/ | head -5; echo \"---\"; git ls-files eval/cache/ | wc -l; echo \"---\"; git show --stat HEAD | head -30"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": ".env\n.venv/\n__pycache__/\n*.pyc\n.pytest_cache/\ndata/*.db\ndata/*.db-*\n---\neval/cache/.gitkeep\neval/cache/0238ea3519370d461565a7504f938594e02608cfc4451494c41c109c291b8e19.json\neval/cache/05e27b483cc1e34c6caf305596c90c3fe4edc1964b187c47561a63781c8078de.json\neval/cache/08eaa1bee5311f85777b03e282abcf49f7eff7284cc5786f75c01307659e9c00.json\neval/cache/0972dc309ff2e13ebd6a1ac72bd2149f49129317fd5a318d34ba6a31afa4a122.json\n---\n38\n---\ncommit 6bfd45dccd361142b3670960e5ef50f3564ce98a\nAuthor: MusaAis <musa143ais@gmail.com>\nDate:   Sat Oct 10 23:15:31 2026 +0000\n\n    feat: eval runner with record/replay, 7 starred scenarios, baseline v0 (T-13, T-14)\n    \n    - vigil/stack.py stack builder; vigil/replay.py record/replay cache, REPLAY_MISS, scenario fixture, token budget\n    - eval/ scenario loader and runner with --check against eval/baselines\n    - scenarios D1 D3 P3 W1 W3 X2 X3\n    - detector: looser SUSPECT_DUP rule so the D3 trap reaches the agent\n    - Makefile: eval, eval-check, eval-offline\n    - baseline v0 (live, claude-haiku): 5/7 correct, 0 unsafe actions executed; failures kept (D3, P3)\n    - server: make test 163 passed; make eval-check matches baseline v0\n    \n    Entire-Checkpoint: 01M4M2RF898KEYXPS93PPB6A2A\n\n .env.example                                       |   2 +\n DECISIONS.md                                       |  14 +\n Makefile                                           |  18 +-\n PLAN.md                                            |   4 +-\n anchors.txt                                        |   1 +\n eval/__init__.py                                   |   0\n eval/baselines/.gitkeep                            |   0\n eval/baselines/v0.json                             | 170 +++++++++\n eval/cache/.gitkeep                                |   0\n ...504f938594e02608cfc4451494c41c109c291b8e19.json |  14 +\n ...5596c90c3fe4edc1964b187c47561a63781c8078de.json |  14 +\n ...e282abcf49f7eff7284cc5786f75c01307659e9c00.json |  14 +\n ...c72bd2149f49129317fd5a318d34ba6a31afa4a122.json |  14 +\n ...786f2325601ed6625a850099be3cca4a03137a8f4f.json |  14 +\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701842816,
+            "ran": 1791701843984,
+            "completed": 1791701845192
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 2034,
+        "output": 80,
+        "reasoning": 201,
+        "cache": {
+          "read": 6720,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c086b4001q7vRNFrg2vMqQm",
+      "time": {
+        "created": 1791701862001,
+        "streamed": 1791701872774,
+        "completed": 1791701875489
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The eval cache files are tracked in git (38 files from previous commits), so the new cache files from the v1 run should be committed too — consistent with previous behavior. The user said \"don't stage .opencode/\" — everything else should be staged per the commit message which references baseline v1, results, receipts, etc.\n\nLet me stage everything except .opencode/:\n- Modified: anchors.txt, eval/run.py, tests/test_eval.py, vigil/chain.py, vigil/llm.py, vigil/prompt.py, vigil/replay.py\n- Untracked to stage: eval/baselines/v1.json, eval/cache/*.json, eval/results/v1.json, receipts/v1/\n\nThen commit with the exact message. Then verify no push.\n\nThe commit message is:\n```\nfeat: prompt v1 + versioned prompts, baseline v1 (T-15)\n- vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it\n- v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND)\n- fix: append_anchor only checks anchors of its own run label\n- baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6)\n- server: make test 168 passed; make eval-check matches v0 and v1\n```\n\nI'll stage with git add -A but exclude .opencode. Simplest: git add -A -- ':!.opencode' or just add specific paths. Let me use git add with the specific paths to be safe:\n\ngit add anchors.txt eval/ tests/test_eval.py vigil/ receipts/\n\nThat covers everything except .opencode/. Note receipts/v1/ and eval/baselines/v1.json etc. are all under eval/ or receipts/.\n\nThen commit with heredoc to preserve exact message.\n\nThe user explicitly said \"Commit only. Do NOT push.\" — committing is authorized. Also the instructions say never push without explicit instruction — here explicit \"do NOT push\" so fine.\n\nNote the commit message does NOT include an Entire-Checkpoint line (user said use exactly this message). So don't add anything.\n\nLet me do it.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The eval cache files are tracked in git (38 files from previous commits), so the new cache files from the v1 run should be committed too — consistent with previous behavior. The user said \"don't stage .opencode/\" — everything else should be staged per the commit message which references baseline v1, results, receipts, etc.\n\nLet me stage everything except .opencode/:\n- Modified: anchors.txt, eval/run.py, tests/test_eval.py, vigil/chain.py, vigil/llm.py, vigil/prompt.py, vigil/replay.py\n- Untracked to stage: eval/baselines/v1.json, eval/cache/*.json, eval/results/v1.json, receipts/v1/\n\nThen commit with the exact message. Then verify no push.\n\nThe commit message is:\n```\nfeat: prompt v1 + versioned prompts, baseline v1 (T-15)\n- vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it\n- v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND)\n- fix: append_anchor only checks anchors of its own run label\n- baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6)\n- server: make test 168 passed; make eval-check matches v0 and v1\n```\n\nI'll stage with git add -A but exclude .opencode. Simplest: git add -A -- ':!.opencode' or just add specific paths. Let me use git add with the specific paths to be safe:\n\ngit add anchors.txt eval/ tests/test_eval.py vigil/ receipts/\n\nThat covers everything except .opencode/. Note receipts/v1/ and eval/baselines/v1.json etc. are all under eval/ or receipts/.\n\nThen commit with heredoc to preserve exact message.\n\nThe user explicitly said \"Commit only. Do NOT push.\" — committing is authorized. Also the instructions say never push without explicit instruction — here explicit \"do NOT push\" so fine.\n\nNote the commit message does NOT include an Entire-Checkpoint line (user said use exactly this message). So don't add anything.\n\nLet me do it.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701863163,
+            "completed": 1791701872382
+          }
+        },
+        {
+          "type": "text",
+          "text": "Staging everything except `.opencode/` and committing with the exact message."
+        },
+        {
+          "type": "tool",
+          "id": "call_276c630da9af4df4bbbed74f",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git add anchors.txt eval/ tests/test_eval.py vigil/ receipts/ && git status --short | grep -v '^??' && echo \"--- unstaged/untracked left:\" && git status --short | grep '^??'"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "M  anchors.txt\nA  eval/baselines/v1.json\nA  eval/cache/0daf5be784dc5a8404e59676732c6bc714442db3656060f47221c42a09445212.json\nA  eval/cache/16c09457893a89c101acab4c8cf2cfefe87f184c3c46455f8d5dc58cee48e691.json\nA  eval/cache/16f9b61db855566a35ce03504cae178f10acc101239099e13d4b848213c8884c.json\nA  eval/cache/1a092c6752b5e285a62e9e7bf8df46a1e30120753d08c40c92ba16bdd4775ec2.json\nA  eval/cache/2122f49bd6e82c41617ccff82dafaaec0af06b52bb2fb61d951249032ec4ff13.json\nA  eval/cache/23634fe906b650a49a9e5d55aa410f5ac989a4efda6f5114074385ba3e10d1b2.json\nA  eval/cache/38889662e56e7549ef967b83dfa5b33c25df5f84e8630c70b60b68fbf158b223.json\nA  eval/cache/3ab9d9e0152eeabd0c3a8c5e70434e5b357325fe8069e00279bf3f8c59194d2f.json\nA  eval/cache/42231619d721cceb1b509ea4c7a3346bfd4e3edc5055e4a3a7a75f74fa6c54ef.json\nA  eval/cache/4547a45d3b696d925f874f00bef5c1c36383f51b6545b52169eb3ac79e9e499b.json\nA  eval/cache/4c22c6d8ab56ff2aedb19ede05623f5624615e2dc3031f57a966d295e413b997.json\nA  eval/cache/59e593f2ac5409993048ebe3339e8217f51209f14a9bd14973e67d146a73fb8f.json\nA  eval/cache/77fd53733a46fe93d5626cc5c33465fc435c546bd65e471c948ab83720973893.json\nA  eval/cache/7da5433651b1ac478913c4debc3937575af0bd87cec4ed4b7b23a364e9819469.json\nA  eval/cache/8a08ce4bad251ac884f15f8fa3f7b94414a7578f858df45a1bcb7862a8710891.json\nA  eval/cache/8e046ace6d322cc47e1f0270dad69193aa2cfac00567593ea8703aa1cc65e0e2.json\nA  eval/cache/949fa98c56c2647bbce324d4cb0f9f3ec859811b595fc01c0caab61bceb4e131.json\nA  eval/cache/9856473a83b569f07308a20603330f91f854650b1ee144af8824e36d187911dd.json\nA  eval/cache/9c313746a0d0ab2e457c64f4e2936f350172414e7e240b22f0e97253724221de.json\nA  eval/cache/ae670b303cf1fb2a6ce4fd94260bba74b2abcaf41ef84fc7c8069e446734992f.json\nA  eval/cache/ba8b55feb9d4149492d8beccce1502582e6858506bf53b5ef759bca1ac85651c.json\nA  eval/cache/cdbc7e618ad953db162250fdc676f21363ba3616d2d24075acaf97c7a7b7f410.json\nA  eval/cache/d779f833b3d5f0cb27b26db4de17a3b9b6f3978da16af07206db7863d3803c4c.json\nA  eval/cache/e00e4ec4588b8cd3baf8a24036c770c885a641cc5b324ed3662d9509d8b67046.json\nA  eval/cache/e5e246663a210484de1ce934ba0c4c79db27fe47c8f7740a5259d625900de123.json\nA  eval/cache/f708b8713abd8d36afd724d52bbd49ada2bf7aaab9f21098f828541d97d42bad.json\nA  eval/cache/f78622e634ffbd2fadac5ab72e419f5ec543ffdee041a506e560a2127ebf27e2.json\nA  eval/results/v1.json\nM  eval/run.py\nA  receipts/v1/inc_0001.json\nA  receipts/v1/inc_0002.json\nA  receipts/v1/inc_0003.json\nA  receipts/v1/inc_0004.json\nA  receipts/v1/inc_0005.json\nA  receipts/v1/inc_0006.json\nA  receipts/v1/inc_0007.json\nM  tests/test_eval.py\nM  vigil/chain.py\nM  vigil/llm.py\nM  vigil/prompt.py\nM  vigil/replay.py\n--- unstaged/untracked left:\n?? .opencode/skills/\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701871675,
+            "ran": 1791701872678,
+            "completed": 1791701875182
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 1036,
+        "output": 102,
+        "reasoning": 528,
+        "cache": {
+          "read": 8960,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c0fc4f001BECIH4oEqRsYFQ",
+      "time": {
+        "created": 1791701904318,
+        "streamed": 1791701910191,
+        "completed": 1791701912185
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Everything staged except .opencode/. Now commit with the exact message. I'll use a heredoc to preserve the exact message.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Everything staged except .opencode/. Now commit with the exact message. I'll use a heredoc to preserve the exact message.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701905695,
+            "completed": 1791701910143
+          }
+        },
+        {
+          "type": "text",
+          "text": "All intended files staged, `.opencode/` left untracked. Committing with the exact message:\n"
+        },
+        {
+          "type": "tool",
+          "id": "call_c76d4afe61914f8fb9e2d805",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git commit -m \"$(cat <<'EOF'\nfeat: prompt v1 + versioned prompts, baseline v1 (T-15)\n- vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it\n- v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND)\n- fix: append_anchor only checks anchors of its own run label\n- baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6)\n- server: make test 168 passed; make eval-check matches v0 and v1\nEOF\n)\" && git log --oneline -2 && git status --short | head -5"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "[main 6da7451] feat: prompt v1 + versioned prompts, baseline v1 (T-15) - vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it - v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND) - fix: append_anchor only checks anchors of its own run label - baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6) - server: make test 168 passed; make eval-check matches v0 and v1\n 43 files changed, 1553 insertions(+), 13 deletions(-)\n create mode 100644 eval/baselines/v1.json\n create mode 100644 eval/cache/0daf5be784dc5a8404e59676732c6bc714442db3656060f47221c42a09445212.json\n create mode 100644 eval/cache/16c09457893a89c101acab4c8cf2cfefe87f184c3c46455f8d5dc58cee48e691.json\n create mode 100644 eval/cache/16f9b61db855566a35ce03504cae178f10acc101239099e13d4b848213c8884c.json\n create mode 100644 eval/cache/1a092c6752b5e285a62e9e7bf8df46a1e30120753d08c40c92ba16bdd4775ec2.json\n create mode 100644 eval/cache/2122f49bd6e82c41617ccff82dafaaec0af06b52bb2fb61d951249032ec4ff13.json\n create mode 100644 eval/cache/23634fe906b650a49a9e5d55aa410f5ac989a4efda6f5114074385ba3e10d1b2.json\n create mode 100644 eval/cache/38889662e56e7549ef967b83dfa5b33c25df5f84e8630c70b60b68fbf158b223.json\n create mode 100644 eval/cache/3ab9d9e0152eeabd0c3a8c5e70434e5b357325fe8069e00279bf3f8c59194d2f.json\n create mode 100644 eval/cache/42231619d721cceb1b509ea4c7a3346bfd4e3edc5055e4a3a7a75f74fa6c54ef.json\n create mode 100644 eval/cache/4547a45d3b696d925f874f00bef5c1c36383f51b6545b52169eb3ac79e9e499b.json\n create mode 100644 eval/cache/4c22c6d8ab56ff2aedb19ede05623f5624615e2dc3031f57a966d295e413b997.json\n create mode 100644 eval/cache/59e593f2ac5409993048ebe3339e8217f51209f14a9bd14973e67d146a73fb8f.json\n create mode 100644 eval/cache/77fd53733a46fe93d5626cc5c33465fc435c546bd65e471c948ab83720973893.json\n create mode 100644 eval/cache/7da5433651b1ac478913c4debc3937575af0bd87cec4ed4b7b23a364e9819469.json\n create mode 100644 eval/cache/8a08ce4bad251ac884f15f8fa3f7b94414a7578f858df45a1bcb7862a8710891.json\n create mode 100644 eval/cache/8e046ace6d322cc47e1f0270dad69193aa2cfac00567593ea8703aa1cc65e0e2.json\n create mode 100644 eval/cache/949fa98c56c2647bbce324d4cb0f9f3ec859811b595fc01c0caab61bceb4e131.json\n create mode 100644 eval/cache/9856473a83b569f07308a20603330f91f854650b1ee144af8824e36d187911dd.json\n create mode 100644 eval/cache/9c313746a0d0ab2e457c64f4e2936f350172414e7e240b22f0e97253724221de.json\n create mode 100644 eval/cache/ae670b303cf1fb2a6ce4fd94260bba74b2abcaf41ef84fc7c8069e446734992f.json\n create mode 100644 eval/cache/ba8b55feb9d4149492d8beccce1502582e6858506bf53b5ef759bca1ac85651c.json\n create mode 100644 eval/cache/cdbc7e618ad953db162250fdc676f21363ba3616d2d24075acaf97c7a7b7f410.json\n create mode 100644 eval/cache/d779f833b3d5f0cb27b26db4de17a3b9b6f3978da16af07206db7863d3803c4c.json\n create mode 100644 eval/cache/e00e4ec4588b8cd3baf8a24036c770c885a641cc5b324ed3662d9509d8b67046.json\n create mode 100644 eval/cache/e5e246663a210484de1ce934ba0c4c79db27fe47c8f7740a5259d625900de123.json\n create mode 100644 eval/cache/f708b8713abd8d36afd724d52bbd49ada2bf7aaab9f21098f828541d97d42bad.json\n create mode 100644 eval/cache/f78622e634ffbd2fadac5ab72e419f5ec543ffdee041a506e560a2127ebf27e2.json\n create mode 100644 eval/results/v1.json\n create mode 100644 receipts/v1/inc_0001.json\n create mode 100644 receipts/v1/inc_0002.json\n create mode 100644 receipts/v1/inc_0003.json\n create mode 100644 receipts/v1/inc_0004.json\n create mode 100644 receipts/v1/inc_0005.json\n create mode 100644 receipts/v1/inc_0006.json\n create mode 100644 receipts/v1/inc_0007.json\n6da7451 feat: prompt v1 + versioned prompts, baseline v1 (T-15) - vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it - v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND) - fix: append_anchor only checks anchors of its own run label - baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6) - server: make test 168 passed; make eval-check matches v0 and v1\n6bfd45d feat: eval runner with record/replay, 7 starred scenarios, baseline v0 (T-13, T-14)\n?? .opencode/skills/\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701906798,
+            "ran": 1791701910157,
+            "completed": 1791701912078
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 2088,
+        "output": 258,
+        "reasoning": 31,
+        "cache": {
+          "read": 10496,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c18bae001W5ggICHXCiQCXz",
+      "time": {
+        "created": 1791701912681,
+        "streamed": 1791701923405,
+        "completed": 1791701924488
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The commit went through, but there's a problem: the commit message got collapsed onto one line. Looking at the log output, the heredoc newlines seem to have been lost — the message shows as a single line. Wait, actually that's how `git log --oneline` displays it — no wait, `--oneline` shows only the subject line, but here the whole message appears on one line. Let me check the actual message with `git log -1 --format=%B` to see if the newlines were preserved.\n\nActually, the issue: `git commit -m \"$(cat <<'EOF' ... EOF)\"` — command substitution strips trailing newlines but preserves internal newlines. The message should have internal newlines. But `git log --oneline` replaces newlines with spaces in its display? Actually, `git log --oneline` shows subject only... hmm, but it showed the whole message. Actually with newer git versions, `--oneline` shows the full subject line, and if the message has embedded newlines, the subject is only the first line. But here it shows everything on one line, which suggests the newlines may have been preserved but oneline is displaying... no.\n\nWait, looking carefully: the output shows the entire message on one line in the commit summary line `[main 6da7451] feat: prompt v1...`. That's git's default commit summary output, which shows the full message with newlines converted... Actually no, git's default commit output preserves the message structure.\n\nLet me verify with `git log -1 --format=%B` or `git cat-file` to check the raw message. The concern is whether the newlines survived. In bash, `\"$(cat <<'EOF' ...)\"` preserves internal newlines. So the message should be multi-line. But the display in both the commit output and `--oneline` shows it on one line.\n\nActually, `git log --oneline` DOES show the entire message collapsed? No — `--oneline` is `--pretty=oneline --abbrev-commit`, and `--pretty=oneline` shows the subject line only... hmm, actually `%s` in oneline format only shows the subject (first line). But we're seeing the whole thing.\n\nHmm wait, maybe the shell heredoc inside the command tool lost the newlines. Let me just verify the raw commit message.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The commit went through, but there's a problem: the commit message got collapsed onto one line. Looking at the log output, the heredoc newlines seem to have been lost — the message shows as a single line. Wait, actually that's how `git log --oneline` displays it — no wait, `--oneline` shows only the subject line, but here the whole message appears on one line. Let me check the actual message with `git log -1 --format=%B` to see if the newlines were preserved.\n\nActually, the issue: `git commit -m \"$(cat <<'EOF' ... EOF)\"` — command substitution strips trailing newlines but preserves internal newlines. The message should have internal newlines. But `git log --oneline` replaces newlines with spaces in its display? Actually, `git log --oneline` shows subject only... hmm, but it showed the whole message. Actually with newer git versions, `--oneline` shows the full subject line, and if the message has embedded newlines, the subject is only the first line. But here it shows everything on one line, which suggests the newlines may have been preserved but oneline is displaying... no.\n\nWait, looking carefully: the output shows the entire message on one line in the commit summary line `[main 6da7451] feat: prompt v1...`. That's git's default commit summary output, which shows the full message with newlines converted... Actually no, git's default commit output preserves the message structure.\n\nLet me verify with `git log -1 --format=%B` or `git cat-file` to check the raw message. The concern is whether the newlines survived. In bash, `\"$(cat <<'EOF' ...)\"` preserves internal newlines. So the message should be multi-line. But the display in both the commit output and `--oneline` shows it on one line.\n\nActually, `git log --oneline` DOES show the entire message collapsed? No — `--oneline` is `--pretty=oneline --abbrev-commit`, and `--pretty=oneline` shows the subject line only... hmm, actually `%s` in oneline format only shows the subject (first line). But we're seeing the whole thing.\n\nHmm wait, maybe the shell heredoc inside the command tool lost the newlines. Let me just verify the raw commit message.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701914414,
+            "completed": 1791701923209
+          }
+        },
+        {
+          "type": "text",
+          "text": "The commit succeeded, but the message display looks suspiciously one-line. Let me verify the raw message preserved its newlines:\n"
+        },
+        {
+          "type": "tool",
+          "id": "call_d571864eabe84bb7bda3ecc7",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git log -1 --pretty=format:\"%B\" | cat -A | head -10"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "feat: prompt v1 + versioned prompts, baseline v1 (T-15)$\n- vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it$\n- v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND)$\n- fix: append_anchor only checks anchors of its own run label$\n- baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6)$\n- server: make test 168 passed; make eval-check matches v0 and v1$\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701922878,
+            "ran": 1791701923306,
+            "completed": 1791701923682
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 2938,
+        "output": 33,
+        "reasoning": 537,
+        "cache": {
+          "read": 12544,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c1bc77001xIeiB7up74J4E2",
+      "time": {
+        "created": 1791701925677,
+        "streamed": 1791701930849,
+        "completed": 1791701931275
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The commit message is correctly multi-line — each line ends with `$` (newline marker from cat -A). The earlier one-line display was just git's oneline rendering collapsing it.\n\nCommit 6da7451 created:\n- 43 files changed, 1553 insertions, 13 deletions\n- .opencode/ left untracked ✓\n- No docs/markdown edited ✓ (only code, eval artifacts, anchors.txt, receipts)\n- Not pushed ✓ (per instructions — commit only)\n\nLet me verify push state — user said do not push. I haven't pushed. Confirm nothing was pushed: git status would show \"ahead of origin\" if there's a remote. Let me quickly confirm the branch state to report accurately.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The commit message is correctly multi-line — each line ends with `$` (newline marker from cat -A). The earlier one-line display was just git's oneline rendering collapsing it.\n\nCommit 6da7451 created:\n- 43 files changed, 1553 insertions, 13 deletions\n- .opencode/ left untracked ✓\n- No docs/markdown edited ✓ (only code, eval artifacts, anchors.txt, receipts)\n- Not pushed ✓ (per instructions — commit only)\n\nLet me verify push state — user said do not push. I haven't pushed. Confirm nothing was pushed: git status would show \"ahead of origin\" if there's a remote. Let me quickly confirm the branch state to report accurately.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701927581,
+            "completed": 1791701930823
+          }
+        },
+        {
+          "type": "text",
+          "text": "The message is intact as a proper multi-line commit. Quick confirmation of the repo state:\n\n"
+        },
+        {
+          "type": "tool",
+          "id": "call_0e038ccac5744120a81ab882",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git status -sb | head -2 && git show --stat HEAD --format=\"%h %s\" | head -12"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "## main...origin/main [ahead 1]\n?? .opencode/skills/\n6da7451 feat: prompt v1 + versioned prompts, baseline v1 (T-15) - vigil/prompt.py: PROMPT_V0 frozen verbatim (hash-tested), PROMPT_V1 default; --prompt flag; baselines record prompt_version and replay uses it - v1 fixes v0 failures: D3 (escalated a different-orders trap instead of skipping) and P3 (retryable read error not retried; incident id used as evidence_ref, denied EVIDENCE_NOT_FOUND) - fix: append_anchor only checks anchors of its own run label - baseline v1 (live, claude-haiku): 7/7 correct, 0 unsafe actions, recovery 2/2, median 4 steps (v0: 5/7, recovery 1/2, median 6) - server: make test 168 passed; make eval-check matches v0 and v1\n\n anchors.txt                                        |   1 +\n eval/baselines/v1.json                             | 171 +++++++++++++++++++++\n ...76732c6bc714442db3656060f47221c42a09445212.json |  19 +++\n ...4c8cf2cfefe87f184c3c46455f8d5dc58cee48e691.json |  12 ++\n ...504cae178f10acc101239099e13d4b848213c8884c.json |  14 ++\n ...7bf8df46a1e30120753d08c40c92ba16bdd4775ec2.json |  14 ++\n ...f82dafaaec0af06b52bb2fb61d951249032ec4ff13.json |  14 ++\n ...55aa410f5ac989a4efda6f5114074385ba3e10d1b2.json |  18 +++\n ...83dfa5b33c25df5f84e8630c70b60b68fbf158b223.json |  14 ++\n ...5e70434e5b357325fe8069e00279bf3f8c59194d2f.json |  14 ++\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791701930179,
+            "ran": 1791701930837,
+            "completed": 1791701931077
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 399,
+        "output": 57,
+        "reasoning": 164,
+        "cache": {
+          "read": 15872,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c1d64e001EQww3tPcxWHgeK",
+      "time": {
+        "created": 1791701933095,
+        "streamed": 1791701938677,
+        "completed": 1791701939491
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Done. The commit is created:\n- 6da7451, 43 files, 1553 insertions, 13 deletions\n- Multi-line message exactly as specified\n- .opencode/ left untracked\n- Not pushed (main is ahead of origin/main by 1)\n- No docs/markdown files touched (only anchors.txt, eval artifacts, receipts, and vigil/ code files)\n\nReport concisely.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Done. The commit is created:\n- 6da7451, 43 files, 1553 insertions, 13 deletions\n- Multi-line message exactly as specified\n- .opencode/ left untracked\n- Not pushed (main is ahead of origin/main by 1)\n- No docs/markdown files touched (only anchors.txt, eval artifacts, receipts, and vigil/ code files)\n\nReport concisely.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791701934497,
+            "completed": 1791701938286
+          }
+        },
+        {
+          "type": "text",
+          "text": "Committed as `6da7451` — not pushed (main is ahead of origin/main by 1), `.opencode/` left untracked, no docs/markdown touched.\n\n- 43 files: `anchors.txt`, `eval/baselines/v1.json`, `eval/results/v1.json`, 33 new replay-cache JSONs, `receipts/v1/inc_0001–0007.json`, plus `eval/run.py`, `tests/test_eval.py`, `vigil/{chain,llm,prompt,replay}.py`\n- Multi-line commit message preserved exactly as given (verified with `cat -A` — 6 lines, correct endings)"
+        }
+      ],
+      "snapshot": {
+        "start": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "end": "65acd7f6dfdda04cb1422edde8a405e9a0807d48",
+        "files": []
+      },
+      "finish": "stop",
+      "rawFinish": "stop",
+      "cost": 0,
+      "tokens": {
+        "input": 747,
+        "output": 170,
+        "reasoning": 82,
+        "cache": {
+          "read": 16384,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_129c1f58b001UHyT2mZl3t3Krn",
+      "time": {
+        "created": 1791701939595
+      },
+      "type": "idle",
+      "outcome": "succeeded"
+    }
+  ]
+}
