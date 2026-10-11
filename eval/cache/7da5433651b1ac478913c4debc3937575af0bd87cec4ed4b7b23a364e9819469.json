@@ -1,0 +1,14 @@
+{
+ "key": "sha256:7da5433651b1ac478913c4debc3937575af0bd87cec4ed4b7b23a364e9819469",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrieve charge details to understand the transaction associated with the missing webhook.",
+  "tokens_in": 3089,
+  "tokens_out": 184,
+  "tool": "get_provider_charge"
+ }
+}

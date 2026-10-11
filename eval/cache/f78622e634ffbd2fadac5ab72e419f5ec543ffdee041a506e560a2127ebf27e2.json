@@ -1,0 +1,14 @@
+{
+ "key": "sha256:f78622e634ffbd2fadac5ab72e419f5ec543ffdee041a506e560a2127ebf27e2",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0001"
+  },
+  "kind": "tool",
+  "rationale": "Investigate the charge related to evidence_conflict incident inc_0007.",
+  "tokens_in": 3140,
+  "tokens_out": 118,
+  "tool": "get_provider_charge"
+ }
+}

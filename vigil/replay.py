@@ -68,9 +68,9 @@ class RecordingModel:
 class ReplayModel:
     """Serves recorded responses. Builds the exact request the live model would send, then looks it up."""
 
-    def __init__(self, model: str, cache_dir: str, config: Optional[Config] = None) -> None:
+    def __init__(self, model: str, cache_dir: str, config: Optional[Config] = None, prompt_version: Optional[str] = None) -> None:
         self.model, self.cache_dir = model, cache_dir
-        self._shape = LiveModel(config or Config(llm_model=model), client=_NoClient())
+        self._shape = LiveModel(config or Config(llm_model=model), client=_NoClient(), prompt_version=prompt_version)
 
     def propose(self, incident: dict, turns: list, step: int) -> Proposal:
         key = request_key(self.model, self._shape.build_messages(incident, turns, step), self._shape._tools)

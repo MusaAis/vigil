@@ -1,0 +1,19 @@
+{
+ "key": "sha256:e00e4ec4588b8cd3baf8a24036c770c885a641cc5b324ed3662d9509d8b67046",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0002",
+   "evidence_refs": [
+    "ch_0001",
+    "ch_0002"
+   ],
+   "idempotency_key": "inc_0001:refund:1"
+  },
+  "kind": "tool",
+  "rationale": "Refunding duplicate charge ch_0002; same order ord_0001, customer cust_01, amount 2500000 NGN charged twice within 40 seconds.",
+  "tokens_in": 3340,
+  "tokens_out": 231,
+  "tool": "issue_refund"
+ }
+}

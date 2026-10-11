@@ -1,0 +1,12 @@
+{
+ "key": "sha256:16c09457893a89c101acab4c8cf2cfefe87f184c3c46455f8d5dc58cee48e691",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {},
+  "kind": "skip",
+  "rationale": "Charges are on different orders (ord_0001 and ord_0002), so these are separate purchases, not a duplicate charge.",
+  "tokens_in": 3340,
+  "tokens_out": 247,
+  "tool": null
+ }
+}

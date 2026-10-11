@@ -1,0 +1,14 @@
+{
+ "key": "sha256:4547a45d3b696d925f874f00bef5c1c36383f51b6545b52169eb3ac79e9e499b",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Final retry of payout status check after repeated provider errors.",
+  "tokens_in": 3229,
+  "tokens_out": 89,
+  "tool": "get_provider_status"
+ }
+}

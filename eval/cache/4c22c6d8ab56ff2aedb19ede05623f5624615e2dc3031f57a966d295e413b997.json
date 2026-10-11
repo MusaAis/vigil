@@ -1,0 +1,14 @@
+{
+ "key": "sha256:4c22c6d8ab56ff2aedb19ede05623f5624615e2dc3031f57a966d295e413b997",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check ledger entries for ord_0001 to identify the evidence conflict.",
+  "tokens_in": 3542,
+  "tokens_out": 93,
+  "tool": "get_ledger_entries"
+ }
+}

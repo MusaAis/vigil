@@ -1,0 +1,18 @@
+{
+ "key": "sha256:23634fe906b650a49a9e5d55aa410f5ac989a4efda6f5114074385ba3e10d1b2",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "po_0001"
+   ],
+   "idempotency_key": "inc_0003:retry:1",
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Payout po_0001 stuck in processing for over 16 minutes; retrying to resolve stuck_payout incident inc_0003.",
+  "tokens_in": 3393,
+  "tokens_out": 216,
+  "tool": "retry_payout"
+ }
+}

@@ -10,14 +10,16 @@ from typing import Any, Optional
 
 from .config import Config
 from .models import Proposal, Turn
-from .prompt import SYSTEM_PROMPT, tool_specs
+from .prompt import DEFAULT_PROMPT_VERSION, PROMPTS, tool_specs
 
 RATIONALE_MAX = 300
 
 
 class LiveModel:
-    def __init__(self, config: Config, client: Any = None, max_tokens: int = 600) -> None:
+    def __init__(self, config: Config, client: Any = None, max_tokens: int = 600, prompt_version: Optional[str] = None) -> None:
         self.config, self.max_tokens = config, max_tokens
+        self.prompt_version = prompt_version or DEFAULT_PROMPT_VERSION
+        self.system = PROMPTS[self.prompt_version]
         if client is None:
             if not config.llm_api_key:
                 raise RuntimeError("LLM_API_KEY (or LITELLM_API_KEY) is not set")
@@ -28,7 +30,7 @@ class LiveModel:
 
     def build_messages(self, incident: dict, turns: list, step: int) -> list[dict]:
         msgs: list[dict] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": self.system},
             {"role": "user", "content": json.dumps({"incident": incident, "step": step}, sort_keys=True)},
         ]
         for i, t in enumerate(turns):

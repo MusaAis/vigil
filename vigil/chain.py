@@ -215,7 +215,7 @@ def verify(db_path: str, anchors_path: Optional[str] = None, run: Optional[str] 
 
 def append_anchor(chain: Chain, anchors_path: str, run_label: str, git_sha: str) -> str:
     """Append the current chain head to anchors.txt. Refuses if the chain does not verify."""
-    res = verify(chain.db_path, anchors_path)
+    res = verify(chain.db_path, anchors_path, run=run_label)  # only this run's anchors apply to this chain
     if not res.ok:
         raise RuntimeError(f"refusing to anchor a broken chain: {res.line()}")
     if res.head_seq is None:

@@ -168,3 +168,52 @@ def test_cost_is_computed_only_when_prices_are_configured(tmp_path):
     # 4000 in x 1.00 + 200 out x 5.00 per million tokens = 5000 micro-USD
     assert priced["scenarios"][0]["cost_usd_micro"] == 5000
     assert priced["metrics"]["cost_per_incident_usd_micro"] == 5000
+
+
+# ------------------------------------------------------------------ prompt versions (T-15)
+
+def test_prompt_v0_is_frozen_so_baseline_v0_keeps_replaying():
+    from vigil.canonical import sha256_json
+    from vigil.prompt import DEFAULT_PROMPT_VERSION, PROMPT_V0, PROMPTS
+    assert sha256_json({"p": PROMPT_V0}) == "sha256:48ffdce0ba13f3bb63896065833a643dafda72d3f5e7e0e60f780b382b761c0d"
+    assert PROMPTS["v0"] is PROMPT_V0 and DEFAULT_PROMPT_VERSION == "v1" and PROMPTS["v1"] != PROMPT_V0
+
+
+def test_v1_prompt_states_the_rules_the_v0_failures_needed():
+    from vigil.prompt import PROMPTS
+    p = PROMPTS["v1"]
+    assert "different orders are separate purchases" in p.lower()
+    assert "incident id is not evidence" in p.lower()
+    assert "retryable error, call it again" in p
+    assert "EVIDENCE_NOT_FOUND" in p and "untrusted" in p      # injection rule kept
+
+
+def test_baseline_without_prompt_version_replays_with_v0(tmp_path):
+    calls, cache = [], tmp_path / "cache"
+    rec = live(tmp_path, cache, calls, prompt_version="v0")
+    assert rec["prompt_version"] == "v0"
+    old = {k: v for k, v in rec.items() if k != "prompt_version"}     # a baseline written before versioning
+    rep = run_eval(label="rec", mode="replay", only=["D3"], config=CFG, baseline=old, cache_dir=str(cache),
+                   db_path=str(tmp_path / "rep.db"))
+    assert rep["prompt_version"] == "v0" and diff_against_baseline(rep, old) == []
+
+
+def test_replaying_a_v1_recording_with_a_v0_baseline_misses(tmp_path):
+    calls, cache = [], tmp_path / "cache"
+    rec = live(tmp_path, cache, calls, prompt_version="v1")
+    assert rec["prompt_version"] == "v1"
+    with pytest.raises(ReplayMiss):
+        run_eval(label="rec", mode="replay", only=["D3"], config=CFG, baseline=dict(rec, prompt_version="v0"),
+                 cache_dir=str(cache), db_path=str(tmp_path / "rep.db"))
+
+
+def test_two_eval_chains_can_share_one_anchors_file(tmp_path):
+    from vigil.chain import append_anchor
+    from vigil.clock import VirtualClock
+    anchors = str(tmp_path / "anchors.txt")
+    a = offline(tmp_path, "a")                       # longer chain
+    b = run_eval(label="b", mode="offline", only=["D3"], db_path=str(tmp_path / "b.db"))   # shorter chain
+    from vigil.chain import Chain
+    append_anchor(Chain(a["db_path"], VirtualClock("2026-10-10T08:00:00Z")), anchors, "a", "g1")
+    append_anchor(Chain(b["db_path"], VirtualClock("2026-10-10T08:00:00Z")), anchors, "b", "g2")   # used to be refused
+    assert verify(a["db_path"], anchors, run="a").ok and verify(b["db_path"], anchors, run="b").ok

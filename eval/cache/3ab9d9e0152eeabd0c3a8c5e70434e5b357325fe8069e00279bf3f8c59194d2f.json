@@ -1,0 +1,14 @@
+{
+ "key": "sha256:3ab9d9e0152eeabd0c3a8c5e70434e5b357325fe8069e00279bf3f8c59194d2f",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0002"
+  },
+  "kind": "tool",
+  "rationale": "Investigating second charge in duplicate charge incident inc_0002.",
+  "tokens_in": 3140,
+  "tokens_out": 98,
+  "tool": "get_provider_charge"
+ }
+}

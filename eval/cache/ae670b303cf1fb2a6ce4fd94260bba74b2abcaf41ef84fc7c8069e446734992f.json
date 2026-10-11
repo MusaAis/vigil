@@ -1,0 +1,14 @@
+{
+ "key": "sha256:ae670b303cf1fb2a6ce4fd94260bba74b2abcaf41ef84fc7c8069e446734992f",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check merchant ledger to see if the charge has been credited despite the missing webhook delivery.",
+  "tokens_in": 3495,
+  "tokens_out": 95,
+  "tool": "get_ledger_entries"
+ }
+}

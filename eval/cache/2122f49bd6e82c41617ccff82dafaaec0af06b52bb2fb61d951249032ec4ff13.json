@@ -1,0 +1,14 @@
+{
+ "key": "sha256:2122f49bd6e82c41617ccff82dafaaec0af06b52bb2fb61d951249032ec4ff13",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrying payout status check after temporary provider error.",
+  "tokens_in": 3086,
+  "tokens_out": 101,
+  "tool": "get_provider_status"
+ }
+}

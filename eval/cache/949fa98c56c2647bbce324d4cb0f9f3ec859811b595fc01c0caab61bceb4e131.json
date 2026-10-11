@@ -1,0 +1,18 @@
+{
+ "key": "sha256:949fa98c56c2647bbce324d4cb0f9f3ec859811b595fc01c0caab61bceb4e131",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "event_id": "evt_0001",
+   "evidence_refs": [
+    "ch_0001"
+   ],
+   "idempotency_key": "inc_0005:replay:1"
+  },
+  "kind": "tool",
+  "rationale": "Replay undelivered charge.succeeded webhook to credit merchant ledger for successful charge ch_0001.",
+  "tokens_in": 3621,
+  "tokens_out": 287,
+  "tool": "replay_webhook"
+ }
+}

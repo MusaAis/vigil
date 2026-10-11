@@ -1,0 +1,19 @@
+{
+ "key": "sha256:0daf5be784dc5a8404e59676732c6bc714442db3656060f47221c42a09445212",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "ch_0001",
+    "evt_0001"
+   ],
+   "reason_code": "LEDGER_PROVIDER_MISMATCH",
+   "summary": "Charge ch_0001 has failed status at provider but ledger shows successful revenue credit. Webhook was delivered. Conflicting evidence requires manual review to determine correct recovery action."
+  },
+  "kind": "tool",
+  "rationale": "Provider and ledger state conflict: failed charge incorrectly credited to revenue; requires human decision on recovery.",
+  "tokens_in": 3862,
+  "tokens_out": 385,
+  "tool": "escalate"
+ }
+}

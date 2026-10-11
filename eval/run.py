@@ -224,7 +224,7 @@ def run_eval(*, label: str, mode: str, only: Optional[list] = None, record: bool
              baseline: Optional[dict] = None, receipts_dir: Optional[str] = None, db_path: Optional[str] = None,
              cache_dir: str = CACHE_DIR, scenario_dir: Optional[str] = None, policy_path: str = "policy.yaml",
              max_tokens: Optional[int] = None, prices: tuple = (None, None), client: Any = None,
-             tracer: Optional[Tracer] = None) -> dict:
+             tracer: Optional[Tracer] = None, prompt_version: Optional[str] = None) -> dict:
     cfg = config or Config.from_env()
     policy = load_policy(policy_path)
     specs = load_all(only=only) if scenario_dir is None else load_all(scenario_dir, only)
@@ -235,13 +235,15 @@ def run_eval(*, label: str, mode: str, only: Optional[list] = None, record: bool
     sha = git_sha()
     model_name = cfg.llm_model
     if mode == "live":
-        live = LiveModel(cfg, client=client)
+        live = LiveModel(cfg, client=client, prompt_version=prompt_version)
+        prompt_version = live.prompt_version
         model: Any = RecordingModel(live, cache_dir) if record else live
         model = BudgetModel(model, max_tokens if max_tokens is not None else cfg.daily_live_budget_tokens)
         tracer = tracer or Tracer.from_env(f"vigil-eval-{label}")
     elif mode == "replay":
         model_name = (baseline or {}).get("model") or cfg.llm_model
-        model = ReplayModel(model_name, cache_dir, cfg)
+        prompt_version = (baseline or {}).get("prompt_version", "v0")  # baselines recorded before versioning used v0
+        model = ReplayModel(model_name, cache_dir, cfg, prompt_version)
         ids = {s["id"]: s["trace_id"] for s in (baseline or {}).get("scenarios", []) if s.get("trace_id")}
         tracer = None  # a FixedTracer is built per scenario below
     elif mode == "offline":
@@ -267,7 +269,7 @@ def run_eval(*, label: str, mode: str, only: Optional[list] = None, record: bool
     head = chain.head()
     anchor = verify(db)
     result = {
-        "run_label": label, "git_sha": sha, "mode": mode, "model": model_name, "started_at": started,
+        "run_label": label, "git_sha": sha, "mode": mode, "model": model_name, "prompt_version": prompt_version if mode != "offline" else None, "started_at": started,
         "finished_at": clock.now(), "recorded_at": SystemClock().now(),
         "chain_head": head["entry_hash"] if head else None, "chain_head_seq": head["seq"] if head else None,
         "chain_verified": anchor.ok, "db_path": db, "policy_sha256": policy.sha256,
@@ -279,6 +281,8 @@ def run_eval(*, label: str, mode: str, only: Optional[list] = None, record: bool
 
 def diff_against_baseline(result: dict, baseline: dict) -> list:
     diffs = []
+    if result.get("prompt_version") != baseline.get("prompt_version", "v0"):
+        diffs.append(f"prompt_version: {result.get('prompt_version')!r} != baseline {baseline.get('prompt_version', 'v0')!r}")
     if result["chain_head"] != baseline.get("chain_head"):
         diffs.append(f"chain_head: {result['chain_head']} != baseline {baseline.get('chain_head')}")
     if result["metrics"] != baseline.get("metrics"):
@@ -300,7 +304,7 @@ def diff_against_baseline(result: dict, baseline: dict) -> list:
 
 def summary_lines(result: dict) -> list:
     m = result["metrics"]
-    lines = [f"run {result['run_label']} mode={result['mode']} model={result['model']} (SIMULATED data)"]
+    lines = [f"run {result['run_label']} mode={result['mode']} model={result['model']} prompt={result.get('prompt_version')} (SIMULATED data)"]
     for s in result["scenarios"]:
         lines.append(f"  {s['id']:<3} {s['outcome']:<10} expected {s['expected_outcome']:<9} "
                      f"{'OK ' if s['correct'] else 'BAD'} steps={s['steps']} denials={s['policy_denials']} "
@@ -327,6 +331,7 @@ def main(argv: Optional[list] = None) -> int:
     ap.add_argument("--record", action="store_true", help="live only: write results, baseline (if absent) and cache")
     ap.add_argument("--check", action="store_true", help="replay only: compare with the committed baseline, exit 1 on any difference")
     ap.add_argument("--anchor", action="store_true", help="with --record: append the chain head to anchors.txt")
+    ap.add_argument("--prompt", default=None, help="live only: prompt version (default: latest in vigil/prompt.py)")
     ap.add_argument("--max-tokens", type=int, default=None, help="live token budget for this run")
     ap.add_argument("--out", default=None, help="also write the result JSON here")
     a = ap.parse_args(argv)
@@ -352,7 +357,7 @@ def main(argv: Optional[list] = None) -> int:
     try:
         result = run_eval(label=a.label, mode=a.mode, only=only, record=a.record, baseline=baseline,
                           receipts_dir=os.path.join("receipts", a.label) if a.record else None,
-                          max_tokens=a.max_tokens, prices=prices)
+                          max_tokens=a.max_tokens, prices=prices, prompt_version=a.prompt)
     except ReplayMiss as exc:
         print(f"ERROR: {exc}")
         return 1
