@@ -92,7 +92,8 @@ class Verifier:
         elif t == "stuck_payout":
             p = self.view.payout(rel[0])
             age = int((parse_ts(self.view.now()) - parse_ts(p["created_at"])).total_seconds())
-            still = p["status"] in ("pending", "processing") and age > self.policy.payout_sla_seconds
+            still = p["status"] == "failed" or \
+                (p["status"] in ("pending", "processing") and age > self.policy.payout_sla_seconds)
         elif t == "evidence_conflict":
             ch = self.view.charge(rel[0])
             still = ch["status"] == "failed" and bool(self.view.revenue_credits(ch["charge_id"]))

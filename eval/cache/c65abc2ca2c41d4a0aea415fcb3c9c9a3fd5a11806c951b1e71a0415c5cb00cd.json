@@ -1,0 +1,18 @@
+{
+ "key": "sha256:c65abc2ca2c41d4a0aea415fcb3c9c9a3fd5a11806c951b1e71a0415c5cb00cd",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "po_0001"
+   ],
+   "idempotency_key": "inc_0002:retry:1",
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrying stuck payout po_0001 that has been in processing state for over 16 minutes with retryable status.",
+  "tokens_in": 3107,
+  "tokens_out": 222,
+  "tool": "retry_payout"
+ }
+}

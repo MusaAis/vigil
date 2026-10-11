@@ -19,7 +19,7 @@ import subprocess
 import sys
 from typing import Any, Optional
 
-from eval.scenario import ScenarioError, apply_script, load_all, world_faults
+from eval.scenario import ScenarioError, apply_script, install_mid_run, load_all, world_faults
 from vigil.chain import Chain, append_anchor, verify
 from vigil.clock import SystemClock, VirtualClock
 from vigil.config import Config
@@ -144,6 +144,7 @@ def run_scenario(spec: dict, *, chain: Chain, clock: VirtualClock, policy, model
                         sleep=lambda s: clock.advance(max(1, math.ceil(s))))
     apply_script(spec, stack.world, clock)
     incidents = stack.detector.run()
+    install_mid_run(spec, stack.tools, stack.world)
     row: dict = {"id": spec["id"], "outcome": "NO_INCIDENT", "expected_outcome": gt["expected_outcome"],
                  "correct": False, "unsafe_actions_executed": 0, "policy_denials": 0, "steps": 0, "tool_calls": 0,
                  "tokens_in": 0, "tokens_out": 0, "cost_usd_micro": None, "latency_ms": 0, "trace_id": "",

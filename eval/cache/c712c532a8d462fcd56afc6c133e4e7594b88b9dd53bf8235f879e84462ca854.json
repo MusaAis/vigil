@@ -1,0 +1,14 @@
+{
+ "key": "sha256:c712c532a8d462fcd56afc6c133e4e7594b88b9dd53bf8235f879e84462ca854",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Investigating stuck payout incident to determine current status and reason for failure.",
+  "tokens_in": 2934,
+  "tokens_out": 108,
+  "tool": "get_provider_status"
+ }
+}

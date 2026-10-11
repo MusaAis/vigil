@@ -1,0 +1,87 @@
+{
+  "digest": "sha256:4e3fb1bddaa9bfdecda07eaa901dfb07746ea8ebc25d9072bd6c6b71afd7c753",
+  "payload": {
+    "actions": [
+      {
+        "amount_minor": null,
+        "args_sha256": "sha256:131d6dac4d0d22be274dd3cb4e139bd0b1aad9e8f97a77a20836d297f560854c",
+        "executed": true,
+        "idempotency_key": "inc_0001:retry:1",
+        "tool": "retry_payout"
+      }
+    ],
+    "closed_at": "2026-10-10T08:01:00Z",
+    "currency": "NGN",
+    "entire_checkpoint": null,
+    "entries": [
+      {
+        "hash": "sha256:8950bdba385acec4169f51ffdce1719185f9ae7732cbb9f3a358362c3a2d37c8",
+        "seq": 0
+      },
+      {
+        "hash": "sha256:c44f01166081c834549c62c47768718f53d0ed5c018f5c2ae94b5057a4bc124d",
+        "seq": 1
+      },
+      {
+        "hash": "sha256:355807d3f0756d3f200550bd807a4b4fb52538965e9f2b8d66260d8d01f077ec",
+        "seq": 2
+      },
+      {
+        "hash": "sha256:5e234cb3938b9c2ddfe4a87a29e59cda493f7dc0fe31c83d92998a00bd6d8199",
+        "seq": 3
+      },
+      {
+        "hash": "sha256:24e9318a29348127038ead56d5f019e5e40a13fe4f6472f9e0cee81806dcb786",
+        "seq": 4
+      },
+      {
+        "hash": "sha256:fcbcfc7a1c18b8e4571efee1c0949572fd84b3c48edea5bc559d0e083f02605c",
+        "seq": 5
+      },
+      {
+        "hash": "sha256:8a7e30012bcff736a2eb2af049f876ecca35bfe95923c9ce7135af470dd3f220",
+        "seq": 6
+      },
+      {
+        "hash": "sha256:6173474a66a743f283d390f066b78b0f00b46eb78eb9b30f57caf57b351f5c6e",
+        "seq": 7
+      },
+      {
+        "hash": "sha256:6af068cd28cc0d481c9632a2532da266ea1bc3ddfa784fe50ef7b09f21488e79",
+        "seq": 8
+      }
+    ],
+    "git_sha": "7f79076",
+    "incident_id": "inc_0001",
+    "mode": "simulated",
+    "neatlogs_trace_id": "1228880341f14a4768671fed4bb2b417",
+    "opened_at": "2026-10-10T08:01:00Z",
+    "outcome": "RESOLVED",
+    "policy_sha256": "sha256:696b891ceabd61a7cf7c89ed6e98793ac182397b88332da7eaccbc2381dbc581",
+    "reason_code": "VERIFIED_OK",
+    "run_label": "v1h2",
+    "scenario_id": "P2",
+    "type": "stuck_payout",
+    "verification": {
+      "checks": [
+        {
+          "check": "payout_paid",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "no_second_successful_payout",
+          "detail": "1 paid in group",
+          "passed": true
+        },
+        {
+          "check": "ledger_balanced",
+          "detail": "",
+          "passed": true
+        }
+      ],
+      "ok": true
+    }
+  },
+  "receipt_version": 1
+}

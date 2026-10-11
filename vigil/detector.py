@@ -51,10 +51,10 @@ class Detector:
                     self._age(c["created_at"]) > self.policy.credit_grace_seconds:
                 open_("missing_webhook", [c["charge_id"]], "MISSING_CREDIT")
 
-        # STUCK_PAYOUT: pending/processing beyond the SLA
+        # STUCK_PAYOUT: failed at the provider, or pending/processing beyond the SLA
         for p in sorted(self.view.payouts(), key=lambda p: p["payout_id"]):
-            if p["status"] in ("pending", "processing") and \
-                    self._age(p["created_at"]) > self.policy.payout_sla_seconds:
+            if p["status"] == "failed" or (p["status"] in ("pending", "processing") and
+                                           self._age(p["created_at"]) > self.policy.payout_sla_seconds):
                 open_("stuck_payout", [p["payout_id"]], "STUCK_PAYOUT")
 
         # CONFLICT: ledger credit exists for a charge the provider says failed

@@ -1,0 +1,18 @@
+{
+ "key": "sha256:04dacea4b8ba1a6ac87a17361de147f776fba2eff1ea78dcbd4b424b48701d2e",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "po_0001"
+   ],
+   "idempotency_key": "inc_0001:retry:1",
+   "payout_id": "po_0001"
+  },
+  "kind": "tool",
+  "rationale": "Retrying failed payout that is marked as retryable to resolve stuck payout incident.",
+  "tokens_in": 3101,
+  "tokens_out": 183,
+  "tool": "retry_payout"
+ }
+}

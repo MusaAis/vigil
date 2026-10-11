@@ -11,6 +11,8 @@ from vigil.clock import VirtualClock, parse_ts
 
 SCENARIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scenarios")
 REQUIRED = ("id", "type", "setup", "script", "ground_truth")
+# State changes a scenario may apply to the simulated provider while the agent is running (see install_mid_run).
+MID_RUN_OPS = ("settle_payout", "fail_payout", "inject_ledger_credit")
 
 
 class ScenarioError(ValueError):
@@ -26,6 +28,10 @@ def load_scenario(path: str) -> dict:
     spec.setdefault("faults", [])
     spec.setdefault("untrusted", {})
     spec.setdefault("llm_fixture", None)
+    spec.setdefault("mid_run", [])
+    for step in spec["mid_run"]:
+        if step.get("op") not in MID_RUN_OPS or int(step.get("after_read_calls", 0)) < 1:
+            raise ScenarioError(f"{path}: bad mid_run step {step}; ops {MID_RUN_OPS}, after_read_calls >= 1")
     return spec
 
 
@@ -60,6 +66,43 @@ def _expect(spec: dict, what: str, got: str, declared: str) -> None:
         raise ScenarioError(f"{spec['id']}: {what} was generated as {got} but the scenario declares {declared}")
 
 
+def _apply_state_op(spec: dict, step: dict, world) -> None:
+    """Provider-side state changes shared by the timed script and the mid-run hook."""
+    op = step["op"]
+    if op == "fail_payout":
+        world.fail_payout(step["id"])
+    elif op == "settle_payout":
+        world.settle_payout(step["id"])
+    elif op == "inject_ledger_credit":
+        world.inject_ledger_credit(step["charge"])
+    else:
+        raise ScenarioError(f"{spec['id']}: unknown script op {op!r}")
+
+
+def install_mid_run(spec: dict, tools, world) -> None:
+    """Apply each `mid_run` step once, right after the agent's Nth read-tool call returns.
+
+    The Nth call itself still sees the earlier state, so the change happens between two agent steps. The trigger counts
+    read calls only, so it is deterministic for a given sequence of model proposals (live, replay and offline alike).
+    """
+    plan = spec.get("mid_run") or []
+    if not plan:
+        return
+    inner = tools.call_read
+    state = {"reads": 0, "done": set()}
+
+    def call_read(tool: str, args: dict) -> dict:
+        result = inner(tool, args)
+        state["reads"] += 1
+        for i, step in enumerate(plan):
+            if i not in state["done"] and state["reads"] >= int(step["after_read_calls"]):
+                state["done"].add(i)
+                _apply_state_op(spec, step, world)
+        return result
+
+    tools.call_read = call_read
+
+
 def apply_script(spec: dict, world, clock: VirtualClock) -> int:
     """Create the setup and play the script on a fresh world. Returns the virtual start time (epoch seconds)."""
     start = int(parse_ts(clock.now()).timestamp())
@@ -84,14 +127,8 @@ def apply_script(spec: dict, world, clock: VirtualClock) -> int:
             pid = world.create_payout(step["amount_minor"], status=step.get("status", "pending"),
                                       retryable=step.get("retryable", True))
             _expect(spec, "payout id", pid, step["id"])
-        elif op == "fail_payout":
-            world.fail_payout(step["id"])
-        elif op == "settle_payout":
-            world.settle_payout(step["id"])
-        elif op == "inject_ledger_credit":
-            world.inject_ledger_credit(step["charge"])
         else:
-            raise ScenarioError(f"{spec['id']}: unknown script op {op!r}")
+            _apply_state_op(spec, step, world)
     for obj_id, fields in spec["untrusted"].items():
         kind = {"ch": "charge", "evt": "event"}.get(obj_id.split("_", 1)[0])
         if kind is None or len(fields) != 1:

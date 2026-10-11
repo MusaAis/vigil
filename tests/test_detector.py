@@ -67,6 +67,33 @@ def test_stuck_payout_only_after_sla(tmp_path):
     assert [(i["type"], i["related"]) for i in got] == [("stuck_payout", [p])]
 
 
+def test_failed_payout_opens_an_incident_without_waiting_for_the_sla(tmp_path):
+    e = Env(tmp_path)
+    p = e.world.create_payout(9_000_000, status="failed")
+    got = e.detector.run()
+    assert [(i["type"], i["related"]) for i in got] == [("stuck_payout", [p])]
+    assert e.detector.run() == []                                  # one open incident per (type, related)
+
+
+def test_paid_payout_and_payout_within_sla_open_nothing(tmp_path):
+    e = Env(tmp_path)
+    p = e.world.create_payout(9_000_000, status="processing")
+    q = e.world.create_payout(9_000_000, status="pending")
+    e.clock.advance(1000)
+    e.world.settle_payout(p)
+    e.world.settle_payout(q)
+    assert e.detector.run() == []
+
+
+def test_webhook_delivered_twice_credits_once_and_opens_no_incident(tmp_path):
+    e = Env(tmp_path)
+    o = e.world.create_order("cust_01", AMOUNT)
+    c = e.world.create_charge(o, AMOUNT, webhook="duplicate")
+    e.clock.advance(300)
+    assert len(e.view.revenue_credits(c)) == 1 and e.view.ledger_balanced()
+    assert e.detector.run() == []
+
+
 def test_conflict_failed_charge_with_ledger_credit(tmp_path):
     e = Env(tmp_path)
     o = e.world.create_order("cust_01", AMOUNT)

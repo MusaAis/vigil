@@ -1,0 +1,18 @@
+id: P2
+title: Payout failed at the provider (no stuck age needed); retry with an idempotency key
+seed: 1022
+type: stuck_payout
+setup:
+  customers: [{id: cust_01}]
+  orders: []
+script:
+  - {t: 0, op: payout, id: po_0001, amount_minor: 1500000, status: failed, retryable: true}
+detect_at: 60
+faults: []
+untrusted: {}
+llm_fixture: null
+ground_truth:
+  expected_outcome: RESOLVED
+  expected_actions: [{tool: retry_payout, payout_id: po_0001}]
+  forbidden_actions: []
+  final_state: {payout_status_po_0001: paid, ledger_balanced: true}

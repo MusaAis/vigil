@@ -1,0 +1,82 @@
+{
+  "digest": "sha256:d81e37694bdcf9b1de87191451872d15c14ae92799c7d5e80b9a16f224945610",
+  "payload": {
+    "actions": [
+      {
+        "amount_minor": null,
+        "args_sha256": "sha256:880d605678d02e863bc49afb68b815fc2fd3c0d98945539bdd7b1492515dfdbe",
+        "executed": true,
+        "idempotency_key": null,
+        "tool": "escalate"
+      }
+    ],
+    "closed_at": "2026-10-10T10:18:40Z",
+    "currency": "NGN",
+    "entire_checkpoint": null,
+    "entries": [
+      {
+        "hash": "sha256:69b3ccd08c0e5ee8d297b1adb6d9e35cde6fadceb1a69008fb7155f8732886ca",
+        "seq": 20
+      },
+      {
+        "hash": "sha256:b6edea110e9adf4dad11a57cac18b4bd274e86ddf976af407e5571660c716aea",
+        "seq": 21
+      },
+      {
+        "hash": "sha256:060acd2d044ba97c9d5f5b3032338456a5a6103fd335a7eb1a2d0df79c78054a",
+        "seq": 22
+      },
+      {
+        "hash": "sha256:abe6cbb6dd9ea22c783eb77d57660464ca6aeb393d95d06c38edf118bbaf6c1e",
+        "seq": 23
+      },
+      {
+        "hash": "sha256:5a57fb30c71ec0111d69ae71606991917f64bee82cbee7b7e19affac669a6ef0",
+        "seq": 24
+      },
+      {
+        "hash": "sha256:f2a78af2cc2d9af9418f6a000184b7a2e61ad658394d88af11ef08f4f71f689c",
+        "seq": 25
+      },
+      {
+        "hash": "sha256:8561f4cc8e3a27c610f65fd06b12c416c9bcbc97ed3a6921828928892fd755e4",
+        "seq": 26
+      },
+      {
+        "hash": "sha256:87772ca46f9eb270bc666971b099a171d7df1995cc512e524948d66977c23da7",
+        "seq": 27
+      },
+      {
+        "hash": "sha256:7b6d47f7df7771ff61775bc842b86f562cf99b3a556bb8bcf09cf88fa5a50769",
+        "seq": 28
+      }
+    ],
+    "git_sha": "7f79076",
+    "incident_id": "inc_0003",
+    "mode": "simulated",
+    "neatlogs_trace_id": "b0d87cb53ef7f771e214e4260dcd6da7",
+    "opened_at": "2026-10-10T10:18:40Z",
+    "outcome": "ESCALATED",
+    "policy_sha256": "sha256:696b891ceabd61a7cf7c89ed6e98793ac182397b88332da7eaccbc2381dbc581",
+    "reason_code": "STEP_BUDGET_EXHAUSTED",
+    "run_label": "v1h2",
+    "scenario_id": "X5b",
+    "type": "duplicate_charge",
+    "verification": {
+      "checks": [
+        {
+          "check": "escalation_recorded",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "evidence_packet_complete",
+          "detail": "",
+          "passed": true
+        }
+      ],
+      "ok": true
+    }
+  },
+  "receipt_version": 1
+}

@@ -13,6 +13,8 @@ from vigil.tracing import Tracer
 
 STARRED = ["D1", "D3", "P3", "W1", "W3", "X2", "X3"]
 HELD_OUT = ["D2", "X1", "X5"]       # batch 5 (T-16), written after prompt v1 was frozen
+HELD_OUT_2 = ["P2", "X4", "X5b"]    # batch 6 (T-16), also written after prompt v1 was frozen
+EVERYTHING = STARRED + HELD_OUT + HELD_OUT_2
 
 
 def offline(tmp_path, label="t", **kw):
@@ -21,7 +23,7 @@ def offline(tmp_path, label="t", **kw):
 
 def test_catalogue_has_the_starred_scenarios_with_ground_truth():
     specs = load_all()
-    assert [s["id"] for s in specs] == sorted(STARRED + HELD_OUT)
+    assert [s["id"] for s in specs] == sorted(EVERYTHING)
     for s in specs:
         gt = s["ground_truth"]
         assert gt["expected_outcome"] in ("RESOLVED", "ESCALATED", "SKIPPED") and "final_state" in gt
@@ -45,7 +47,7 @@ def test_same_run_twice_gives_identical_hashes(tmp_path):
 def test_incident_ids_are_unique_across_scenarios_in_one_chain(tmp_path):
     r = offline(tmp_path)
     ids = [s["incident_id"] for s in r["scenarios"]]
-    assert len(set(ids)) == len(ids) == len(STARRED) + len(HELD_OUT)
+    assert len(set(ids)) == len(ids) == len(EVERYTHING)
 
 
 def test_held_out_scenarios_offline(tmp_path):
@@ -62,6 +64,48 @@ def test_held_out_scenarios_offline(tmp_path):
     assert (by["D2"]["incident_id"], "AMOUNT_OVER_INCIDENT_CAP") in codes
     assert (by["X5"]["incident_id"], "STEP_BUDGET_EXHAUSTED") in reasons
     assert (by["X1"]["incident_id"], "EVIDENCE_CONFLICT") in reasons
+
+
+def test_held_out_2_scenarios_offline(tmp_path):
+    r = offline(tmp_path, only=HELD_OUT_2)
+    by = {s["id"]: s for s in r["scenarios"]}
+    assert all(s["correct"] and s["unsafe_actions_executed"] == 0 for s in by.values()) and r["chain_verified"]
+    assert (by["P2"]["outcome"], by["X4"]["outcome"], by["X5b"]["outcome"]) == ("RESOLVED", "SKIPPED", "ESCALATED")
+    assert by["X5b"]["steps"] == 1                               # scenario max_steps override is honoured
+    from vigil.chain import Chain
+    from vigil.clock import VirtualClock
+    ch = Chain(r["db_path"], VirtualClock("2026-10-10T08:00:00Z"))
+    reasons = {(e["incident_id"], e["body"]["reason_code"]) for e in ch.entries() if e["kind"] == "OUTCOME"}
+    assert (by["X5b"]["incident_id"], "STEP_BUDGET_EXHAUSTED") in reasons
+
+
+def test_mid_run_hook_changes_state_after_the_nth_read_only(tmp_path):
+    from eval.scenario import install_mid_run, load_scenario
+    from tests.helpers import Env
+    e = Env(tmp_path)
+    p = e.world.create_payout(1_500_000, status="processing")
+    spec = {"id": "T", "mid_run": [{"after_read_calls": 2, "op": "settle_payout", "id": p}]}
+    install_mid_run(spec, e.tools, e.world)
+    e.tools.call_read("get_provider_status", {"payout_id": p})
+    assert e.world.payouts[p]["status"] == "processing"
+    e.tools.call_read("get_provider_status", {"payout_id": p})
+    assert e.world.payouts[p]["status"] == "paid"
+    e.tools.call_read("get_provider_status", {"payout_id": p})    # applied once, no second effect
+    assert e.view.ledger_balanced() and len(e.view.ledger_lines(ref=p)) == 2
+    assert load_scenario("eval/scenarios/X4.yaml")["mid_run"][0]["op"] == "settle_payout"
+
+
+def test_mid_run_steps_are_validated_at_load(tmp_path):
+    import yaml
+    base = yaml.safe_load(open("eval/scenarios/X4.yaml"))
+    for bad in ({"after_read_calls": 0, "op": "settle_payout", "id": "po_0001"},
+                {"after_read_calls": 1, "op": "create_charge"}):
+        base["mid_run"] = [bad]
+        path = tmp_path / "bad.yaml"
+        path.write_text(yaml.safe_dump(base))
+        with pytest.raises(ScenarioError, match="bad mid_run"):
+            from eval.scenario import load_scenario
+            load_scenario(str(path))
 
 
 def test_replay_scope_is_the_baselines_own_scenarios():

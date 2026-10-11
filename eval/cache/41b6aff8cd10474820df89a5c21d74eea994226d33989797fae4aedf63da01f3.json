@@ -1,0 +1,18 @@
+{
+ "key": "sha256:41b6aff8cd10474820df89a5c21d74eea994226d33989797fae4aedf63da01f3",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "po_0001"
+   ],
+   "reason_code": "STUCK_PAYOUT_PROCESSING",
+   "summary": "Payout po_0001 has been in processing state for over 16 minutes. Retry was denied by policy gate (PAYOUT_NOT_RETRYABLE), indicating the payout may not be eligible for retry despite the age. Requires human review to determine if this is a genuine stuck payout or expected processing delay."
+  },
+  "kind": "tool",
+  "rationale": "Payout status shows processing state with age of 1000 seconds but policy gate blocks retry, requiring human investigation.",
+  "tokens_in": 3310,
+  "tokens_out": 280,
+  "tool": "escalate"
+ }
+}

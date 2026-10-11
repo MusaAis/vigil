@@ -51,6 +51,17 @@ def test_stuck_payout_verification(tmp_path):
     assert e.verifier.verify(inc)["ok"] is True
 
 
+def test_failed_payout_is_not_confirmed_as_no_action_until_it_is_paid(tmp_path):
+    e = Env(tmp_path)
+    p = e.world.create_payout(9_000_000, status="failed")
+    inc = e.open_incident()
+    assert e.verifier.confirm_no_action(inc)["ok"] is False
+    assert e.verifier.verify(inc)["ok"] is False
+    e.world.retry_payout(p, "k1")
+    assert e.verifier.confirm_no_action(inc)["ok"] is True
+    assert e.verifier.verify(inc)["ok"] is True
+
+
 def test_evidence_conflict_needs_escalation_with_evidence(tmp_path):
     e = Env(tmp_path)
     o = e.world.create_order("cust_01", AMOUNT)
