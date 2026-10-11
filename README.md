@@ -4,7 +4,7 @@ Vigil is a payment-operations agent built for neatHack 2026 (Oct 10–12). It wa
 
 All payment data is simulated. No real money, no real customers.
 
-**Status:** the agent, gate, verifier, decision chain, receipts and the reproducible eval exist and are tested. Not built yet: the HTTP API, dashboard, proof page, `make demo` and a public deployment. There is no live URL.
+**Status:** the agent, gate, verifier, decision chain, receipts, the reproducible eval and a read-only web app (JSON API, live decision stream, dashboard, proof page, status page) exist and are tested. Run the web app locally with `make serve`. Not built yet: a public deployment (there is no live URL), the evidence pack and the cfo.ai plan.
 
 **Authorship:** the code was written and tested in a Claude chat sandbox, then applied and committed on the build server through OpenCode so that Entire could record the sessions. The coding agent did not author the code (see `DECISIONS.md` D-002).
 
@@ -12,13 +12,26 @@ All payment data is simulated. No real money, no real customers.
 
 ```
 make setup
-make test           # 177 tests, including the chain tamper tests and the invariant property tests
+make test           # 214 tests, including the chain tamper tests, the invariant property tests and the web app tests
 make eval-check     # replays every committed baseline (v0, v1, v1h, v1h2) from eval/cache and compares chain heads
 .venv/bin/python scripts/verify_chain --db data/eval-v1.db --run v1
 .venv/bin/python scripts/verify_receipt --db data/eval-v1.db receipts/v1
 ```
 
 `eval-check` writes the eval chains to `data/eval-<label>.db`; the two verify commands then check the chain of label `v1` against its anchor in `anchors.txt` and every receipt in `receipts/v1` against that chain. `tests/test_chain_tamper.py` edits, deletes, reorders, inserts and truncates rows on a raw connection and asserts that verification fails each time.
+
+## The web app (read-only, simulated)
+
+`make serve` starts it on `127.0.0.1:8005` (change the port with `make serve PORT=...`). On first start it seeds its own chain database (`data/vigil.db`, not committed) with three simulated scenarios (D1 resolved, D3 skipped trap, D2 escalated cap case) decided by the deterministic **offline stub model on a virtual clock**, so the dashboard costs nothing and needs no key. These incidents say nothing about LLM quality: the LLM numbers are only the eval results above.
+
+| Page | What it shows |
+|---|---|
+| `/dashboard` | incident list, counters with their counting boundaries, exposure meter against the policy caps, live decision log |
+| `/dashboard/incidents/<id>` | the chain entries of one incident, gate verdicts, verification checks, the receipt JSON and a Verify button |
+| `/proof` | chain status and anchors, every eval label with its remaining failures, test counts, evidence links (PENDING until a real link exists), real vs simulated, the verify commands, limits, first and latest commit |
+| `/status` | the same data as `/api/health` |
+
+JSON: `/api/health`, `/api/metrics` (every metric has a `boundary` and the list has a `snapshot_sha256`), `/api/proof`, `/api/incidents`, `/api/incidents/<id>`, `/api/incidents/<id>/receipt`, `POST /api/incidents/<id>/receipt/verify`, and `/api/stream` (server-sent events, event `chain_entry`). Responses carry `"source": "simulated"` (`/api/health` reports `"mode": "simulated"`). The chain is fully verified at startup and every five minutes; `/api/health` reports `ok: false` if it does not verify. No endpoint accepts free text. The pages work without JavaScript (only the live log uses it).
 
 ## What Vigil does
 
@@ -57,6 +70,7 @@ The suite is small, each label is one live run, and `eval-check` only proves tha
 | Agent, policy gate, verifier, decision chain, receipts, eval runner | Real code that really ran (tests, chains, receipts) |
 | LLM calls | Real in the live runs (`claude-haiku`); recorded responses in replay (`eval/cache`) |
 | neatlogs traces | Real traces from the live runs; ids in `eval/results/<label>.json` |
+| Incidents on `/dashboard` | Simulated scenarios decided by the deterministic offline stub, not an LLM; trace ids there are `offline-<n>` placeholders |
 
 ## How we used the required tools
 
@@ -66,7 +80,8 @@ The suite is small, each label is one live run, and `eval-check` only proves tha
 
 ## Architecture
 
-- `vigil/` — canonical JSON, decision chain, incident store, detector, tools, gate, verifier, executor, agent loop, receipts, prompt, model adapters, replay and stack builder.
+- `vigil/` — canonical JSON, decision chain, incident store, detector, tools, gate, verifier, executor, agent loop, receipts, prompt, model adapters, replay and stack builder; `vigil/demo.py` seeds the demo chain; `vigil/web/` is the framework-free web service, settings and HTML rendering.
+- `api/` — the thin FastAPI app (`api/app.py`); `web/templates/` — the server-rendered pages.
 - `sim/` — deterministic simulated provider and double-entry ledger with seeded fault injection.
 - `eval/` — scenario files (`eval/scenarios`), runner (`python -m eval.run`), recorded results, baselines and the replay cache.
 - `scripts/` — `verify_chain`, `verify_receipt`, `anchor`, `live_smoke.py`. `policy.yaml` holds the caps and limits (amounts are integer minor units, NGN).
@@ -79,6 +94,7 @@ make setup                 # venv + requirements
 cp .env.example .env       # fill in your own keys; never commit .env
 make test
 make eval-offline          # deterministic stub model, no key
+make serve                 # web app on 127.0.0.1:8005 (dashboard, /proof, /status, API)
 ```
 
 A live run needs the gateway key in `.env` (`LLM_API_KEY`), and a neatlogs project key (`NEATLOGS_API_KEY`) for traces. Use a new label for every live run: `.venv/bin/python -m eval.run --label <new> --mode live --record --only <ids> --anchor`.
@@ -89,7 +105,9 @@ A live run needs the gateway key in `.env` (`LLM_API_KEY`), and a neatlogs proje
 - v1 is tuned on the failures it fixes; only v1h and v1h2 are held-out, and X5b was informed by X5. X4 is a failing scenario whose cause has not been analysed.
 - Replay of a baseline holds only while the code that builds the model request is unchanged; tool descriptions and schemas are not versioned yet.
 - Cost per incident is not computed (no price configured).
-- Not built yet: API and SSE, dashboard, `/proof`, `/status`, `make demo`, deployment, evidence pack, cfo.ai plan.
+- The web app has been called with curl on the build server (health and `/proof`); it has not been opened in a browser there, and there is no public deployment yet.
+- The `/proof` test count is counted from the test sources and the CI result is shown as PENDING; neither is a recorded run result.
+- Not built yet: public deployment, evidence pack, cfo.ai plan.
 
 ## Built during neatHack
 

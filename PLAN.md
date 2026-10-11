@@ -16,8 +16,8 @@
 - [x] T-14 Baseline v0 (live, claude-haiku: 5/7 correct, 0 unsafe actions executed; failures D3, P3 kept)
 - [x] T-15 Improvement loop v1 (live: 7/7, tuned on the v0 failures; no v2 run; see docs/results.md)
 - [x] T-16 Remaining scenarios: D2, X1, X5 (v1h) and P2, X4, X5b (v1h2) added; W2, P1 (detector unit tests) and X6 (gate/invariant tests) not built as eval scenarios, see D-016 (server: 177 tests pass)
-- [ ] T-17 API + SSE
-- [ ] T-18 Dashboard, /proof, /status
+- [x] T-17 API + SSE (server: 214 tests pass; `/api/health` ok:true with the chain verified, commit e193084)
+- [x] T-18 Dashboard, /proof, /status (server: `GET /proof` 200 via curl; not yet opened in a browser on the server; no public URL)
 - [ ] T-19 make demo, make eval-check
 - [ ] T-20 Deploy public URL
 - [ ] T-21 Reviewer docs, evidence pack

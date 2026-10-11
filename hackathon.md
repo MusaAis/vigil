@@ -8,9 +8,9 @@
 Team "musa Ais" (solo): GitHub MusaAis.
 
 ## Stack
-Python 3.12.3, SQLite (stdlib `sqlite3`), PyYAML, pytest. Live model: `claude-haiku` through the neatHack LiteLLM gateway
+Python 3.12.3, SQLite (stdlib `sqlite3`), PyYAML, pytest; web app: FastAPI, uvicorn, Jinja2 (httpx for the tests). Live model: `claude-haiku` through the neatHack LiteLLM gateway
 (OpenAI-compatible, `openai` Python client). Tracing: neatlogs Python SDK (>=1.4.26). Coding-agent capture: Entire CLI 0.11.4 with
-OpenCode 2.0.26. Business plan: cfo.ai. Not built yet: API (FastAPI), dashboard, proof page, `make demo`, deployment.
+OpenCode 2.0.26. Business plan: cfo.ai. Not built yet: deployment.
 Authorship: the code is written and tested in a Claude chat sandbox, then applied and committed on the build server through OpenCode (DECISIONS D-002).
 
 ## Tools: how each is used and evidence
@@ -20,8 +20,9 @@ Authorship: the code is written and tested in a Claude chat sandbox, then applie
 - Entire: CLI 0.11.4; enabled with the OpenCode agent. Checkpoints on `main`, each created with `entire session attach` (through a shim, see FEEDBACK E3/E5):
   `01M4JHV41G3A3SRKC5C8ETWGWY` (35155c5, batch 1), `01M4JYYS4PAB86K9FFD5E9F6FE` (7e5510f, batch 2), `01M4KRQ6DG1K959DTXD9J982YD` (46e201b, batch 3),
   `01M4KVRB9H2C718A5F1ZABTMXK` (f0dbfd5), `01M4M2RF898KEYXPS93PPB6A2A` (6bfd45d, eval runner + baseline v0), `01M4MW63WGMZHZ1435JWSE0SBK` (d8b2242, prompt v1 + baseline v1),
-  `01M4N2463MDG5M1218MRSCD5A4` (7f79076, held-out D2 X1 X5 + baseline v1h), `01M4N76A06F48MP8J3NHTK83YX` (0f95573, P2 X4 X5b + baseline v1h2).
-  Attaching prints Entire's warning that no user prompts were parsed from the transcript (seen from batch 2 on, most recently for the v1h checkpoint; FEEDBACK E3/E5/E6). Checkpoint links: PENDING
+  `01M4N2463MDG5M1218MRSCD5A4` (7f79076, held-out D2 X1 X5 + baseline v1h), `01M4N76A06F48MP8J3NHTK83YX` (0f95573, P2 X4 X5b + baseline v1h2),
+  `01M4NYVXJ5Z9FMVDBJR0ECH0K2` (e193084, T-17/T-18 web app).
+  Attaching prints Entire's warning that no user prompts were parsed from the transcript (seen from batch 2 on, most recently for the web app checkpoint; FEEDBACK E3/E5/E6). Checkpoint links: PENDING
 - cfo.ai: account created. Business plan: PENDING
 
 ## Build log
@@ -99,6 +100,15 @@ Authorship: the code is written and tested in a Claude chat sandbox, then applie
 - Not built as eval scenarios: W2 and P1 (the correct behaviour is that no incident opens; covered by detector unit tests) and X6 (the gate's DUPLICATE_ACTION check is covered by the gate and invariant tests); DECISIONS D-016.
 - Numbers for every label are in docs/results.md.
 
+### 2026-10-11 (WAT) — T-17, T-18: read-only web app
+- Written in the Claude chat sandbox (214 tests there with real pytest and FastAPI's TestClient; 8 deliberate breakages of the web layer were each caught by the tests), verified on the build server, committed through OpenCode as e193084 (checkpoint 01M4NYVXJ5Z9FMVDBJR0ECH0K2).
+- Built: `vigil/web/service.py` (framework-free, one function per endpoint), `api/app.py` (thin FastAPI wrapper), `web/templates/` (server-rendered pages), `vigil/demo.py` (seeds the demo chain), Makefile target `serve`.
+  Endpoints: `/api/health`, `/api/metrics`, `/api/proof`, `/api/incidents`, `/api/incidents/<id>`, `.../receipt`, `POST .../receipt/verify`, `/api/stream` (SSE); pages `/dashboard`, `/dashboard/incidents/<id>`, `/proof`, `/status`. DECISIONS D-017 to D-019.
+- What it serves: its own chain (`data/vigil.db`, not committed), 38 entries, three incidents (D1, D3, D2) decided by the offline stub model on a virtual clock. They are simulated and say nothing about LLM quality; LLM numbers on `/proof` come only from `eval/results`.
+- Server evidence: `make test` 214 passed; `make eval-check` CHECK OK for v0, v1, v1h and v1h2 with unchanged chain heads; `make serve` on port 8005 (8000 was in use); `GET /api/health` returned `ok: true`, `mode: simulated`, chain length 38, `verified_ok: true` (full), head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b, `last_eval` v1h2; `GET /proof` returned HTTP 200.
+- Not verified on the server yet: the pages in a browser, the SSE stream, the Verify button, access from outside the server. There is no public URL.
+- Not done at this point: deployment, evidence pack, cfo.ai plan.
+
 ## Build in public
 - 2026-10-10 14:20 WAT — first #neatHack post (idea, first neatlogs trace, repo) and a reply on tests/gate and the Entire+OpenCode snag: https://x.com/musa_ais/status/2108910440721813529
 - 2026-10-10 — failing baseline post (v0): https://x.com/musa_ais/status/2109035793872510995
@@ -115,7 +125,8 @@ PENDING
 - Cost per incident is not computed: the two price variables are unset and no price has been invented. Token counts per scenario are in `eval/results`.
 - neatlogs span attributes are not attached and `neatlogs.wrap` is not used. Entire checkpoints were created with `attach` and carry no parsed prompts (FEEDBACK E6).
 - Replay of a baseline holds only while the code that builds the model request is unchanged. Tool descriptions and schemas are not versioned yet.
-- Not built yet: API and SSE, dashboard, /proof, /status, `make demo`, deployment, evidence pack, cfo.ai business plan. See PLAN.md.
+- The web app has been called with curl on the build server (health and `/proof`) but not opened in a browser there; there is no public deployment. The `/proof` test counts come from the test sources, and the CI result is shown as PENDING.
+- Not built yet: deployment, evidence pack, cfo.ai business plan. See PLAN.md.
 
 ## Submission
 Added at submission time.

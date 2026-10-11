@@ -119,3 +119,21 @@ Cost: a failed payout the provider will never accept again still opens an incide
 - A label is never overwritten and failures stay in `eval/results` and `eval/baselines`: X5 (v1h) and X4 (v1h2) failed and are kept as recorded.
 - W2 (webhook delivered twice) and P1 (payout within the SLA) are not eval scenarios because the correct behaviour is that no incident opens; they are covered by detector unit tests.
   X6 (same refund proposed twice) cannot occur through the loop because a verified refund closes the incident; the gate's DUPLICATE_ACTION check is covered by the gate and invariant tests.
+
+## D-017 Web app: FastAPI + Jinja2, logic outside the framework, port 8005 — 2026-10-11
+- Choice: FastAPI and uvicorn for HTTP, Jinja2 for server-rendered pages (they work without JavaScript; only the live log uses a few lines of JS). All logic is in `vigil/web/service.py` (plain functions returning dicts, one per endpoint); `api/app.py` is a thin wrapper. Reason: every number and link can then be tested without the framework (tests in `tests/test_web_service.py`, wrapper checked with FastAPI's TestClient in `tests/test_web_app.py`).
+- Deviation from the handoff plan: `make serve` uses a `PORT` variable, default 8005, because port 8000 was already in use on the build server.
+- The public surface is read-only: no endpoint accepts free text, incident ids must match `^inc_[0-9a-z]+$`, the OpenAPI and docs pages are off.
+
+## D-018 What the web app serves — 2026-10-11
+- It opens its own chain database (`VIGIL_DB_PATH`, default `data/vigil.db`, not committed) and, only when that database is missing or empty, seeds it with D1, D3 and D2 using the offline stub model and a virtual clock (`vigil/demo.py`). Reason: no key, no cost, reproducible hashes (the head is the same on the sandbox and on the server).
+- Consequence: incidents on the dashboard say nothing about LLM quality. LLM numbers on `/proof` come only from `eval/results`. An existing database is never replaced (delete `data/vigil.db*` and `receipts/web/` by hand if the scenarios change); an unreadable database is reported as `ok: false`, not replaced.
+- The whole chain is verified from genesis at startup and again every five minutes in a background thread; `/api/health` reports `ok: false` if it fails. Reads use read-only SQLite connections.
+
+## D-019 Proof, metrics and health details — 2026-10-11
+- `snapshot_sha256` (of `/api/proof` and `/api/metrics`) covers `data` only; time stamps sit outside it, so the hash changes only when the content changes.
+- Every metric has a `boundary` string. Eval metrics sum over every file in `eval/results`; the incident and gate-denial counters count the demo chain only, and say so.
+- `/api/health` `built_at` is the time of the HEAD commit, and `llm` is `offline-stub` because the web app never calls a model.
+- `/proof` counts test functions from the test sources (not a run result); CI and the last CI result render PENDING; evidence rows render PENDING unless they have status ok and an https URL (there is no `docs/evidence.json` yet).
+- `make verify` checks `data/vigil.db` with `--run demo` (the anchors of the eval labels do not apply to that chain) and the receipts in `receipts/web` when they exist.
+- The dashboard exposure meter is computed from the demo chain and its receipts (peak refunded per virtual day against the daily cap, most write actions in one incident). `/api/exposure` (Tier B) is not built.
