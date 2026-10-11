@@ -1,7 +1,8 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup test invariants verify hello live-smoke eval eval-check eval-offline
+.PHONY: setup test invariants verify hello live-smoke eval eval-check eval-offline serve
 LABEL ?= v0
+PORT ?= 8005
 setup:
 	python3 -m venv .venv
 	$(PY) -m pip install -q -U pip
@@ -14,8 +15,8 @@ invariants:
 	VIGIL_PROP_CASES=$${VIGIL_PROP_CASES:-300} $(PY) -m pytest -q tests/test_invariants.py
 
 verify:
-	$(PY) scripts/verify_chain
-	@if ls receipts/*.json >/dev/null 2>&1; then $(PY) scripts/verify_receipt receipts; fi
+	$(PY) scripts/verify_chain --run demo
+	@if ls receipts/web/*.json >/dev/null 2>&1; then $(PY) scripts/verify_receipt receipts/web; fi
 
 hello:
 	$(PY) scripts/hello_trace.py
@@ -36,4 +37,8 @@ eval-check:
 eval-offline:
 	$(PY) -m eval.run --label offline --mode offline
 
-# Targets still to come (SPEC 14): demo, anchor, serve, evidence
+# serve: the read-only web app (dashboard, proof, status, API) on 127.0.0.1:8000. Seeds data/vigil.db on first start (simulated, offline model).
+serve:
+	$(PY) -m uvicorn api.app:app --host 127.0.0.1 --port $(PORT)
+
+# Targets still to come (SPEC 14): demo, anchor, evidence

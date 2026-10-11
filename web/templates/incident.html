@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ d.incident.incident_id }}{% endblock %}
+{% block body %}
+{% set i = d.incident %}
+<p><a href="/dashboard">&larr; Dashboard</a></p>
+<h1>{{ i.incident_id }} <span class="sim">SIMULATED</span></h1>
+<div class="card">
+  <b>{{ i.type }}</b> (rule {{ i.detector_rule }}), related {{ i.related|join(", ") }}<br>
+  Scenario {{ i.scenario_id or "n/a" }} · outcome <span class="b {{ i.outcome }}">{{ i.outcome }}</span> {{ i.reason_code or "" }}
+  · {{ i.steps }} steps · {{ i.opened_at }} to {{ i.closed_at or "open" }}
+</div>
+
+<h2>Gate verdicts</h2>
+<div class="wrap"><table><tr><th>Step</th><th>Verdict</th><th>Code</th><th>Entry</th></tr>
+{% for g in d.gate_verdicts %}<tr><td>{{ g.step }}</td><td><span class="b {{ g.verdict }}">{{ g.verdict }}</span></td><td>{{ g.code }}</td><td>#{{ g.seq }}</td></tr>
+{% else %}<tr><td colspan="4">No gate verdicts (nothing was proposed that needed the gate).</td></tr>{% endfor %}
+</table></div>
+
+<h2>Verification</h2>
+{% if d.verification %}
+<p>Independent check by code: <span class="{{ 'ok' if d.verification.ok else 'bad' }}">{{ 'passed' if d.verification.ok else 'FAILED' }}</span></p>
+<ul>{% for c in d.verification.checks %}<li><span class="{{ 'ok' if c.ok else 'bad' }}">{{ 'pass' if c.ok else 'FAIL' }}</span> {{ c.name }} <span class="mut">{{ c.detail }}</span></li>{% endfor %}</ul>
+{% else %}<p class="mut">No verification entry was recorded for this incident.</p>{% endif %}
+
+<h2>Timeline (decision chain)</h2>
+<div class="wrap"><table><tr><th>Seq</th><th>Time</th><th>Kind</th><th>Summary</th></tr>
+{% for e in d.timeline %}
+<tr><td>#{{ e.seq }}</td><td>{{ e.ts }}</td><td><b>{{ e.kind }}</b></td>
+<td>{{ e.summary }}<details><summary>entry JSON</summary><pre>{{ {"seq": e.seq, "ts": e.ts, "kind": e.kind, "body": e.body, "trace_id": e.trace_id, "prev_hash": e.prev_hash, "entry_hash": e.entry_hash}|tojson(indent=2) }}</pre></details></td></tr>
+{% endfor %}
+</table></div>
+
+<h2>Receipt</h2>
+{% if receipt_json %}
+<form method="post" action="/dashboard/incidents/{{ i.incident_id }}/verify"><button type="submit">Verify receipt against the chain</button></form>
+{% if verify %}
+<div class="card"><b class="{{ 'ok' if verify.ok else 'bad' }}">{{ 'OK' if verify.ok else 'BROKEN' }}</b> <code>{{ verify.line }}</code>
+<div class="mut">{{ verify.note }}</div></div>
+{% endif %}
+<details open><summary>Raw receipt JSON</summary><pre>{{ receipt_json }}</pre></details>
+{% else %}<p class="mut">No receipt file for this incident.</p>{% endif %}
+{% endblock %}

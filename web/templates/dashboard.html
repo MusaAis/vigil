@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<h1>Dashboard <span class="sim">SIMULATED</span></h1>
+<p class="mut">Chain: {{ chain.length }} entries, head <code>{{ chain.head|short }}</code>, verified
+<span class="{{ 'ok' if chain.ok else 'bad' }}">{{ 'OK' if chain.ok else 'BROKEN' }}</span> ({{ chain.verify_mode }}) at {{ chain.verified_at }}.
+Incidents here are simulated scenarios decided by a deterministic offline stub, not an LLM. LLM results are on <a href="/proof">/proof</a>.</p>
+
+<h2>Counters</h2>
+<div class="grid">
+{% for name, label in [("incidents_resolved","Resolved"),("incidents_escalated","Escalated"),("incidents_skipped","Skipped"),("gate_denials","Gate denials"),("gate_escalations","Gate escalations"),("unsafe_actions_executed","Unsafe actions executed (target 0)")] %}
+  <div class="card"><div class="mut">{{ label }}</div><div class="num">{{ metrics[name].value }}</div><div class="mut">{{ metrics[name].boundary }}</div></div>
+{% endfor %}
+</div>
+
+<h2>Exposure meter</h2>
+<div class="card">
+  <table>
+    <tr><th>Cap</th><th>Limit</th><th>Peak in this chain</th></tr>
+    <tr><td>Refund per incident</td><td>{{ exposure.caps.per_incident_minor|money(exposure.currency) }}</td><td>see incidents below</td></tr>
+    <tr><td>Refund per UTC day</td><td>{{ exposure.caps.per_day_minor|money(exposure.currency) }}</td><td>{{ exposure.peak_day_refunded_minor|money(exposure.currency) }}</td></tr>
+    <tr><td>Write actions per incident</td><td>{{ exposure.caps.max_write_actions_per_incident }}</td><td>{{ exposure.max_write_actions_in_one_incident }}</td></tr>
+  </table>
+  <div class="mut">{{ exposure.note }}</div>
+</div>
+
+<h2>Incidents</h2>
+<div class="wrap"><table>
+<tr><th>Incident</th><th>Type</th><th>Scenario</th><th>Outcome</th><th>Steps</th><th>Started</th><th>Closed</th><th></th></tr>
+{% for i in incidents %}
+<tr><td><a href="/dashboard/incidents/{{ i.incident_id }}">{{ i.incident_id }}</a></td><td>{{ i.type }}</td><td>{{ i.scenario_id or "n/a" }}</td>
+<td><span class="b {{ i.outcome }}">{{ i.outcome }}</span> <span class="mut">{{ i.reason_code or "" }}</span></td>
+<td>{{ i.steps }}</td><td>{{ i.opened_at }}</td><td>{{ i.closed_at or "open" }}</td><td><span class="sim">SIMULATED</span></td></tr>
+{% else %}
+<tr><td colspan="8">No incidents yet.</td></tr>
+{% endfor %}
+</table></div>
+
+<h2>Live decision log</h2>
+<p class="mut">Each line is a decision-chain entry that /proof lets you verify. The page works without JavaScript; with it, new entries stream in from <code>/api/stream</code>.</p>
+<ol id="log" class="card" style="padding-left:34px">
+{% for e in recent %}
+<li data-seq="{{ e.seq }}"><code>#{{ e.seq }}</code> {{ e.incident_id }} <b>{{ e.kind }}</b> {{ e.summary }} <span class="mut"><code>{{ e.entry_hash|short(10) }}</code></span></li>
+{% endfor %}
+</ol>
+<script>
+(function(){
+  var log=document.getElementById('log'); if(!log||!window.EventSource) return;
+  var last=-1; var items=log.querySelectorAll('li'); if(items.length) last=parseInt(items[items.length-1].dataset.seq,10);
+  var es=new EventSource('/api/stream?after='+last);
+  es.addEventListener('chain_entry',function(ev){
+    var d=JSON.parse(ev.data); if(d.seq<=last) return; last=d.seq;
+    var li=document.createElement('li'); li.dataset.seq=d.seq;
+    li.textContent='#'+d.seq+' '+d.incident_id+' '+d.kind+' '+d.summary+' '+d.entry_hash.slice(0,17)+'…';
+    log.appendChild(li);
+  });
+})();
+</script>
+{% endblock %}

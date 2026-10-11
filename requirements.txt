@@ -2,3 +2,7 @@ neatlogs>=1.4.26
 pytest>=8
 pyyaml>=6
 openai>=1.40
+fastapi>=0.110
+uvicorn>=0.29
+jinja2>=3.1
+httpx>=0.27

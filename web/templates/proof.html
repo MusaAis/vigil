@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Proof{% endblock %}
+{% block body %}
+{% set d = p.data %}
+<h1>Proof <span class="sim">SIMULATED</span></h1>
+<p>One page to check every claim. Every number and link below is generated from files and the chain database by
+<a href="/api/proof">/api/proof</a>; nothing is typed by hand. Entries without a real link show <b class="pending">PENDING</b>.</p>
+<div class="card mut">Snapshot <code>{{ p.snapshot_sha256 }}</code> (sha256 of the canonical JSON of <code>data</code>) · generated {{ p.generated_at }} · chain last verified {{ p.verified_at }}</div>
+
+<h2>1. Chain status</h2>
+<p class="mut">source: {{ d.chain.source }} · generated {{ p.generated_at }}</p>
+<div class="card">Length <b>{{ d.chain.length }}</b> · head <code>{{ d.chain.head }}</code><br>
+verified <b class="{{ 'ok' if d.chain.verified_ok else 'bad' }}">{{ d.chain.verified_ok }}</b> ({{ d.chain.verify_mode }}, from genesis) · <code>{{ d.chain.verify_line }}</code></div>
+<div class="wrap"><table><tr><th>Anchored</th><th>Run</th><th>Seq</th><th>Head</th><th>Commit</th></tr>
+{% for a in d.chain.anchors %}<tr><td>{{ a.ts }}</td><td>{{ a.run }}</td><td>{{ a.seq }}</td><td><code>{{ a.head }}</code></td><td><a href="{{ a.commit_url }}">{{ a.git }}</a></td></tr>
+{% else %}<tr><td colspan="5">No anchors.</td></tr>{% endfor %}
+</table></div>
+<p class="mut">The anchors in anchors.txt were written for the eval runs; each eval chain is checked against its own anchors with <code>scripts/verify_chain --run LABEL</code>.</p>
+
+<h2>2. Eval results</h2>
+<p class="mut">source: {{ d.eval.source }} · generated {{ p.generated_at }}</p>
+<div class="wrap"><table>
+<tr><th>Label</th><th>Commit</th><th>Mode</th><th>Prompt</th><th>Correct</th><th>Unsafe executed</th><th>Recovery</th><th>Injection</th><th>Median steps</th><th>Cost / incident</th><th>File</th></tr>
+{% for r in d.eval.runs %}
+<tr><td><b>{{ r.label }}</b></td><td>{{ r.git_sha }}</td><td>{{ r.mode }}</td><td>{{ r.prompt_version or "n/a" }}</td>
+<td>{{ r.n_correct }}/{{ r.n_total }} ({{ r.correct_resolution_pct|pct }})</td><td>{{ r.unsafe_actions_executed }}</td>
+<td>{{ r.n_fault_correct }}/{{ r.n_fault_scenarios }} ({{ r.recovery_pct|pct }})</td>
+<td>{{ r.n_injection_correct }}/{{ r.n_injection_scenarios }} ({{ r.injection_resistance_pct|pct }})</td>
+<td>{{ r.median_steps }}</td><td>{{ "not computed" if r.cost_per_incident_usd_micro is none else r.cost_per_incident_usd_micro ~ " micro-USD" }}</td>
+<td><a href="{{ r.file_url }}">{{ r.file }}</a></td></tr>
+{% else %}<tr><td colspan="11">No eval results found.</td></tr>{% endfor %}
+</table></div>
+<h3>Failures that remain (kept, never deleted)</h3>
+<ul>
+{% for r in d.eval.runs %}{% for f in r.failures %}<li><b>{{ r.label }} {{ f.id }}</b>: got {{ f.outcome }}, expected {{ f.expected_outcome }}. <span class="mut">{{ f.notes }}</span></li>{% endfor %}{% endfor %}
+</ul>
+
+<h2>3. Invariants and tests</h2>
+<p class="mut">source: {{ d.tests.source }} · generated {{ p.generated_at }}</p>
+<div class="card">
+Invariants enforced and property-tested: {{ d.tests.invariants|join(", ") }}.<br>
+Test functions found in tests/: <b>{{ d.tests.test_functions_total }}</b>, of which {{ d.tests.property_test_functions }} in the invariant property tests.<br>
+CI: {% if d.tests.ci_workflows %}<a href="{{ d.tests.ci_url }}">{{ d.tests.ci_workflows|join(", ") }}</a>{% else %}<b class="pending">PENDING</b> (no workflow in the repository yet){% endif %}
+· last CI run: <b class="pending">PENDING</b><br>
+<span class="mut">{{ d.tests.note }}</span></div>
+
+<h2>4. Evidence links</h2>
+<p class="mut">source: {{ d.evidence.source }} · generated {{ p.generated_at }}</p>
+<div class="wrap"><table><tr><th>Claim</th><th>Kind</th><th>Link</th></tr>
+{% for e in d.evidence["items"] %}<tr><td>{{ e.claim }}</td><td>{{ e.kind or "" }}</td>
+<td>{% if e.url %}<a href="{{ e.url }}" rel="noopener">{{ e.url }}</a>{% else %}<b class="pending">PENDING</b>{% endif %}</td></tr>{% endfor %}
+</table></div>
+
+<h2>5. Real vs simulated</h2>
+<p class="mut">source: {{ d.real_vs_simulated.source }} · generated {{ p.generated_at }}</p>
+<div class="wrap"><table><tr><th>Component</th><th>Real or simulated</th><th>Evidence</th></tr>
+{% for r in d.real_vs_simulated.rows %}<tr><td>{{ r.component }}</td><td>{{ r.status }}</td><td>{{ r.evidence }}</td></tr>{% endfor %}
+</table></div>
+
+<h2>6. Verify it yourself</h2>
+<p class="mut">source: {{ d.verify.source }} · generated {{ p.generated_at }}</p>
+<pre>{% for c in d.verify.commands %}{{ c }}
+{% endfor %}</pre>
+
+<h2>7. Limits and non-claims</h2>
+<p class="mut">source: {{ d.limits.source }} · generated {{ p.generated_at }}</p>
+<ul>{% for l in d.limits["items"] %}<li>{{ l }}</li>{% endfor %}</ul>
+
+<h2>8. Event-window proof</h2>
+<p class="mut">source: {{ d.event_window.source }} · generated {{ p.generated_at }}</p>
+<div class="card">
+First commit: {% if d.event_window.first %}<a href="{{ d.event_window.first.url }}"><code>{{ d.event_window.first.short }}</code></a> at {{ d.event_window.first.committed_at }} ({{ d.event_window.first.subject }}){% else %}<b class="pending">PENDING</b> (no git history on this server){% endif %}<br>
+Latest commit: {% if d.event_window.latest %}<a href="{{ d.event_window.latest.url }}"><code>{{ d.event_window.latest.short }}</code></a> at {{ d.event_window.latest.committed_at }} ({{ d.event_window.latest.subject }}){% else %}<b class="pending">PENDING</b>{% endif %}
+</div>
+{% endblock %}
