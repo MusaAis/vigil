@@ -77,7 +77,8 @@ def summarize_entry(e: dict) -> str:
     if k == "GATE_VERDICT":
         return f"gate {b.get('verdict')} {b.get('code')}"
     if k == "ACTION_INTENT":
-        return f"intent {b.get('tool')} key {b.get('idempotency_key')} (committed before execution)"
+        key = f" key {b['idempotency_key']}" if b.get("idempotency_key") else ""
+        return f"intent {b.get('tool')}{key} (committed before execution)"
     if k == "ACTION_RESULT":
         state = "ok" if b.get("ok") else f"failed {b.get('error_type')}"
         return f"{b.get('tool')} attempt {b.get('attempt')}: {state}"
