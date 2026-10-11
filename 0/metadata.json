@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.11.4",
+  "checkpoint_id": "01M4P2DFXP8GR5VZMNRA7V7K1E",
+  "session_id": "ses_ed3e6d4c4ffeZiuU41nS9X2Bdf",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-11T18:08:19.610744662Z",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "agent": "OpenCode",
+  "model": "",
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  }
+}

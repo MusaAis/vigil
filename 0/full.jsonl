@@ -1,0 +1,514 @@
+{
+  "info": {
+    "id": "ses_ed3e6d4c4ffeZiuU41nS9X2Bdf",
+    "projectID": "4d23e4f15b0e54d1fc2d1daa331865fcc6f60d4a",
+    "agent": "build",
+    "model": {
+      "id": "ling-3.1-flash-free",
+      "providerID": "opencode",
+      "variant": "default"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 20989,
+      "output": 648,
+      "reasoning": 1265,
+      "cache": {
+        "read": 24128,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1791741209679,
+      "updated": 1791741337380,
+      "idle": 1791741337396
+    },
+    "title": "Commit T-19 demo verify anchor evidence CI",
+    "location": {
+      "directory": "/home/ubuntu/vigil"
+    }
+  },
+  "messages": [
+    {
+      "id": "msg_12c192bda001fsLpnTE9CtYa7h",
+      "time": {
+        "created": 1791741210888
+      },
+      "text": "Commit only. Do NOT push. Do NOT edit any docs or markdown files. Stage only these paths: .gitignore Makefile .github/workflows/ci.yml vigil/demo.py vigil/web/service.py tests/test_demo.py. Use exactly this message:\n\nT-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n\nmake demo seeds D1, D3 and D2 offline, prints the decision log, writes receipts and\nverifies the chain and each receipt. make verify now checks every chain database present\nagainst its own run's anchors, plus its receipts. Adds make anchor RUN=, make evidence\n(fails until check_evidence exists) and a GitHub Actions workflow with no secrets.\nServer: make test 241 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo\nDEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b;\nmake verify: 7 chain databases verified. ",
+      "files": [],
+      "agents": [],
+      "type": "user"
+    },
+    {
+      "id": "msg_12c1931c2001AmOSOy81S919XJ",
+      "time": {
+        "created": 1791741211179,
+        "streamed": 1791741214484,
+        "completed": 1791741215089
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The user wants me to:\n1. Commit only, do NOT push\n2. Do NOT edit any docs or markdown files\n3. Stage only these paths: .gitignore Makefile .github/workflows/ci.yml vigil/demo.py vigil/web/service.py tests/test_demo.py\n4. Use exactly the commit message provided\n\nLet me first check the git status to see what's going on, then stage the specific files and commit.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The user wants me to:\n1. Commit only, do NOT push\n2. Do NOT edit any docs or markdown files\n3. Stage only these paths: .gitignore Makefile .github/workflows/ci.yml vigil/demo.py vigil/web/service.py tests/test_demo.py\n4. Use exactly the commit message provided\n\nLet me first check the git status to see what's going on, then stage the specific files and commit.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741213213,
+            "completed": 1791741214392
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_d267de47033141a99ff9b527",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cd /home/ubuntu/vigil && git status --short"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": " M .gitignore\n M Makefile\n M vigil/demo.py\n M vigil/web/service.py\n?? .github/\n?? tests/test_demo.py\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791741214226,
+            "ran": 1791741214477,
+            "completed": 1791741214793
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 6751,
+        "output": 23,
+        "reasoning": 92,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c194235001UdYlRu8RG6BSGl",
+      "time": {
+        "created": 1791741215392,
+        "streamed": 1791741220772,
+        "completed": 1791741221075
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The status shows modified files: .gitignore, Makefile, vigil/demo.py, vigil/web/service.py, and untracked: .github/ and tests/test_demo.py.\n\nThe user wants me to stage only:\n- .gitignore\n- Makefile\n- .github/workflows/ci.yml\n- vigil/demo.py\n- vigil/web/service.py\n- tests/test_demo.py\n\nNote that .github/ is untracked - I need to make sure I only stage .github/workflows/ci.yml specifically, not everything in .github/.\n\nLet me check what's in .github/ first, then stage the specific paths and commit with the exact message.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The status shows modified files: .gitignore, Makefile, vigil/demo.py, vigil/web/service.py, and untracked: .github/ and tests/test_demo.py.\n\nThe user wants me to stage only:\n- .gitignore\n- Makefile\n- .github/workflows/ci.yml\n- vigil/demo.py\n- vigil/web/service.py\n- tests/test_demo.py\n\nNote that .github/ is untracked - I need to make sure I only stage .github/workflows/ci.yml specifically, not everything in .github/.\n\nLet me check what's in .github/ first, then stage the specific paths and commit with the exact message.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741217596,
+            "completed": 1791741220485
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_ffaffc1a8b044ca796bd0923",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cd /home/ubuntu/vigil && find .github -type f"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": ".github/workflows/ci.yml\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791741219493,
+            "ran": 1791741220587,
+            "completed": 1791741220892
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 6596,
+        "output": 33,
+        "reasoning": 134,
+        "cache": {
+          "read": 320,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c195940001jVEV0Wcu7ra8At",
+      "time": {
+        "created": 1791741275573,
+        "streamed": 1791741278694,
+        "completed": 1791741279079
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Good, `.github/` contains only `workflows/ci.yml`. Now stage exactly the specified paths and commit with the exact message. No pushing.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Good, `.github/` contains only `workflows/ci.yml`. Now stage exactly the specified paths and commit with the exact message. No pushing.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741277439,
+            "completed": 1791741278674
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_c58a2b82ac0244069ac0208a",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cd /home/ubuntu/vigil && git add .gitignore Makefile .github/workflows/ci.yml vigil/demo.py vigil/web/service.py tests/test_demo.py && git status --short"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "A  .github/workflows/ci.yml\nM  .gitignore\nM  Makefile\nA  tests/test_demo.py\nM  vigil/demo.py\nM  vigil/web/service.py\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791741278094,
+            "ran": 1791741278688,
+            "completed": 1791741278975
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 5638,
+        "output": 48,
+        "reasoning": 34,
+        "cache": {
+          "read": 1472,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c1a3bca001UDYcm6pJDPf2hW",
+      "time": {
+        "created": 1791741279285,
+        "streamed": 1791741287594,
+        "completed": 1791741289719
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "All six paths staged, nothing else. Now commit with the exact message. The message is multi-line, so I need to use a heredoc or multiple -m flags. Let me use a single commit with the exact message. The message:\n\n```\nT-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n\nmake demo seeds D1, D3 and D2 offline, prints the decision log, writes receipts and\nverifies the chain and each receipt. make verify now checks every chain database present\nagainst its own run's anchors, plus its receipts. Adds make anchor RUN=, make evidence\n(fails until check_evidence exists) and a GitHub Actions workflow with no secrets.\nServer: make test 241 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo\nDEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b;\nmake verify: 7 chain databases verified.\n```\n\nI'll use git commit with a heredoc to preserve the exact formatting. Then verify the commit. Do NOT push.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "All six paths staged, nothing else. Now commit with the exact message. The message is multi-line, so I need to use a heredoc or multiple -m flags. Let me use a single commit with the exact message. The message:\n\n```\nT-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n\nmake demo seeds D1, D3 and D2 offline, prints the decision log, writes receipts and\nverifies the chain and each receipt. make verify now checks every chain database present\nagainst its own run's anchors, plus its receipts. Adds make anchor RUN=, make evidence\n(fails until check_evidence exists) and a GitHub Actions workflow with no secrets.\nServer: make test 241 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo\nDEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b;\nmake verify: 7 chain databases verified.\n```\n\nI'll use git commit with a heredoc to preserve the exact formatting. Then verify the commit. Do NOT push.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741280395,
+            "completed": 1791741287573
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_22d637eae9b4497895f048b9",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cd /home/ubuntu/vigil && git commit -m \"$(cat <<'EOF'\nT-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n\nmake demo seeds D1, D3 and D2 offline, prints the decision log, writes receipts and\nverifies the chain and each receipt. make verify now checks every chain database present\nagainst its own run's anchors, plus its receipts. Adds make anchor RUN=, make evidence\n(fails until check_evidence exists) and a GitHub Actions workflow with no secrets.\nServer: make test 241 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo\nDEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b;\nmake verify: 7 chain databases verified.\nEOF\n)\""
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "[main 09e57c0] T-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n 6 files changed, 390 insertions(+), 6 deletions(-)\n create mode 100644 .github/workflows/ci.yml\n create mode 100644 tests/test_demo.py\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791741284582,
+            "ran": 1791741287587,
+            "completed": 1791741289602
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 85,
+        "output": 295,
+        "reasoning": 247,
+        "cache": {
+          "read": 7168,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c1a6599001oi845vNf6ew4Hv",
+      "time": {
+        "created": 1791741329813,
+        "streamed": 1791741332587,
+        "completed": 1791741332983
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Committed. Let me verify the commit message and that the working tree state is as expected (remaining unstaged changes should still be there but not committed). Let me check the log and confirm no push happened.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Committed. Let me verify the commit message and that the working tree state is as expected (remaining unstaged changes should still be there but not committed). Let me check the log and confirm no push happened.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741331282,
+            "completed": 1791741332481
+          }
+        },
+        {
+          "type": "tool",
+          "id": "call_071f2e2b73a1416bbfe2901b",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "cd /home/ubuntu/vigil && git log -1 --format='%H%n---%n%B' && git status --short && git log --oneline -3"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "09e57c0269786dd4ce0c86e807a9deb426326bb3\n---\nT-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n\nmake demo seeds D1, D3 and D2 offline, prints the decision log, writes receipts and\nverifies the chain and each receipt. make verify now checks every chain database present\nagainst its own run's anchors, plus its receipts. Adds make anchor RUN=, make evidence\n(fails until check_evidence exists) and a GitHub Actions workflow with no secrets.\nServer: make test 241 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo\nDEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b;\nmake verify: 7 chain databases verified.\n\n09e57c0 T-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n57f09d2 docs: record batch 7 (T-17, T-18) in README, hackathon.md, DECISIONS D-017..D-019, PLAN\ne193084 T-17/T-18: read-only web app (API, SSE stream, dashboard, proof, status)\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791741331952,
+            "ran": 1791741332581,
+            "completed": 1791741332901
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 1178,
+        "output": 37,
+        "reasoning": 53,
+        "cache": {
+          "read": 6720,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c1b0e51001nOaq0kuZIeLJtu",
+      "time": {
+        "created": 1791741333097,
+        "streamed": 1791741336995,
+        "completed": 1791741337380
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Committed successfully:\n- Commit 09e57c0 with the exact message\n- 6 files changed, 390 insertions, 6 deletions\n- Only the specified paths were staged\n- Not pushed (no push command was run)\n- No docs/markdown files were edited (only the 6 specified paths were staged; the working tree shows nothing else modified now — actually the git status --short after commit returned empty output, meaning the working tree is clean)\n\nWait, the status output shows nothing between the message and the log — the working tree is clean. Good.\n\nDone. Brief confirmation to user.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Committed successfully:\n- Commit 09e57c0 with the exact message\n- 6 files changed, 390 insertions, 6 deletions\n- Only the specified paths were staged\n- Not pushed (no push command was run)\n- No docs/markdown files were edited (only the 6 specified paths were staged; the working tree shows nothing else modified now — actually the git status --short after commit returned empty output, meaning the working tree is clean)\n\nWait, the status output shows nothing between the message and the log — the working tree is clean. Good.\n\nDone. Brief confirmation to user.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791741334626,
+            "completed": 1791741336902
+          }
+        },
+        {
+          "type": "text",
+          "text": "Committed `09e57c0` on `main` — exact message, 6 files staged (`.gitignore`, `Makefile`, `.github/workflows/ci.yml`, `vigil/demo.py`, `vigil/web/service.py`, `tests/test_demo.py`), 390 insertions / 6 deletions. Not pushed. No docs or markdown files touched. Working tree is clean."
+        }
+      ],
+      "snapshot": {
+        "start": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "end": "57989f51c041f6f5202466ccb37bbfabeef47b5c",
+        "files": []
+      },
+      "finish": "stop",
+      "rawFinish": "stop",
+      "cost": 0,
+      "tokens": {
+        "input": 433,
+        "output": 80,
+        "reasoning": 145,
+        "cache": {
+          "read": 7936,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12c1b1f34001hGHUGz0a3n6qlJ",
+      "time": {
+        "created": 1791741337396
+      },
+      "type": "idle",
+      "outcome": "succeeded"
+    }
+  ]
+}
