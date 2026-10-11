@@ -140,7 +140,7 @@ def run_scenario(spec: dict, *, chain: Chain, clock: VirtualClock, policy, model
     gt = spec["ground_truth"]
     stack_model = FixtureModel(model, spec["llm_fixture"]) if spec.get("llm_fixture") else model
     stack = build_stack(chain=chain, clock=clock, policy=policy, model=stack_model, faults=world_faults(spec),
-                        tracer=tracer, max_steps=max_steps, incident_start=incident_start,
+                        tracer=tracer, max_steps=int(spec.get("max_steps", max_steps)), incident_start=incident_start,
                         sleep=lambda s: clock.advance(max(1, math.ceil(s))))
     apply_script(spec, stack.world, clock)
     incidents = stack.detector.run()
@@ -279,6 +279,10 @@ def run_eval(*, label: str, mode: str, only: Optional[list] = None, record: bool
     return result
 
 
+def baseline_scenario_ids(baseline: dict) -> list:
+    return [s["id"] for s in baseline.get("scenarios", [])]
+
+
 def diff_against_baseline(result: dict, baseline: dict) -> list:
     diffs = []
     if result.get("prompt_version") != baseline.get("prompt_version", "v0"):
@@ -348,6 +352,8 @@ def main(argv: Optional[list] = None) -> int:
             return 2
         with open(bpath, encoding="utf-8") as f:
             baseline = json.load(f)
+        if only is None:  # replay runs exactly the scenarios the baseline recorded, so later catalogue additions never break old labels
+            only = baseline_scenario_ids(baseline)
     rpath = os.path.join(RESULTS_DIR, f"{a.label}.json")
     if a.record and os.path.exists(rpath):
         print(f"ERROR: {rpath} exists. Earlier labels are never overwritten; use a new label.")

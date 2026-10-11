@@ -1,0 +1,98 @@
+{
+  "digest": "sha256:d43674dfa73dd6b70bec10c39cbf5a83a7b0852c29b9d8eda5898302c5ec56b0",
+  "payload": {
+    "actions": [
+      {
+        "amount_minor": null,
+        "args_sha256": "sha256:479e0f8584870cc373003ac32b94783ef37de246ee658b6ac42db96234954e9b",
+        "executed": true,
+        "idempotency_key": null,
+        "tool": "escalate"
+      }
+    ],
+    "closed_at": "2026-10-10T08:01:00Z",
+    "currency": "NGN",
+    "entire_checkpoint": null,
+    "entries": [
+      {
+        "hash": "sha256:a632736f3cfbea2068d5f935bf15eb3c1ee3d91bceb6007cd1ba9d0f883b6870",
+        "seq": 0
+      },
+      {
+        "hash": "sha256:cfe6e1b5d60eb063974ea1855428bccfe9d7c0e1d2545bea7e35ef4758396e96",
+        "seq": 1
+      },
+      {
+        "hash": "sha256:999eee9b528188866c4ba535b2f0749fef27cbee6f13b2d0ee239738316c05be",
+        "seq": 2
+      },
+      {
+        "hash": "sha256:6e7740e7e0323cf71c669fdb70f669df39d5ee28c0981c5ff39de480e1a96f8c",
+        "seq": 3
+      },
+      {
+        "hash": "sha256:98af31497c7777870518b992c538febb4cf44a74e3c094f3bbf6adec520cc979",
+        "seq": 4
+      },
+      {
+        "hash": "sha256:f21b916c5e623d8b86f93358d11d61b4fb5c38769967124adb645d60633d0ce7",
+        "seq": 5
+      },
+      {
+        "hash": "sha256:8a290ec19cd8fd5e0d6f9a5374ba4f983e73d4f5cc19db52d925bf1ab8db2930",
+        "seq": 6
+      },
+      {
+        "hash": "sha256:6c2cf439fbebd7a5db604353b0ccadd2d7be201432bf8b98bb9ae186dd58de0e",
+        "seq": 7
+      },
+      {
+        "hash": "sha256:6b880ff60cba8c19b6e21d5b3d8dca5422c7113468ca9e5f733ec6604c27da22",
+        "seq": 8
+      },
+      {
+        "hash": "sha256:1f354ea6b26bea89d0ea1b6a74be128543f2b072adbf2534d01114001d437306",
+        "seq": 9
+      },
+      {
+        "hash": "sha256:8bea7389d5a8fc8fd0ce60ccacdb851472dc346f79021cee4fa3bab0864b0a32",
+        "seq": 10
+      },
+      {
+        "hash": "sha256:07d42f62c55a8473ae109e02ae9442c42ed102f623501a3ff3ff905464b154a0",
+        "seq": 11
+      },
+      {
+        "hash": "sha256:0df2812ad8bfaebda9700b592428238561a1c433b83c45990765259051549885",
+        "seq": 12
+      }
+    ],
+    "git_sha": "d8b2242",
+    "incident_id": "inc_0001",
+    "mode": "simulated",
+    "neatlogs_trace_id": "622a62acdc6fecc78caf8ca26da97b1e",
+    "opened_at": "2026-10-10T08:01:00Z",
+    "outcome": "ESCALATED",
+    "policy_sha256": "sha256:696b891ceabd61a7cf7c89ed6e98793ac182397b88332da7eaccbc2381dbc581",
+    "reason_code": "AMOUNT_OVER_INCIDENT_CAP",
+    "run_label": "v1h",
+    "scenario_id": "D2",
+    "type": "duplicate_charge",
+    "verification": {
+      "checks": [
+        {
+          "check": "escalation_recorded",
+          "detail": "",
+          "passed": true
+        },
+        {
+          "check": "evidence_packet_complete",
+          "detail": "",
+          "passed": true
+        }
+      ],
+      "ok": true
+    }
+  },
+  "receipt_version": 1
+}

@@ -1,3 +1,4 @@
 # Vigil chain-head anchors (append-only). Format: <ts> run=<label> seq=<n> head=sha256:<hex> git=<sha>
 2026-10-10T23:02:17Z run=v0 seq=111 head=sha256:4a7a869b8609b4ff8f529aa7885ed5aa474a76c33f04655a89ef8fdd1dc40d14 git=f0dbfd5
 2026-10-11T06:49:00Z run=v1 seq=88 head=sha256:91504212ce0f8e4024cacb9bac4fe579a0254dc13572e629db514a458969018a git=6bfd45d
+2026-10-11T08:14:38Z run=v1h seq=38 head=sha256:c419c8b890d26cfd30e504f0e43b2bdbdc74155432ee1e0ec74294d9b72d5b10 git=d8b2242

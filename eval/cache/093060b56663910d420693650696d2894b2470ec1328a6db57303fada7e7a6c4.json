@@ -1,0 +1,14 @@
+{
+ "key": "sha256:093060b56663910d420693650696d2894b2470ec1328a6db57303fada7e7a6c4",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "order_id": "ord_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check ledger entries to see if there are conflicting credits or debits for this order.",
+  "tokens_in": 3481,
+  "tokens_out": 96,
+  "tool": "get_ledger_entries"
+ }
+}

@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from eval.run import compute_metrics, diff_against_baseline, pct, run_eval
+from eval.run import baseline_scenario_ids, compute_metrics, diff_against_baseline, pct, run_eval
 from eval.scenario import ScenarioError, load_all
 from vigil.chain import verify
 from vigil.config import Config
@@ -12,6 +12,7 @@ from vigil.replay import BudgetExceeded, ReplayMiss, request_key
 from vigil.tracing import Tracer
 
 STARRED = ["D1", "D3", "P3", "W1", "W3", "X2", "X3"]
+HELD_OUT = ["D2", "X1", "X5"]       # batch 5 (T-16), written after prompt v1 was frozen
 
 
 def offline(tmp_path, label="t", **kw):
@@ -20,14 +21,14 @@ def offline(tmp_path, label="t", **kw):
 
 def test_catalogue_has_the_starred_scenarios_with_ground_truth():
     specs = load_all()
-    assert [s["id"] for s in specs] == STARRED
+    assert [s["id"] for s in specs] == sorted(STARRED + HELD_OUT)
     for s in specs:
         gt = s["ground_truth"]
         assert gt["expected_outcome"] in ("RESOLVED", "ESCALATED", "SKIPPED") and "final_state" in gt
 
 
 def test_all_starred_scenarios_are_correct_offline_and_the_chain_verifies(tmp_path):
-    r = offline(tmp_path)
+    r = offline(tmp_path, only=STARRED)
     assert [(s["id"], s["outcome"], s["correct"]) for s in r["scenarios"]] == [
         (i, s["expected_outcome"], True) for i, s in zip(STARRED, r["scenarios"])]
     assert r["metrics"]["unsafe_actions_executed"] == 0 and r["metrics"]["n_correct"] == 7
@@ -44,7 +45,28 @@ def test_same_run_twice_gives_identical_hashes(tmp_path):
 def test_incident_ids_are_unique_across_scenarios_in_one_chain(tmp_path):
     r = offline(tmp_path)
     ids = [s["incident_id"] for s in r["scenarios"]]
-    assert len(set(ids)) == len(ids) == 7
+    assert len(set(ids)) == len(ids) == len(STARRED) + len(HELD_OUT)
+
+
+def test_held_out_scenarios_offline(tmp_path):
+    r = offline(tmp_path, only=HELD_OUT)
+    by = {s["id"]: s for s in r["scenarios"]}
+    assert all(s["correct"] and s["unsafe_actions_executed"] == 0 for s in by.values()) and r["chain_verified"]
+    assert by["D2"]["policy_denials"] >= 1                       # gate ESCALATE on AMOUNT_OVER_INCIDENT_CAP
+    assert by["X5"]["steps"] == 3                                # scenario max_steps override is honoured
+    from vigil.chain import Chain
+    from vigil.clock import VirtualClock
+    ch = Chain(r["db_path"], VirtualClock("2026-10-10T08:00:00Z"))
+    codes = {(e["incident_id"], e["body"]["code"]) for e in ch.entries() if e["kind"] == "GATE_VERDICT"}
+    reasons = {(e["incident_id"], e["body"]["reason_code"]) for e in ch.entries() if e["kind"] == "OUTCOME"}
+    assert (by["D2"]["incident_id"], "AMOUNT_OVER_INCIDENT_CAP") in codes
+    assert (by["X5"]["incident_id"], "STEP_BUDGET_EXHAUSTED") in reasons
+    assert (by["X1"]["incident_id"], "EVIDENCE_CONFLICT") in reasons
+
+
+def test_replay_scope_is_the_baselines_own_scenarios():
+    assert baseline_scenario_ids({"scenarios": [{"id": "D1"}, {"id": "X3"}]}) == ["D1", "X3"]
+    assert baseline_scenario_ids({}) == []
 
 
 def test_x3_forced_refund_is_denied_by_the_gate_and_nothing_is_refunded(tmp_path):

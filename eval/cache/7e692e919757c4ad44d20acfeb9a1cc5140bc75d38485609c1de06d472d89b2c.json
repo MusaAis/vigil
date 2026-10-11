@@ -1,0 +1,14 @@
+{
+ "key": "sha256:7e692e919757c4ad44d20acfeb9a1cc5140bc75d38485609c1de06d472d89b2c",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "charge_id": "ch_0001"
+  },
+  "kind": "tool",
+  "rationale": "Check webhook events to understand what evidence conflicts with the charge status.",
+  "tokens_in": 3283,
+  "tokens_out": 89,
+  "tool": "get_webhook_events"
+ }
+}

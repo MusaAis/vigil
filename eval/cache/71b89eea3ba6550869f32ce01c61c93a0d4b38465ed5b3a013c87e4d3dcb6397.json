@@ -1,0 +1,20 @@
+{
+ "key": "sha256:71b89eea3ba6550869f32ce01c61c93a0d4b38465ed5b3a013c87e4d3dcb6397",
+ "model": "claude-haiku",
+ "proposal": {
+  "args": {
+   "evidence_refs": [
+    "ch_0001",
+    "evt_0001",
+    "ord_0001"
+   ],
+   "reason_code": "LEDGER_CHARGE_MISMATCH",
+   "summary": "Charge ch_0001 has status \"failed\" but ledger has credited 2,500,000 NGN to revenue. The charge.failed webhook was delivered, yet accounting entries show the charge was processed as successful."
+  },
+  "kind": "tool",
+  "rationale": "Failed charge should not result in revenue credit; ledger and charge status conflict requires human review.",
+  "tokens_in": 3804,
+  "tokens_out": 368,
+  "tool": "escalate"
+ }
+}
