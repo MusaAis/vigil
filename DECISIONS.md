@@ -89,3 +89,33 @@ offset; replay reuses the baseline's trace ids (FixedTracer) so the chain hashes
 neatlogs traces are created; the replay cache stores only the proposal and token counts (never request
 text, keys or headers); percentages are integers rounded half up with counts stored alongside; cost is
 computed only when `LLM_PRICE_IN/OUT_USD_MICRO_PER_MTOK` are set.
+
+Update 2026-10-11 (to D-004): eight Entire checkpoints now exist, all created with `entire session attach` (see hackathon.md for ids and commits). Entire still warns that no user prompts were parsed (FEEDBACK E6).
+Update 2026-10-11 (to D-009): tool-calling through the gateway is verified (live eval runs v0, v1, v1h, v1h2 and `make live-smoke`). neatlogs span attributes are still not attached. `DAILY_LIVE_BUDGET_TOKENS` caps tokens per run, not per day.
+
+## D-012 Prompt versioning and replay — 2026-10-11
+The system prompt is part of the replay cache key, so editing it would break replay of every earlier baseline. `vigil/prompt.py` therefore keeps `PROMPT_V0` verbatim (hash-tested)
+and adds `PROMPT_V1` as the default. Baselines store `prompt_version` (older ones default to v0) and replay uses it. A prompt change needs a new label.
+Known gap: tool descriptions and schemas are not versioned, so changing them would also break replay of existing baselines.
+
+## D-013 Anchors are checked per run label — 2026-10-11
+`append_anchor` and `scripts/verify_chain --run <label>` only compare the anchors of that run label. Before this fix, appending the v1 anchor was checked against the v0 anchor
+and failed because the two runs have different chains. Each eval run has its own chain database (`data/eval-<label>.db`, not committed) and its own anchor line in `anchors.txt`.
+
+## D-014 Eval harness: per-scenario max_steps, replay scope, mid-run hook — 2026-10-11
+- A scenario may set `max_steps`. It is not part of the replay cache key, so existing baselines are unaffected.
+- Replay runs exactly the scenarios listed in the baseline, so later catalogue additions never break `make eval-check` for older labels.
+- A scenario may declare `mid_run` steps (`after_read_calls`, `op` in settle_payout, fail_payout, inject_ledger_credit). Each applies once, right after the agent's Nth read-tool call returns.
+  The trigger counts read calls only, so it is deterministic for a given sequence of model proposals (live, replay and offline). Used by X4.
+
+## D-015 Failed payouts open an incident (deviation from SPEC 4) — 2026-10-11
+SPEC 4 opens `stuck_payout` only for pending or processing payouts older than the SLA. A payout already `failed` at the provider opened nothing, although the gate (SPEC 6.2 check 8) and the verifier already treat it as retryable.
+Choice: the detector also opens `stuck_payout` for a `failed` payout, with no age requirement, and `confirm_no_action` returns not-ok while the payout is failed. The gate is unchanged.
+Cost: a failed payout the provider will never accept again still opens an incident; the agent can only retry or escalate. Covered by `test_failed_payout_opens_an_incident_without_waiting_for_the_sla` and `test_failed_payout_is_not_confirmed_as_no_action_until_it_is_paid`; scenario P2.
+
+## D-016 Reporting rules for held-out scenarios, and scenarios not built — 2026-10-11
+- Held-out means: the prompt was not changed after seeing the scenario. D2, X1, X5 (label v1h) and P2, X4, X5b (label v1h2) were run with prompt v1 unchanged. v1 itself was tuned on the v0 failures of the same 7 starred scenarios, so it is not held-out.
+- X5b was written after X5 showed that a 3-step budget did not bind, so it is informed by that result and not a blind test.
+- A label is never overwritten and failures stay in `eval/results` and `eval/baselines`: X5 (v1h) and X4 (v1h2) failed and are kept as recorded.
+- W2 (webhook delivered twice) and P1 (payout within the SLA) are not eval scenarios because the correct behaviour is that no incident opens; they are covered by detector unit tests.
+  X6 (same refund proposed twice) cannot occur through the loop because a verified refund closes the incident; the gate's DUPLICATE_ACTION check is covered by the gate and invariant tests.
