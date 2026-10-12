@@ -182,12 +182,6 @@ def test_make_anchor_needs_a_run_label_and_a_database(sandbox):
     assert make(sandbox, "verify").returncode == 0  # the new anchor is checked and matches
 
 
-@pytest.mark.skipif(not HAS_MAKE or os.path.exists(os.path.join(ROOT, "scripts", "check_evidence")), reason="check_evidence exists (T-21)")
-def test_make_evidence_fails_clearly_until_t21(sandbox):
-    r = make(sandbox, "evidence")
-    assert r.returncode != 0 and "check_evidence does not exist yet" in r.stdout
-
-
 # ---------------------------------------------------------------- CI and ignore rules
 def test_ci_workflow_runs_the_spec_steps_without_secrets():
     path = os.path.join(ROOT, ".github", "workflows", "ci.yml")
@@ -196,7 +190,7 @@ def test_ci_workflow_runs_the_spec_steps_without_secrets():
     assert "push" in (wf.get(True) or wf.get("on"))  # PyYAML reads the key `on` as True
     steps = [s for job in wf["jobs"].values() for s in job["steps"]]
     runs = [s["run"] for s in steps if "run" in s]
-    assert runs == ["make setup", "make test", "make invariants", "make eval-check", "make verify", "make demo"]
+    assert runs == ["make setup", "make test", "make invariants", "make eval-check", "make verify", "make demo", "make evidence"]
     assert "secrets." not in text and "LLM_API_KEY" not in text
 
 

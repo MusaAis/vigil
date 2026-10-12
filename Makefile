@@ -1,6 +1,6 @@
 PY ?= .venv/bin/python
 
-.PHONY: setup test invariants verify hello live-smoke eval eval-check eval-offline serve demo anchor evidence
+.PHONY: setup test invariants verify hello live-smoke eval eval-check eval-offline serve demo anchor evidence render
 LABEL ?= v0
 PORT ?= 8005
 setup:
@@ -74,7 +74,10 @@ anchor:
 	@test -e "$(DB)" || { echo "database not found: $(DB)"; exit 2; }
 	$(PY) scripts/anchor --run $(RUN) --db $(DB)
 
-# evidence: checks docs/evidence.json (a claim marked ok needs a real URL). The script is built in T-21.
+# evidence: checks docs/evidence.json (a claim marked ok needs an https URL; every required claim must be listed).
 evidence:
-	@test -f scripts/check_evidence || { echo "scripts/check_evidence does not exist yet (task T-21)"; exit 1; }
 	$(PY) scripts/check_evidence
+
+# render: regenerates docs/submission.md and docs/business-plan-inputs.md from docs/evidence.json, eval/results and anchors.txt.
+render:
+	$(PY) scripts/render_docs

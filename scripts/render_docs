@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""Regenerate docs/submission.md and docs/business-plan-inputs.md from files (never typed by hand)."""
+import os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from vigil.docsgen import write_all  # noqa: E402
+from vigil.web.settings import DEFAULT_REPO_URL  # noqa: E402
+
+root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+for p in write_all(os.path.normpath(root), DEFAULT_REPO_URL):
+    print("wrote " + os.path.relpath(p, root))

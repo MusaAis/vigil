@@ -20,3 +20,4 @@ jobs:
       - run: make eval-check
       - run: make verify
       - run: make demo
+      - run: make evidence

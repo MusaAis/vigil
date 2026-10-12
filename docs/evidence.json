@@ -1,0 +1,11 @@
+[
+  {"claim": "agent improved (two traces and numbers)", "kind": "neatlogs traces v0 and v1 with eval numbers", "url": null, "added_at": null, "status": "pending"},
+  {"claim": "used neatlogs", "kind": "shareable trace link", "url": null, "added_at": null, "status": "pending"},
+  {"claim": "used Entire", "kind": "checkpoint link or entire output", "url": null, "added_at": null, "status": "pending"},
+  {"claim": "used cfo.ai (business plan)", "kind": "exported plan link", "url": null, "added_at": null, "status": "pending"},
+  {"claim": "recovers from failures", "kind": "neatlogs trace of W3 or P3", "url": null, "added_at": null, "status": "pending"},
+  {"claim": "built in public", "kind": "post: first update (idea, first trace, repo)", "url": "https://x.com/musa_ais/status/2108910440721813529", "added_at": "2026-10-12", "status": "ok"},
+  {"claim": "built in public", "kind": "post: failing baseline v0", "url": "https://x.com/musa_ais/status/2109035793872510995", "added_at": "2026-10-12", "status": "ok"},
+  {"claim": "built in public", "kind": "post: v1 improvement", "url": "https://x.com/musa_ais/status/2109178362128126111", "added_at": "2026-10-12", "status": "ok"},
+  {"claim": "wrote code during the hackathon", "kind": "public repo commit history", "url": "https://github.com/MusaAis/vigil/commits/main", "added_at": "2026-10-12", "status": "ok"}
+]
