@@ -57,7 +57,7 @@ section{scroll-margin-top:56px}
 <p class="src">source: {{ d.eval.source }}</p>
 {% for r in d.eval.runs %}
 <div class="run">
-  <div class="t"><b>{{ r.label }}</b><span class="mut">{{ r.mode }} run{% if r.model %}, {{ r.model }}{% endif %}{% if r.prompt_version %}, prompt {{ r.prompt_version }}{% endif %}, commit {{ r.git_sha }}</span></div>
+  <div class="t"><b>{{ r.label }}</b><span class="mut">{{ r.mode }} run{% if r.model %}, {{ r.model }}{% endif %}{% if r.prompt_version %}, prompt {{ r.prompt_version }}{% endif %}, run on commit {{ r.git_sha }}</span></div>
   <div class="bar" role="img" aria-label="{{ r.n_correct }} of {{ r.n_total }} correct"><i style="width:{{ r.n_correct|ratio(r.n_total) }}%"></i></div>
   <dl class="mx">
     <div><dt>Correct</dt><dd>{{ r.n_correct }} of {{ r.n_total }} ({{ r.correct_resolution_pct|pct }})</dd></div>

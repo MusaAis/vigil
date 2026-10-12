@@ -75,15 +75,41 @@ def test_committed_evidence_file_is_valid_and_every_ok_row_is_https():
     assert all(i["url"].startswith("https://") for i in items if i["status"] == "ok")
 
 
+def _without_first_commit_line(text):
+    return "\n".join(ln for ln in text.split("\n") if not ln.startswith("- First commit:"))
+
+
 def test_committed_generated_docs_match_their_sources():
-    for name, render in (("submission.md", lambda: docsgen.render_submission(ROOT, DEFAULT_REPO_URL, include_git=False)),
-                         ("business-plan-inputs.md", lambda: docsgen.render_plan_inputs(ROOT))):
-        text = open(os.path.join(ROOT, "docs", name), encoding="utf-8").read()
-        want = render()
-        if name == "submission.md":
-            # the git section is generated only where history is available (a shallow CI clone may lack the root commit)
-            want = docsgen.render_submission(ROOT, DEFAULT_REPO_URL, include_git=docsgen._root_commit(ROOT) is not None)
-        assert text == want, f"docs/{name} is stale: run make render"
+    plan = open(os.path.join(ROOT, "docs", "business-plan-inputs.md"), encoding="utf-8").read()
+    assert plan == docsgen.render_plan_inputs(ROOT), "docs/business-plan-inputs.md is stale: run make render"
+    sub = open(os.path.join(ROOT, "docs", "submission.md"), encoding="utf-8").read()
+    if docsgen._root_commit(ROOT) is not None:
+        assert sub == docsgen.render_submission(ROOT, DEFAULT_REPO_URL, include_git=True), "docs/submission.md is stale"
+    else:
+        # shallow clone (for example a default CI checkout): the git section cannot be regenerated, so compare the rest
+        want = docsgen.render_submission(ROOT, DEFAULT_REPO_URL, include_git=False)
+        assert _without_first_commit_line(sub) == want, "docs/submission.md is stale: run make render"
+
+
+def test_root_commit_is_unavailable_in_a_shallow_clone(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t",
+           "PATH": os.environ["PATH"], "HOME": str(tmp_path)}
+
+    def git(cwd, *a):
+        subprocess.run(["git", *a], cwd=cwd, check=True, capture_output=True, env=env)
+
+    git(src, "init", "-q")
+    for n in ("a", "b"):
+        (src / n).write_text(n)
+        git(src, "add", n)
+        git(src, "commit", "-q", "-m", n)
+    full = docsgen._root_commit(str(src))
+    assert full is not None and len(full[0]) == 7
+    shallow = tmp_path / "shallow"
+    git(tmp_path, "clone", "-q", "--depth", "1", "file://" + str(src), str(shallow))
+    assert docsgen._root_commit(str(shallow)) is None
 
 
 def test_submission_renders_pending_and_never_links_a_row_that_is_not_ok(tmp_path):
@@ -112,5 +138,6 @@ def test_proof_evidence_rows_follow_the_committed_file(tmp_path):
     ok = {(r["claim"], r["url"]) for r in rows if r["status"] == "ok"}
     assert ("wrote code during the hackathon", "https://github.com/MusaAis/vigil/commits/main") in ok
     pending = {r["claim"] for r in rows if r["status"] == "pending"}
-    assert {"used neatlogs", "used Entire", "used cfo.ai (business plan)"} <= pending
+    assert {"used neatlogs", "used cfo.ai (business plan)"} <= pending
+    assert ("used Entire", "https://github.com/MusaAis/vigil/commit/9db1bb7") in ok
     assert all(r["url"] is None for r in rows if r["status"] == "pending")

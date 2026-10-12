@@ -67,6 +67,10 @@ def _anchor_lines(root: str) -> list:
 
 def _root_commit(root: str) -> Optional[tuple]:
     try:
+        shallow = subprocess.check_output(["git", "rev-parse", "--is-shallow-repository"], cwd=root, text=True,
+                                          stderr=subprocess.DEVNULL).strip()
+        if shallow != "false":
+            return None  # a shallow clone has no real root commit: its oldest commit is only the checkout boundary
         sha = subprocess.check_output(["git", "rev-list", "--max-parents=0", "HEAD"], cwd=root, text=True,
                                       stderr=subprocess.DEVNULL).split()[0]
         date = subprocess.check_output(["git", "show", "-s", "--format=%cI", sha], cwd=root, text=True,

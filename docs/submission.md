@@ -9,10 +9,12 @@ All payment data in this project is simulated.
 | Claim | Kind | Link | Added |
 |---|---|---|---|
 | agent improved (two traces and numbers) | neatlogs traces v0 and v1 with eval numbers | PENDING | - |
+| agent improved (two traces and numbers) | numbers only: eval results v0 vs v1 (traces are the pending row above) | [link](https://github.com/MusaAis/vigil/blob/main/docs/results.md) | 2026-10-12 |
 | used neatlogs | shareable trace link | PENDING | - |
-| used Entire | checkpoint link or entire output | PENDING | - |
+| used Entire | commit carrying the Entire-Checkpoint trailer 01M4QJB5FHJ4TSM6K2JW4V6AB6 (checkpoint refs are on origin under refs/entire/checkpoints) | [link](https://github.com/MusaAis/vigil/commit/9db1bb7) | 2026-10-12 |
 | used cfo.ai (business plan) | exported plan link | PENDING | - |
 | recovers from failures | neatlogs trace of W3 or P3 | PENDING | - |
+| recovers from failures | eval result: W3 and P3 recovered in v1, recovery 2 of 2 (the trace is the pending row above) | [link](https://github.com/MusaAis/vigil/blob/main/eval/results/v1.json) | 2026-10-12 |
 | built in public | post: first update (idea, first trace, repo) | [link](https://x.com/musa_ais/status/2108910440721813529) | 2026-10-12 |
 | built in public | post: failing baseline v0 | [link](https://x.com/musa_ais/status/2109035793872510995) | 2026-10-12 |
 | built in public | post: v1 improvement | [link](https://x.com/musa_ais/status/2109178362128126111) | 2026-10-12 |
