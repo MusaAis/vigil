@@ -1,79 +1,79 @@
 [
- {
-  "claim": "agent improved (two traces and numbers)",
-  "kind": "neatlogs traces v0 and v1 with eval numbers",
-  "url": null,
-  "added_at": null,
-  "status": "pending"
- },
- {
-  "claim": "agent improved (two traces and numbers)",
-  "kind": "numbers only: eval results v0 vs v1 (traces are the pending row above)",
-  "url": "https://github.com/MusaAis/vigil/blob/main/docs/results.md",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "used neatlogs",
-  "kind": "shareable trace link",
-  "url": null,
-  "added_at": null,
-  "status": "pending"
- },
- {
-  "claim": "used Entire",
-  "kind": "commit carrying the Entire-Checkpoint trailer 01M4QJB5FHJ4TSM6K2JW4V6AB6 (checkpoint refs are on origin under refs/entire/checkpoints)",
-  "url": "https://github.com/MusaAis/vigil/commit/9db1bb7",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "used cfo.ai (business plan)",
-  "kind": "exported plan link",
-  "url": null,
-  "added_at": null,
-  "status": "pending"
- },
- {
-  "claim": "recovers from failures",
-  "kind": "neatlogs trace of W3 or P3",
-  "url": null,
-  "added_at": null,
-  "status": "pending"
- },
- {
-  "claim": "recovers from failures",
-  "kind": "eval result: W3 and P3 recovered in v1, recovery 2 of 2 (the trace is the pending row above)",
-  "url": "https://github.com/MusaAis/vigil/blob/main/eval/results/v1.json",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "built in public",
-  "kind": "post: first update (idea, first trace, repo)",
-  "url": "https://x.com/musa_ais/status/2108910440721813529",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "built in public",
-  "kind": "post: failing baseline v0",
-  "url": "https://x.com/musa_ais/status/2109035793872510995",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "built in public",
-  "kind": "post: v1 improvement",
-  "url": "https://x.com/musa_ais/status/2109178362128126111",
-  "added_at": "2026-10-12",
-  "status": "ok"
- },
- {
-  "claim": "wrote code during the hackathon",
-  "kind": "public repo commit history",
-  "url": "https://github.com/MusaAis/vigil/commits/main",
-  "added_at": "2026-10-12",
-  "status": "ok"
- }
+  {
+    "claim": "agent improved (two traces and numbers)",
+    "kind": "neatlogs traces v0 and v1 with eval numbers",
+    "url": null,
+    "added_at": null,
+    "status": "pending"
+  },
+  {
+    "claim": "agent improved (two traces and numbers)",
+    "kind": "numbers only: eval results v0 vs v1 (traces are the pending row above)",
+    "url": "https://github.com/MusaAis/vigil/blob/main/docs/results.md",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "used neatlogs",
+    "kind": "shareable trace link",
+    "url": null,
+    "added_at": null,
+    "status": "pending"
+  },
+  {
+    "claim": "used Entire",
+    "kind": "commit carrying the Entire-Checkpoint trailer 01M4QJB5FHJ4TSM6K2JW4V6AB6 (checkpoint refs are on origin under refs/entire/checkpoints)",
+    "url": "https://github.com/MusaAis/vigil/commit/9db1bb7",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "used cfo.ai (business plan)",
+    "kind": "exported plan link",
+    "url": "https://app.cfo.ai/s/U3uFzNEfNJP_Swas",
+    "added_at": "2026-10-12T13:45:00Z",
+    "status": "ok"
+  },
+  {
+    "claim": "recovers from failures",
+    "kind": "neatlogs trace of W3 or P3",
+    "url": null,
+    "added_at": null,
+    "status": "pending"
+  },
+  {
+    "claim": "recovers from failures",
+    "kind": "eval result: W3 and P3 recovered in v1, recovery 2 of 2 (the trace is the pending row above)",
+    "url": "https://github.com/MusaAis/vigil/blob/main/eval/results/v1.json",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "built in public",
+    "kind": "post: first update (idea, first trace, repo)",
+    "url": "https://x.com/musa_ais/status/2108910440721813529",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "built in public",
+    "kind": "post: failing baseline v0",
+    "url": "https://x.com/musa_ais/status/2109035793872510995",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "built in public",
+    "kind": "post: v1 improvement",
+    "url": "https://x.com/musa_ais/status/2109178362128126111",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  },
+  {
+    "claim": "wrote code during the hackathon",
+    "kind": "public repo commit history",
+    "url": "https://github.com/MusaAis/vigil/commits/main",
+    "added_at": "2026-10-12",
+    "status": "ok"
+  }
 ]

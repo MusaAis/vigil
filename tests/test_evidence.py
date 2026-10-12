@@ -138,6 +138,6 @@ def test_proof_evidence_rows_follow_the_committed_file(tmp_path):
     ok = {(r["claim"], r["url"]) for r in rows if r["status"] == "ok"}
     assert ("wrote code during the hackathon", "https://github.com/MusaAis/vigil/commits/main") in ok
     pending = {r["claim"] for r in rows if r["status"] == "pending"}
-    assert {"used neatlogs", "used cfo.ai (business plan)"} <= pending
+    assert {"used neatlogs"} <= pending
     assert ("used Entire", "https://github.com/MusaAis/vigil/commit/9db1bb7") in ok
     assert all(r["url"] is None for r in rows if r["status"] == "pending")
