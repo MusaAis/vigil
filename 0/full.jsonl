@@ -1,0 +1,448 @@
+{
+  "info": {
+    "id": "ses_ed0de04ceffem2vA1FwGMCIajb",
+    "projectID": "4d23e4f15b0e54d1fc2d1daa331865fcc6f60d4a",
+    "agent": "build",
+    "model": {
+      "id": "ling-3.1-flash-free",
+      "providerID": "opencode",
+      "variant": "default"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 17091,
+      "output": 625,
+      "reasoning": 870,
+      "cache": {
+        "read": 23552,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1791792120578,
+      "updated": 1791792295284,
+      "idle": 1791792295374
+    },
+    "location": {
+      "directory": "/home/ubuntu/vigil"
+    }
+  },
+  "messages": [
+    {
+      "id": "msg_12f21fbba001leKMtyCCuOf2Vu",
+      "time": {
+        "created": 1791792124397
+      },
+      "text": "Commit only. Do NOT push. Do NOT edit any docs or markdown files, or any other file. Stage exactly these paths and nothing else:\nMakefile .github/workflows/ci.yml vigil/docsgen.py scripts/check_evidence scripts/render_docs tests/test_evidence.py tests/test_demo.py docs/evidence.json docs/submission.md docs/business-plan-inputs.md docs/reviewer-start.md docs/threat-model.md\nUse exactly this message:\n\nT-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\n\n- vigil/docsgen.py validates docs/evidence.json and renders docs/submission.md and docs/business-plan-inputs.md from eval/results, anchors.txt and the git root commit\n- scripts/check_evidence fails on an ok row without an https URL, a bad status or a missing required claim; make evidence runs it; make render regenerates the docs\n- docs/evidence.json: 4 ok rows (3 posts, repo commit history), 5 pending (neatlogs, Entire, cfo.ai, agent improved, recovery)\n- docs/reviewer-start.md and docs/threat-model.md added; cost per incident left unset (no token price supplied)\n- CI now also runs make evidence\n- server: make test 265 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo DEMO OK head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; make evidence EVIDENCE OK: 4 ok, 5 pending ",
+      "files": [],
+      "agents": [],
+      "type": "user"
+    },
+    {
+      "id": "msg_12f221380001ssmiIM87ANvJTM",
+      "time": {
+        "created": 1791792155983,
+        "streamed": 1791792169689,
+        "completed": 1791792173296
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The user wants me to stage exactly specific paths and commit them with a specific message. They explicitly say:\n- Commit only, do NOT push\n- Do NOT edit any docs or markdown files or any other file\n- Stage exactly these paths and nothing else\n\nLet me first check the current git status to see what's there, then stage the exact paths and commit.\n\nLet me be careful: the paths are:\n- Makefile\n- .github/workflows/ci.yml\n- vigil/docsgen.py\n- scripts/check_evidence\n- scripts/render_docs\n- tests/test_evidence.py\n- tests/test_demo.py\n- docs/evidence.json\n- docs/submission.md\n- docs/business-plan-inputs.md\n- docs/reviewer-start.md\n- docs/threat-model.md\n\nThe commit message is exactly:\n```\nT-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\n\n- vigil/docsgen.py validates docs/evidence.json and renders docs/submission.md and docs/business-plan-inputs.md from eval/results, anchors.txt and the git root commit\n- scripts/check_evidence fails on an ok row without an https URL, a bad status or a missing required claim; make evidence runs it; make render regenerates the docs\n- docs/evidence.json: 4 ok rows (3 posts, repo commit history), 5 pending (neatlogs, Entire, cfo.ai, agent improved, recovery)\n- docs/reviewer-start.md and docs/threat-model.md added; cost per incident left unset (no token price supplied)\n- CI now also runs make evidence\n- server: make test 265 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo DEMO OK head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; make evidence EVIDENCE OK: 4 ok, 5 pending\n```\n\nLet me first check git status to see what's modified and whether all these files exist. Then stage exactly those paths and commit.\n\nThe instructions say not to edit any files, so I just need to stage and commit. Let me verify the state first.\n\nNote the commit message body lines are long; I'll use a heredoc or -m flags carefully. Better to use git commit with -F from a file? But I shouldn't create files... I can use printf piped to git commit -F -. That doesn't create files. Or use multiple -m flags — but that would create paragraphs, not lines within the same paragraph. Actually multiple -m flags create separate paragraphs (blank line between). The message body lines starting with \"- \" would each be a paragraph, which would render with blank lines between them. To preserve exact formatting, use printf '%s\\n' ... | git commit -F -.\n\nLet me check git status first.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The user wants me to stage exactly specific paths and commit them with a specific message. They explicitly say:\n- Commit only, do NOT push\n- Do NOT edit any docs or markdown files or any other file\n- Stage exactly these paths and nothing else\n\nLet me first check the current git status to see what's there, then stage the exact paths and commit.\n\nLet me be careful: the paths are:\n- Makefile\n- .github/workflows/ci.yml\n- vigil/docsgen.py\n- scripts/check_evidence\n- scripts/render_docs\n- tests/test_evidence.py\n- tests/test_demo.py\n- docs/evidence.json\n- docs/submission.md\n- docs/business-plan-inputs.md\n- docs/reviewer-start.md\n- docs/threat-model.md\n\nThe commit message is exactly:\n```\nT-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\n\n- vigil/docsgen.py validates docs/evidence.json and renders docs/submission.md and docs/business-plan-inputs.md from eval/results, anchors.txt and the git root commit\n- scripts/check_evidence fails on an ok row without an https URL, a bad status or a missing required claim; make evidence runs it; make render regenerates the docs\n- docs/evidence.json: 4 ok rows (3 posts, repo commit history), 5 pending (neatlogs, Entire, cfo.ai, agent improved, recovery)\n- docs/reviewer-start.md and docs/threat-model.md added; cost per incident left unset (no token price supplied)\n- CI now also runs make evidence\n- server: make test 265 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo DEMO OK head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; make evidence EVIDENCE OK: 4 ok, 5 pending\n```\n\nLet me first check git status to see what's modified and whether all these files exist. Then stage exactly those paths and commit.\n\nThe instructions say not to edit any files, so I just need to stage and commit. Let me verify the state first.\n\nNote the commit message body lines are long; I'll use a heredoc or -m flags carefully. Better to use git commit with -F from a file? But I shouldn't create files... I can use printf piped to git commit -F -. That doesn't create files. Or use multiple -m flags — but that would create paragraphs, not lines within the same paragraph. Actually multiple -m flags create separate paragraphs (blank line between). The message body lines starting with \"- \" would each be a paragraph, which would render with blank lines between them. To preserve exact formatting, use printf '%s\\n' ... | git commit -F -.\n\nLet me check git status first.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791792158098,
+            "completed": 1791792169394
+          }
+        },
+        {
+          "type": "text",
+          "text": "I'll check the current state, then stage exactly those paths and commit with the exact message."
+        },
+        {
+          "type": "tool",
+          "id": "call_e23d8feccd4245cbb3ea40dd",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git status --short && echo \"---\" && git log --oneline -3"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": " M .github/workflows/ci.yml\n M Makefile\n M tests/test_demo.py\n?? docs/business-plan-inputs.md\n?? docs/evidence.json\n?? docs/reviewer-start.md\n?? docs/submission.md\n?? docs/threat-model.md\n?? scripts/check_evidence\n?? scripts/render_docs\n?? tests/test_evidence.py\n?? vigil/docsgen.py\n---\n549a835 feat: redesign web app (overview page, chain ribbon, new layouts) and Vercel proxy config\n35707c7 T-19: make demo, make verify over every chain, anchor and evidence targets, CI workflow\n57f09d2 docs: record batch 7 (T-17, T-18) in README, hackathon.md, DECISIONS D-017..D-019, PLAN\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791792168982,
+            "ran": 1791792169577,
+            "completed": 1791792172372
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "end": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 6864,
+        "output": 78,
+        "reasoning": 635,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12f22d2e0001gEF4iZ1B5BpQo8",
+      "time": {
+        "created": 1791792216302,
+        "streamed": 1791792226584,
+        "completed": 1791792227679
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "All 12 paths are present and match exactly what the user listed — 3 modified files (.github/workflows/ci.yml, Makefile, tests/test_demo.py) and 9 untracked files. Nothing else is modified or untracked, so staging these paths stages exactly what's intended.\n\nNow stage exactly those paths and commit with the exact message. I'll use printf piped to git commit -F - to preserve exact line formatting.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "All 12 paths are present and match exactly what the user listed — 3 modified files (.github/workflows/ci.yml, Makefile, tests/test_demo.py) and 9 untracked files. Nothing else is modified or untracked, so staging these paths stages exactly what's intended.\n\nNow stage exactly those paths and commit with the exact message. I'll use printf piped to git commit -F - to preserve exact line formatting.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791792217605,
+            "completed": 1791792226376
+          }
+        },
+        {
+          "type": "text",
+          "text": "All 12 paths exist and nothing else is dirty. Staging exactly those paths and committing with the exact message (no push):"
+        },
+        {
+          "type": "tool",
+          "id": "call_a190b7367f2543e182aa1c44",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git add -- Makefile .github/workflows/ci.yml vigil/docsgen.py scripts/check_evidence scripts/render_docs tests/test_evidence.py tests/test_demo.py docs/evidence.json docs/submission.md docs/business-plan-inputs.md docs/reviewer-start.md docs/threat-model.md && git status --short"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "M  .github/workflows/ci.yml\nM  Makefile\nA  docs/business-plan-inputs.md\nA  docs/evidence.json\nA  docs/reviewer-start.md\nA  docs/submission.md\nA  docs/threat-model.md\nA  scripts/check_evidence\nA  scripts/render_docs\nM  tests/test_demo.py\nA  tests/test_evidence.py\nA  vigil/docsgen.py\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791792225505,
+            "ran": 1791792226477,
+            "completed": 1791792227409
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "end": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 358,
+        "output": 94,
+        "reasoning": 101,
+        "cache": {
+          "read": 7424,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12f23a5cb001Ntf3QIs7YGhZUp",
+      "time": {
+        "created": 1791792278306,
+        "streamed": 1791792283413,
+        "completed": 1791792285772
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Staged exactly the 12 paths. Now commit with the exact message. I'll use printf piped to git commit -F - to preserve exact formatting.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Staged exactly the 12 paths. Now commit with the exact message. I'll use printf piped to git commit -F - to preserve exact formatting.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791792279473,
+            "completed": 1791792283380
+          }
+        },
+        {
+          "type": "text",
+          "text": "All 12 paths staged, nothing else. Committing with the exact message:"
+        },
+        {
+          "type": "tool",
+          "id": "call_9ab01666a1544462bdc23833",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "printf '%s\\n' \"T-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\" \"\" \"- vigil/docsgen.py validates docs/evidence.json and renders docs/submission.md and docs/business-plan-inputs.md from eval/results, anchors.txt and the git root commit\" \"- scripts/check_evidence fails on an ok row without an https URL, a bad status or a missing required claim; make evidence runs it; make render regenerates the docs\" \"- docs/evidence.json: 4 ok rows (3 posts, repo commit history), 5 pending (neatlogs, Entire, cfo.ai, agent improved, recovery)\" \"- docs/reviewer-start.md and docs/threat-model.md added; cost per incident left unset (no token price supplied)\" \"- CI now also runs make evidence\" \"- server: make test 265 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo DEMO OK head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; make evidence EVIDENCE OK: 4 ok, 5 pending\" | git commit -F -"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "[main b05db9f] T-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\n 12 files changed, 519 insertions(+), 10 deletions(-)\n create mode 100644 docs/business-plan-inputs.md\n create mode 100644 docs/evidence.json\n create mode 100644 docs/reviewer-start.md\n create mode 100644 docs/submission.md\n create mode 100644 docs/threat-model.md\n create mode 100755 scripts/check_evidence\n create mode 100755 scripts/render_docs\n create mode 100644 tests/test_evidence.py\n create mode 100644 vigil/docsgen.py\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791792280227,
+            "ran": 1791792283397,
+            "completed": 1791792285678
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "end": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 150,
+        "output": 326,
+        "reasoning": 34,
+        "cache": {
+          "read": 7936,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12f2488c20014gROO0eYm3cA7C",
+      "time": {
+        "created": 1791792285917,
+        "streamed": 1791792290674,
+        "completed": 1791792291388
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "Committed. Let me verify the commit message was recorded exactly and confirm nothing was pushed (I didn't push). Let me verify the commit message matches exactly.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "Committed. Let me verify the commit message was recorded exactly and confirm nothing was pushed (I didn't push). Let me verify the commit message matches exactly.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791792288729,
+            "completed": 1791792290480
+          }
+        },
+        {
+          "type": "text",
+          "text": "Verifying the commit message and that nothing was pushed:\n"
+        },
+        {
+          "type": "tool",
+          "id": "call_24cd301fe2854adeab55e020",
+          "name": "shell",
+          "executed": false,
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "git log -1 --format='%B' && echo \"---FILES---\" && git show --stat --format= HEAD && echo \"---STATUS---\" && git status --short --branch"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "T-21: evidence pack (check_evidence, generated submission and plan inputs, reviewer start, threat model)\n\n- vigil/docsgen.py validates docs/evidence.json and renders docs/submission.md and docs/business-plan-inputs.md from eval/results, anchors.txt and the git root commit\n- scripts/check_evidence fails on an ok row without an https URL, a bad status or a missing required claim; make evidence runs it; make render regenerates the docs\n- docs/evidence.json: 4 ok rows (3 posts, repo commit history), 5 pending (neatlogs, Entire, cfo.ai, agent improved, recovery)\n- docs/reviewer-start.md and docs/threat-model.md added; cost per incident left unset (no token price supplied)\n- CI now also runs make evidence\n- server: make test 265 passed; make eval-check CHECK OK for v0, v1, v1h, v1h2; make demo DEMO OK head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; make evidence EVIDENCE OK: 4 ok, 5 pending\n\n---FILES---\n .github/workflows/ci.yml     |   1 +\n Makefile                     |   9 +-\n docs/business-plan-inputs.md |  27 ++++++\n docs/evidence.json           |  11 +++\n docs/reviewer-start.md       |  63 ++++++++++++++\n docs/submission.md           |  49 +++++++++++\n docs/threat-model.md         |  13 +++\n scripts/check_evidence       |  24 ++++++\n scripts/render_docs          |  10 +++\n tests/test_demo.py           |   8 +-\n tests/test_evidence.py       | 116 +++++++++++++++++++++++++\n vigil/docsgen.py             | 198 +++++++++++++++++++++++++++++++++++++++++++\n 12 files changed, 519 insertions(+), 10 deletions(-)\n---STATUS---\n## main...origin/main [ahead 1]\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1791792289621,
+            "ran": 1791792290594,
+            "completed": 1791792291192
+          }
+        }
+      ],
+      "snapshot": {
+        "start": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "end": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "files": []
+      },
+      "finish": "tool-calls",
+      "rawFinish": "tool_calls",
+      "cost": 0,
+      "tokens": {
+        "input": 8651,
+        "output": 56,
+        "reasoning": 41,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12f249eb0001CjKWCA0B3PYoN4",
+      "time": {
+        "created": 1791792291598,
+        "streamed": 1791792295190,
+        "completed": 1791792295284
+      },
+      "type": "assistant",
+      "agent": "build",
+      "model": {
+        "id": "ling-3.1-flash-free",
+        "providerID": "opencode",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "reasoning",
+          "text": "The commit is done:\n- Commit b05db9f created with exactly the 12 paths staged\n- Message matches exactly (verbatim)\n- Working tree is clean\n- Branch is ahead 1 of origin/main — not pushed, as instructed\n\nDone. Concise summary.",
+          "state": {
+            "reasoningField": "reasoning",
+            "reasoningDetails": [
+              {
+                "type": "reasoning.text",
+                "text": "The commit is done:\n- Commit b05db9f created with exactly the 12 paths staged\n- Message matches exactly (verbatim)\n- Working tree is clean\n- Branch is ahead 1 of origin/main — not pushed, as instructed\n\nDone. Concise summary.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          },
+          "time": {
+            "created": 1791792293111,
+            "completed": 1791792294984
+          }
+        },
+        {
+          "type": "text",
+          "text": "Done. Commit `b05db9f` created on `main` with exactly the 12 requested paths (519 insertions, 10 deletions), message verbatim as specified. Working tree is clean; branch is `ahead 1` of `origin/main` — nothing was pushed, per your instruction."
+        }
+      ],
+      "snapshot": {
+        "start": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "end": "43fd06d8ee2ea022088d1f3d2124ea25a14b371d",
+        "files": []
+      },
+      "finish": "stop",
+      "rawFinish": "stop",
+      "cost": 0,
+      "tokens": {
+        "input": 1068,
+        "output": 71,
+        "reasoning": 59,
+        "cache": {
+          "read": 8192,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_12f24adce001GX5KRPciwWseyM",
+      "time": {
+        "created": 1791792295374
+      },
+      "type": "idle",
+      "outcome": "succeeded"
+    }
+  ]
+}
