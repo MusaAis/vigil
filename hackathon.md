@@ -10,7 +10,7 @@ Team "musa Ais" (solo): GitHub MusaAis.
 ## Stack
 Python 3.12.3, SQLite (stdlib `sqlite3`), PyYAML, pytest; web app: FastAPI, uvicorn, Jinja2 (httpx for the tests). Live model: `claude-haiku` through the neatHack LiteLLM gateway
 (OpenAI-compatible, `openai` Python client). Tracing: neatlogs Python SDK (>=1.4.26). Coding-agent capture: Entire CLI 0.11.4 with
-OpenCode 2.0.26. Business plan: cfo.ai. Not built yet: deployment.
+OpenCode 2.0.26. Business plan: cfo.ai. Deployment: nginx and certbot with a systemd unit on one Ubuntu server (https://vigil-xyz.duckdns.org); CI: GitHub Actions.
 Authorship: the code is written and tested in a Claude chat sandbox, then applied and committed on the build server through OpenCode (DECISIONS D-002).
 
 ## Tools: how each is used and evidence
@@ -21,8 +21,9 @@ Authorship: the code is written and tested in a Claude chat sandbox, then applie
   `01M4JHV41G3A3SRKC5C8ETWGWY` (35155c5, batch 1), `01M4JYYS4PAB86K9FFD5E9F6FE` (7e5510f, batch 2), `01M4KRQ6DG1K959DTXD9J982YD` (46e201b, batch 3),
   `01M4KVRB9H2C718A5F1ZABTMXK` (f0dbfd5), `01M4M2RF898KEYXPS93PPB6A2A` (6bfd45d, eval runner + baseline v0), `01M4MW63WGMZHZ1435JWSE0SBK` (d8b2242, prompt v1 + baseline v1),
   `01M4N2463MDG5M1218MRSCD5A4` (7f79076, held-out D2 X1 X5 + baseline v1h), `01M4N76A06F48MP8J3NHTK83YX` (0f95573, P2 X4 X5b + baseline v1h2),
-  `01M4NYVXJ5Z9FMVDBJR0ECH0K2` (e193084, T-17/T-18 web app).
-  Attaching prints Entire's warning that no user prompts were parsed from the transcript (seen from batch 2 on, most recently for the web app checkpoint; FEEDBACK E3/E5/E6). Checkpoint links: PENDING
+  `01M4NYVXJ5Z9FMVDBJR0ECH0K2` (e193084, T-17/T-18 web app), `01M4P2DFXP8GR5VZMNRA7V7K1E` (35707c7, T-19), `01M4QFXX3Y4JD5CHT43TZ4T84S` (549a835, redesign), `01M4QJB5FHJ4TSM6K2JW4V6AB6` (9db1bb7, T-21),
+  01M4QKRR62899SNV3596HBA5JH (4ff5333, T-21 CI fix).
+  Attaching prints Entire's warning that no user prompts were parsed from the transcript (seen from batch 2 on, every time; FEEDBACK E3/E5/E6). Evidence: each commit message carries an `Entire-Checkpoint` trailer, `git ls-remote origin` lists the checkpoint refs under `refs/entire/checkpoints/` (all twelve ids above before the CI fix were found there on 2026-10-12; `entire checkpoint list` printed 12 after the T-21 attach), and docs/evidence.json links the T-21 commit page. A shareable Entire page link: PENDING
 - cfo.ai: account created. Business plan: PENDING
 
 ## Build log
@@ -109,13 +110,31 @@ Authorship: the code is written and tested in a Claude chat sandbox, then applie
 - Not verified on the server yet: the pages in a browser, the SSE stream, the Verify button, access from outside the server. There is no public URL.
 - Not done at this point: deployment, evidence pack, cfo.ai plan.
 
+### 2026-10-11 (WAT) — T-19: make demo, make verify, anchor, evidence, CI
+- Written in the Claude chat sandbox, committed through OpenCode as 35707c7 (checkpoint 01M4P2DFXP8GR5VZMNRA7V7K1E). `make demo`, `make verify` over every chain database, `make anchor`, `make evidence` (failing until T-21), `.github/workflows/ci.yml` (no secrets). DECISIONS D-021.
+- Server evidence (pasted output): `make test` 241 passed; `make eval-check` CHECK OK for v0, v1, v1h, v1h2; `make demo` DEMO OK, head sha256:58a61f12b136fa6ce21f318685b7ffe1a57ad98cda807faa73a6808f0b54755b; `make verify` verified 7 chain databases. The GitHub Actions run for 35707c7 showed a green check.
+
+### 2026-10-11 (WAT) — T-20: public deployment
+- Public URL https://vigil-xyz.duckdns.org (DuckDNS host name pointing at the build server). nginx site `vigil` proxies to 127.0.0.1:8005 (`proxy_buffering off`, long read timeout for the stream) next to the server's other sites; certificate by certbot (expires 2027-01-09, renewal scheduled); app run by the systemd unit `vigil.service`. DECISIONS D-022.
+- Observed: `/api/health` over HTTPS returned `ok: true`, chain 38 verified; `/api/stream?once=true` returned entries through nginx; `/dashboard` and `/proof` opened in an incognito tab on a phone on mobile data. Not confirmed: the live log in a browser, the Verify button.
+
+### 2026-10-11 (WAT) — web redesign and Vercel proxy config
+- Committed through OpenCode as 549a835 (checkpoint 01M4QFXX3Y4JD5CHT43TZ4T84S). New overview page at `/` with the chain ribbon, rewritten templates (system fonts only, light and dark), `deploy/vercel/vercel.json`. DECISIONS D-020, D-023.
+- Server: `make test` 251 passed after the redesign. Phone screenshots of the overview page and `/proof` on the public URL on 2026-10-12 08:54 WAT show the new design. The Vercel proxy has not been tested.
+
+### 2026-10-12 (WAT) — T-21: evidence pack, and a CI failure
+- Committed through OpenCode as 9db1bb7 (checkpoint 01M4QJB5FHJ4TSM6K2JW4V6AB6): `docs/evidence.json`, `scripts/check_evidence`, `vigil/docsgen.py` and `scripts/render_docs` (generate `docs/submission.md` and `docs/business-plan-inputs.md` from files), `docs/reviewer-start.md`, `docs/threat-model.md`, `make evidence` and `make render`, `make evidence` added to CI. DECISIONS D-024.
+- Server evidence (pasted output): `make test` 265 passed; `make eval-check` CHECK OK for the four baselines; `make demo` DEMO OK with the same head; `make evidence` EVIDENCE OK (4 ok, 5 pending). After a restart `/api/health` showed `ok: true` on git_sha 9db1bb7 and `/api/proof` returned 4 ok evidence rows; the pending rows render as PENDING on `/proof` (phone screenshots).
+- Failure: the CI run for 9db1bb7 failed in `tests/test_evidence.py::test_committed_generated_docs_match_their_sources`. Cause: the default CI checkout is shallow, so the oldest visible commit is HEAD, not the repository's first commit, and the generated "First commit" line differed. Fix 4ff5333 (checkpoint 01M4QKRR62899SNV3596HBA5JH): `_root_commit` returns nothing in a shallow clone, the test then compares everything except that line, a new test covers the shallow case, and CI checks out full history. In the sandbox the suite passed (266), including a depth-1 clone; the CI result of the fix is on the Actions tab.
+- Also changed: the eval run rows on `/proof` now say "run on commit" (the commit a run started from), and docs/evidence.json gained three rows with real links (eval numbers for "agent improved", the T-21 commit page for "used Entire", the v1 results file for "recovers from failures"); the trace rows stay PENDING.
+
 ## Build in public
 - 2026-10-10 14:20 WAT — first #neatHack post (idea, first neatlogs trace, repo) and a reply on tests/gate and the Entire+OpenCode snag: https://x.com/musa_ais/status/2108910440721813529
 - 2026-10-10 — failing baseline post (v0): https://x.com/musa_ais/status/2109035793872510995
 - 2026-10-11 — v1 improvement post: https://x.com/musa_ais/status/2109178362128126111
 
 ## Demo
-PENDING
+Live instance (simulated data): https://vigil-xyz.duckdns.org. Reproduce locally: `make setup`, `make demo`, `make eval-check`, `make verify`, `make evidence`; see docs/reviewer-start.md.
 
 ## Known limitations and next steps
 - All payment data is SIMULATED; the agent, gate, verifier, chain, receipts and eval are real code that really ran.
@@ -125,8 +144,8 @@ PENDING
 - Cost per incident is not computed: the two price variables are unset and no price has been invented. Token counts per scenario are in `eval/results`.
 - neatlogs span attributes are not attached and `neatlogs.wrap` is not used. Entire checkpoints were created with `attach` and carry no parsed prompts (FEEDBACK E6).
 - Replay of a baseline holds only while the code that builds the model request is unchanged. Tool descriptions and schemas are not versioned yet.
-- The web app has been called with curl on the build server (health and `/proof`) but not opened in a browser there; there is no public deployment. The `/proof` test counts come from the test sources, and the CI result is shown as PENDING.
-- Not built yet: deployment, evidence pack, cfo.ai business plan. See PLAN.md.
+- The public pages were opened on a phone; the live log and the Verify button are not confirmed there. The `/proof` test counts come from the test sources, and the CI result is shown as PENDING.
+- Pending evidence: public neatlogs trace links (v0, v1, recovery), a shareable Entire page link, the cfo.ai plan. Not built: Tier B (`/try`, `/api/exposure`), neatlogs span attributes, cost per incident. See PLAN.md.
 
 ## Submission
-Added at submission time.
+Outstanding, marked PENDING: neatlogs trace links, the cfo.ai business plan link, the demo video and the submission post. The evidence table is in docs/submission.md (generated from docs/evidence.json).

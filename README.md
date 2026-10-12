@@ -4,7 +4,7 @@ Vigil is a payment-operations agent built for neatHack 2026 (Oct 10–12). It wa
 
 All payment data is simulated. No real money, no real customers.
 
-**Status:** the agent, gate, verifier, decision chain, receipts, the reproducible eval and a read-only web app (JSON API, live decision stream, dashboard, proof page, status page) exist and are tested. Run the web app locally with `make serve`. Not built yet: a public deployment (there is no live URL), the evidence pack and the cfo.ai plan.
+**Status:** the agent, gate, verifier, decision chain, receipts, the reproducible eval, a read-only web app (overview, dashboard, proof, status, JSON API, live decision stream), `make demo`, CI and an evidence pack exist and are tested. The app is deployed at **https://vigil-xyz.duckdns.org** (all data simulated). Not done: the cfo.ai business plan, public links to the neatlogs traces, cost per incident (no token price supplied), and the Tier B items (`/try`, `/api/exposure`).
 
 **Authorship:** the code was written and tested in a Claude chat sandbox, then applied and committed on the build server through OpenCode so that Entire could record the sessions. The coding agent did not author the code (see `DECISIONS.md` D-002).
 
@@ -12,8 +12,11 @@ All payment data is simulated. No real money, no real customers.
 
 ```
 make setup
-make test           # 214 tests, including the chain tamper tests, the invariant property tests and the web app tests
+make test           # 266 tests, including the chain tamper tests, the invariant property tests, the web app and evidence tests
 make eval-check     # replays every committed baseline (v0, v1, v1h, v1h2) from eval/cache and compares chain heads
+make demo           # offline and SIMULATED: seeds a chain with D1, D3 and D2, writes receipts, verifies the chain and every receipt
+make verify         # verifies every chain database present against its own anchors, plus its receipts
+make evidence       # checks docs/evidence.json (an ok row needs an https URL; pending rows are listed)
 .venv/bin/python scripts/verify_chain --db data/eval-v1.db --run v1
 .venv/bin/python scripts/verify_receipt --db data/eval-v1.db receipts/v1
 ```
@@ -22,10 +25,11 @@ make eval-check     # replays every committed baseline (v0, v1, v1h, v1h2) from 
 
 ## The web app (read-only, simulated)
 
-`make serve` starts it on `127.0.0.1:8005` (change the port with `make serve PORT=...`). On first start it seeds its own chain database (`data/vigil.db`, not committed) with three simulated scenarios (D1 resolved, D3 skipped trap, D2 escalated cap case) decided by the deterministic **offline stub model on a virtual clock**, so the dashboard costs nothing and needs no key. These incidents say nothing about LLM quality: the LLM numbers are only the eval results above.
+The public instance is https://vigil-xyz.duckdns.org. `make serve` starts it on `127.0.0.1:8005` (change the port with `make serve PORT=...`). On first start it seeds its own chain database (`data/vigil.db`, not committed) with three simulated scenarios (D1 resolved, D3 skipped trap, D2 escalated cap case) decided by the deterministic **offline stub model on a virtual clock**, so the dashboard costs nothing and needs no key. These incidents say nothing about LLM quality: the LLM numbers are only the eval results above.
 
 | Page | What it shows |
 |---|---|
+| `/` | overview: the chain of every demo incident as one cell per entry, how a fix is made, eval runs, the verify commands, limits |
 | `/dashboard` | incident list, counters with their counting boundaries, exposure meter against the policy caps, live decision log |
 | `/dashboard/incidents/<id>` | the chain entries of one incident, gate verdicts, verification checks, the receipt JSON and a Verify button |
 | `/proof` | chain status and anchors, every eval label with its remaining failures, test counts, evidence links (PENDING until a real link exists), real vs simulated, the verify commands, limits, first and latest commit |
@@ -75,8 +79,8 @@ The suite is small, each label is one live run, and `eval-check` only proves tha
 ## How we used the required tools
 
 - **neatlogs:** every live eval run is traced (workflow `vigil-eval-<label>`) and the trace ids are stored in `eval/results`; the v0 failures were found in the recorded runs and drove prompt v1. Span attributes are not attached yet. Public trace links: pending (dashboard links need a login).
-- **Entire:** enabled with the OpenCode agent; eight checkpoints are listed in `hackathon.md`. They were created with `entire session attach` and Entire warned that no user prompts were parsed (`FEEDBACK.md` E3, E5, E6).
-- **cfo.ai:** account created; the business plan (pricing, costs, revenue, runway) is not written yet. Measured token counts per incident are in `docs/results.md`; no price has been assumed.
+- **Entire:** enabled with the OpenCode agent; the checkpoints are listed in `hackathon.md` and their refs are on origin under `refs/entire/checkpoints/`. They were created with `entire session attach` and Entire warned that no user prompts were parsed (`FEEDBACK.md` E3, E5, E6).
+- **cfo.ai:** account created; the business plan (pricing, costs, revenue, runway) is not written yet. Measured token counts per incident are generated into `docs/business-plan-inputs.md`; no price has been assumed.
 
 ## Architecture
 
@@ -84,8 +88,13 @@ The suite is small, each label is one live run, and `eval-check` only proves tha
 - `api/` — the thin FastAPI app (`api/app.py`); `web/templates/` — the server-rendered pages.
 - `sim/` — deterministic simulated provider and double-entry ledger with seeded fault injection.
 - `eval/` — scenario files (`eval/scenarios`), runner (`python -m eval.run`), recorded results, baselines and the replay cache.
-- `scripts/` — `verify_chain`, `verify_receipt`, `anchor`, `live_smoke.py`. `policy.yaml` holds the caps and limits (amounts are integer minor units, NGN).
-- Specification: `docs/SPEC.md`. Decisions: `DECISIONS.md`. Build log: `hackathon.md`. Tool feedback: `FEEDBACK.md`.
+- `scripts/` — `verify_chain`, `verify_receipt`, `anchor`, `check_evidence`, `render_docs`, `live_smoke.py`; `vigil/docsgen.py` generates `docs/submission.md` and `docs/business-plan-inputs.md` from files (`make render`). `policy.yaml` holds the caps and limits (amounts are integer minor units, NGN).
+- `deploy/vercel/` — a one-line proxy config (`vercel.json`) that forwards every path to the public instance; it holds no code and no secrets.
+- Specification: `docs/SPEC.md`. Reviewer path: `docs/reviewer-start.md`. Evidence: `docs/submission.md`, `docs/evidence.json`. Threat model: `docs/threat-model.md`. Decisions: `DECISIONS.md`. Build log: `hackathon.md`. Tool feedback: `FEEDBACK.md`.
+
+## Deployment
+
+One Ubuntu server: `uvicorn` on `127.0.0.1:8005` as a systemd unit, behind an nginx site with a Let's Encrypt certificate for the DuckDNS host name, alongside other sites on the same nginx. The app never replaces an existing `data/vigil.db`: after changing the scenarios or the offline model, stop the service, delete `data/vigil.db*` and `receipts/web/`, and start it again. `deploy/vercel/` is a proxy config for a Vercel front; it has not been verified.
 
 ## Run it locally
 
@@ -105,9 +114,9 @@ A live run needs the gateway key in `.env` (`LLM_API_KEY`), and a neatlogs proje
 - v1 is tuned on the failures it fixes; only v1h and v1h2 are held-out, and X5b was informed by X5. X4 is a failing scenario whose cause has not been analysed.
 - Replay of a baseline holds only while the code that builds the model request is unchanged; tool descriptions and schemas are not versioned yet.
 - Cost per incident is not computed (no price configured).
-- The web app has been called with curl on the build server (health and `/proof`); it has not been opened in a browser there, and there is no public deployment yet.
-- The `/proof` test count is counted from the test sources and the CI result is shown as PENDING; neither is a recorded run result.
-- Not built yet: public deployment, evidence pack, cfo.ai plan.
+- The public pages were opened from a phone on mobile data; the SSE stream returned entries through nginx (`/api/stream?once=true`). The live log in a browser and the Verify button have not been confirmed on the public URL.
+- The `/proof` test count is counted from the test sources and the CI result is shown as PENDING; neither is a recorded run result. CI was green for 35707c7; the run for 9db1bb7 failed in `tests/test_evidence.py` because a shallow checkout has no real root commit. That is fixed in 4ff5333 (the Actions tab shows its result).
+- Pending evidence: public neatlogs trace links (v0, v1, one recovery trace), the cfo.ai plan link. Not built: Tier B (`/try`, `/api/exposure`), neatlogs span attributes, cost per incident.
 
 ## Built during neatHack
 

@@ -18,11 +18,11 @@
 - [x] T-16 Remaining scenarios: D2, X1, X5 (v1h) and P2, X4, X5b (v1h2) added; W2, P1 (detector unit tests) and X6 (gate/invariant tests) not built as eval scenarios, see D-016 (server: 177 tests pass)
 - [x] T-17 API + SSE (server: 214 tests pass; `/api/health` ok:true with the chain verified, commit e193084)
 - [x] T-18 Dashboard, /proof, /status (server: `GET /proof` 200 via curl; not yet opened in a browser on the server; no public URL)
-- [ ] T-19 make demo, make eval-check
-- [ ] T-20 Deploy public URL
-- [ ] T-21 Reviewer docs, evidence pack
+- [x] T-19 make demo, make verify, make anchor, CI workflow (server: 241 tests pass at the time, `make demo` DEMO OK; CI green for 35707c7)
+- [x] T-20 Deploy public URL (https://vigil-xyz.duckdns.org; `/api/health` ok:true over HTTPS)
+- [x] T-21 Reviewer docs, evidence pack, check_evidence (server: 265 tests pass; evidence rows for neatlogs traces and cfo.ai are still PENDING)
 - [ ] T-22 Tier B
-- [ ] T-23 README, FEEDBACK, hackathon.md final (README.md and docs/results.md exist and match the current state; final pass after the trust surface exists)
+- [ ] T-23 README, FEEDBACK, hackathon.md final (updated 2026-10-12 for T-19 to T-21; final pass after the last evidence links)
 - [ ] T-24 Final run, anchor, freeze
 
 ## Cut list (drop in this order if behind)

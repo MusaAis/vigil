@@ -134,6 +134,26 @@ Cost: a failed payout the provider will never accept again still opens an incide
 - `snapshot_sha256` (of `/api/proof` and `/api/metrics`) covers `data` only; time stamps sit outside it, so the hash changes only when the content changes.
 - Every metric has a `boundary` string. Eval metrics sum over every file in `eval/results`; the incident and gate-denial counters count the demo chain only, and say so.
 - `/api/health` `built_at` is the time of the HEAD commit, and `llm` is `offline-stub` because the web app never calls a model.
-- `/proof` counts test functions from the test sources (not a run result); CI and the last CI result render PENDING; evidence rows render PENDING unless they have status ok and an https URL (there is no `docs/evidence.json` yet).
+- `/proof` counts test functions from the test sources (not a run result); CI and the last CI result render PENDING; evidence rows render PENDING unless they have status ok and an https URL (`docs/evidence.json` was added in T-21, D-024).
 - `make verify` checks `data/vigil.db` with `--run demo` (the anchors of the eval labels do not apply to that chain) and the receipts in `receipts/web` when they exist.
 - The dashboard exposure meter is computed from the demo chain and its receipts (peak refunded per virtual day against the daily cap, most write actions in one incident). `/api/exposure` (Tier B) is not built.
+
+## D-020 Web redesign: overview page, chain ribbon, system fonts only — 2026-10-11
+- `/` is an overview page instead of a redirect: the real chain as one cell per entry (each links to its entry), a legend of the kinds present, how a fix is made, eval runs, the verify commands and limits. Every number and command is built from files or the chain (the verify commands from the repository URL).
+- Pages stay self-contained: no external fonts, scripts or images; light and dark by `prefers-color-scheme`. The only JavaScript is the dashboard live log, written with `textContent` (a test fails on `innerHTML`). Ribbon colours are scoped to `.cell` and `.legend i` so timeline classes cannot collide (a test guards it).
+
+## D-021 Batch 8: demo, verify, anchor, evidence, CI — 2026-10-11
+- `make demo` runs `python -m vigil.demo` (offline, virtual clock, writes `data/demo.db` and `receipts/demo/`). `make verify` checks every chain database present against the anchors of its own run label, plus its receipts, and fails when there is nothing to verify. `make anchor RUN=<label>` wraps `scripts/anchor`. `make evidence` runs `scripts/check_evidence`.
+- `.github/workflows/ci.yml` (SPEC 14) runs setup, test, invariants, eval-check, verify and demo on every push; it uses no secrets because the eval check replays committed recordings.
+
+## D-022 Deployment on one host behind nginx — 2026-10-11
+- The whole app (FastAPI, SQLite) runs on the build server as the systemd unit `vigil.service` on 127.0.0.1:8005, behind a separate nginx site with a certbot certificate for a DuckDNS host name. This replaces the earlier Caddy plan: nginx already served other sites on the host, so Vigil is one more site (other sites' files are never touched; `nginx -t` before every reload). Pages are server-rendered and the stream is on one origin, so there is no CORS.
+- The app never replaces an existing `data/vigil.db`: after a scenario or model change, stop the service, delete `data/vigil.db*` and `receipts/web/`, then start it.
+
+## D-023 Vercel front as a thin proxy — 2026-10-11
+- `deploy/vercel/vercel.json` has one catch-all rewrite to the public instance and holds no code, environment or secrets (`tests/test_deploy.py` checks the folder). Reason: no second frontend to maintain, no CORS, and the no-JavaScript pages keep working. Not verified: the proxy itself, and whether the event stream passes through it.
+
+## D-024 Evidence pack generated from files; CI needs history — 2026-10-12
+- `docs/evidence.json` is the only hand-edited evidence source (real https URLs only; anything else is `pending` with a null URL). `docs/submission.md` and `docs/business-plan-inputs.md` are generated from it, `eval/results`, `anchors.txt` and the git root commit by `make render`, and a test fails when the committed copies are stale. `scripts/check_evidence` fails on an ok row without an https URL, a bad status, a pending row with a URL, or a missing required claim.
+- Rows that carry only part of a claim say so in `kind` (for example eval numbers for "agent improved"; the trace rows stay pending). Cost per incident is not computed and no token price is assumed.
+- The first CI run of T-21 failed because a default checkout is shallow and the "first commit" is then HEAD. `_root_commit` now returns nothing for a shallow clone, the staleness test compares the rest of the file in that case, and the workflow checks out full history.
