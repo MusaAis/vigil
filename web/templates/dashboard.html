@@ -1,48 +1,94 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+{% block css %}
+.head{padding:28px 0 4px}
+.head h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.04em}
+.seal{display:flex;gap:9px;align-items:flex-start;margin-top:10px;font-size:14px;color:var(--mute)}
+.seal .tick{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--seal);color:var(--on-seal);font-weight:800;font-size:12px;margin-top:2px}
+.seal.badc .tick{background:var(--void)}
+.counts{display:grid;grid-template-columns:repeat(2,1fr);margin-top:6px;border-top:1px solid var(--line)}
+@media(min-width:760px){.counts{grid-template-columns:repeat(3,1fr)}}
+.count{padding:14px 16px 14px 0;border-bottom:1px solid var(--line)}
+.count + .count{padding-left:16px;border-left:1px solid var(--line)}
+.counts .count:nth-child(2n+1){padding-left:0;border-left:0}
+@media(min-width:760px){.counts .count:nth-child(2n+1){padding-left:16px;border-left:1px solid var(--line)}.counts .count:nth-child(3n+1){padding-left:0;border-left:0}}
+.count .v{font:800 2.2rem/1 var(--display);letter-spacing:-.04em}
+.count .l{font-weight:700;margin-top:2px}
+.count .b{color:var(--mute);font-size:12.5px;line-height:1.4;margin-top:4px}
+.count.target .v{color:var(--seal)}
+.meter{margin:6px 0}
+.mrow{display:grid;grid-template-columns:1fr;gap:2px 12px;padding:9px 0}
+@media(min-width:620px){.mrow{grid-template-columns:1fr auto}.mrow .track{grid-column:1/3}}
+.mrow .nm{font-weight:600}
+.mrow .val{color:var(--mute);font-size:14px}
+@media(min-width:620px){.mrow .val{text-align:right}}
+.mrow .track{height:10px;border-radius:5px;background:var(--panel);overflow:hidden}
+.mrow .track i{display:block;height:100%;min-width:2px;background:var(--teal)}
+.rows{list-style:none;margin:6px 0 0;padding:0}
+.rows a{display:grid;grid-template-columns:1fr auto;gap:3px 14px;align-items:center;padding:13px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+.rows li:last-child a{border-bottom:1px solid var(--line)}
+.rows a:hover{background:var(--panel)}
+.rows .id{font:800 17px/1.2 var(--display);color:var(--link)}
+.rows .ty{grid-column:1/3;color:var(--mute);font-size:14px}
+.rows .tm{grid-column:1/3;color:var(--mute);font-size:12.5px}
+.rows .sc{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 6px;font-size:12px;font-weight:700;margin-left:6px;color:var(--mute)}
+.simtag{font-size:10.5px;letter-spacing:.08em;color:var(--flag);border:1px solid var(--flag);border-radius:3px;padding:0 4px;margin-left:6px;font-weight:700}
+.term{background:#071319;color:#d7e6e1;border-radius:12px;padding:12px 14px;margin:8px 0;max-height:420px;overflow:auto;font:12.5px/1.6 var(--mono)}
+.term ol{list-style:none;margin:0;padding:0}
+.term li{display:grid;grid-template-columns:34px 1fr;gap:0 8px;padding:3px 0}
+.term .sq{color:#6f8c97;text-align:right}
+.term .kind{min-width:0;font-size:11px;margin-right:6px}
+.term .hs{color:#6f8c97}
+{% endblock %}
 {% block body %}
-<h1>Dashboard <span class="sim">SIMULATED</span></h1>
-<p class="mut">Chain: {{ chain.length }} entries, head <code>{{ chain.head|short }}</code>, verified
-<span class="{{ 'ok' if chain.ok else 'bad' }}">{{ 'OK' if chain.ok else 'BROKEN' }}</span> ({{ chain.verify_mode }}) at {{ chain.verified_at }}.
-Incidents here are simulated scenarios decided by a deterministic offline stub, not an LLM. LLM results are on <a href="/proof">/proof</a>.</p>
+<div class="head">
+  <h1>Dashboard</h1>
+  <div class="seal {{ '' if chain.ok else 'badc' }}"><span class="tick" aria-hidden="true">{{ "✓" if chain.ok else "!" }}</span>
+  <span>{% if chain.ok %}Chain verified {{ chain.verify_mode }}: {{ chain.length }} entries, head <span class="hash">{{ chain.head|short(18) }}</span>, checked {{ chain.verified_at|ts }}.{% else %}<b class="bad">Chain does not verify.</b>{% endif %}
+  These incidents are simulated scenarios decided by a deterministic offline stub, not an LLM. Model results are on the <a href="/proof#eval">proof page</a>.</span></div>
+</div>
 
 <h2>Counters</h2>
-<div class="grid">
-{% for name, label in [("incidents_resolved","Resolved"),("incidents_escalated","Escalated"),("incidents_skipped","Skipped"),("gate_denials","Gate denials"),("gate_escalations","Gate escalations"),("unsafe_actions_executed","Unsafe actions executed (target 0)")] %}
-  <div class="card"><div class="mut">{{ label }}</div><div class="num">{{ metrics[name].value }}</div><div class="mut">{{ metrics[name].boundary }}</div></div>
+<div class="counts">
+{% for name, label in [("incidents_resolved","Resolved"),("incidents_escalated","Escalated"),("incidents_skipped","Skipped"),("gate_denials","Gate denials"),("gate_escalations","Gate escalations"),("unsafe_actions_executed","Unsafe actions executed")] %}
+  <div class="count{{ ' target' if name == 'unsafe_actions_executed' else '' }}"><div class="v">{{ metrics[name].value }}</div><div class="l">{{ label }}{{ " (target 0)" if name == "unsafe_actions_executed" else "" }}</div><div class="b">{{ metrics[name].boundary }}</div></div>
 {% endfor %}
 </div>
 
 <h2>Exposure meter</h2>
-<div class="card">
-  <table>
-    <tr><th>Cap</th><th>Limit</th><th>Peak in this chain</th></tr>
-    <tr><td>Refund per incident</td><td>{{ exposure.caps.per_incident_minor|money(exposure.currency) }}</td><td>see incidents below</td></tr>
-    <tr><td>Refund per UTC day</td><td>{{ exposure.caps.per_day_minor|money(exposure.currency) }}</td><td>{{ exposure.peak_day_refunded_minor|money(exposure.currency) }}</td></tr>
-    <tr><td>Write actions per incident</td><td>{{ exposure.caps.max_write_actions_per_incident }}</td><td>{{ exposure.max_write_actions_in_one_incident }}</td></tr>
-  </table>
-  <div class="mut">{{ exposure.note }}</div>
+<div class="meter">
+  <div class="mrow"><span class="nm">Largest refund in one incident</span><span class="val">{{ exposure.peak_incident_refunded_minor|money(exposure.currency) }} of {{ exposure.caps.per_incident_minor|money(exposure.currency) }}</span>
+    <div class="track" role="img" aria-label="{{ exposure.peak_incident_refunded_minor|ratio(exposure.caps.per_incident_minor) }} percent of the per-incident cap"><i style="width:{{ exposure.peak_incident_refunded_minor|ratio(exposure.caps.per_incident_minor) }}%"></i></div></div>
+  <div class="mrow"><span class="nm">Most refunded on one UTC day</span><span class="val">{{ exposure.peak_day_refunded_minor|money(exposure.currency) }} of {{ exposure.caps.per_day_minor|money(exposure.currency) }}</span>
+    <div class="track" role="img" aria-label="{{ exposure.peak_day_refunded_minor|ratio(exposure.caps.per_day_minor) }} percent of the daily cap"><i style="width:{{ exposure.peak_day_refunded_minor|ratio(exposure.caps.per_day_minor) }}%"></i></div></div>
+  <div class="mrow"><span class="nm">Most write actions in one incident</span><span class="val">{{ exposure.max_write_actions_in_one_incident }} of {{ exposure.caps.max_write_actions_per_incident }}</span>
+    <div class="track" role="img" aria-label="write actions against the per-incident limit"><i style="width:{{ exposure.max_write_actions_in_one_incident|ratio(exposure.caps.max_write_actions_per_incident) }}%"></i></div></div>
 </div>
+<p class="mut sm">{{ exposure.note }}</p>
 
 <h2>Incidents</h2>
-<div class="wrap"><table>
-<tr><th>Incident</th><th>Type</th><th>Scenario</th><th>Outcome</th><th>Steps</th><th>Started</th><th>Closed</th><th></th></tr>
+<ul class="rows">
 {% for i in incidents %}
-<tr><td><a href="/dashboard/incidents/{{ i.incident_id }}">{{ i.incident_id }}</a></td><td>{{ i.type }}</td><td>{{ i.scenario_id or "n/a" }}</td>
-<td><span class="b {{ i.outcome }}">{{ i.outcome }}</span> <span class="mut">{{ i.reason_code or "" }}</span></td>
-<td>{{ i.steps }}</td><td>{{ i.opened_at }}</td><td>{{ i.closed_at or "open" }}</td><td><span class="sim">SIMULATED</span></td></tr>
+  <li><a href="/dashboard/incidents/{{ i.incident_id }}">
+    <span class="id">{{ i.incident_id }}<span class="sc">{{ i.scenario_id or "n/a" }}</span></span>
+    <span class="pill {{ i.outcome }}">{{ i.outcome|lower }}</span>
+    <span class="ty">{{ i.type }}{% if i.reason_code %}, {{ i.reason_code }}{% endif %}</span>
+    <span class="tm">{{ i.steps }} steps, {{ i.entries }} chain entries, opened {{ i.opened_at|ts }}, closed {{ i.closed_at|ts if i.closed_at else "not yet" }}<span class="simtag">SIMULATED</span></span>
+  </a></li>
 {% else %}
-<tr><td colspan="8">No incidents yet.</td></tr>
+  <li class="mut">No incidents yet. They appear here as the agent opens them.</li>
 {% endfor %}
-</table></div>
+</ul>
 
 <h2>Live decision log</h2>
-<p class="mut">Each line is a decision-chain entry that /proof lets you verify. The page works without JavaScript; with it, new entries stream in from <code>/api/stream</code>.</p>
-<ol id="log" class="card" style="padding-left:34px">
+<p class="mut">Each line is a decision-chain entry that the proof page lets you verify. Works without JavaScript; with it, new entries stream in from <code>/api/stream</code>.</p>
+<div class="term" tabindex="0" aria-label="Decision log, newest at the bottom">
+<ol id="log">
 {% for e in recent %}
-<li data-seq="{{ e.seq }}"><code>#{{ e.seq }}</code> {{ e.incident_id }} <b>{{ e.kind }}</b> {{ e.summary }} <span class="mut"><code>{{ e.entry_hash|short(10) }}</code></span></li>
+<li data-seq="{{ e.seq }}"><span class="sq">#{{ e.seq }}</span><span><span class="kind {{ e.kind }}">{{ e.kind|replace("_", " ")|lower }}</span>{{ e.incident_id }} {{ e.summary }} <span class="hs">{{ e.entry_hash|short(10) }}</span></span></li>
 {% endfor %}
 </ol>
+</div>
 <script>
 (function(){
   var log=document.getElementById('log'); if(!log||!window.EventSource) return;
@@ -51,8 +97,11 @@ Incidents here are simulated scenarios decided by a deterministic offline stub, 
   es.addEventListener('chain_entry',function(ev){
     var d=JSON.parse(ev.data); if(d.seq<=last) return; last=d.seq;
     var li=document.createElement('li'); li.dataset.seq=d.seq;
-    li.textContent='#'+d.seq+' '+d.incident_id+' '+d.kind+' '+d.summary+' '+d.entry_hash.slice(0,17)+'…';
-    log.appendChild(li);
+    var sq=document.createElement('span'); sq.className='sq'; sq.textContent='#'+d.seq;
+    var body=document.createElement('span'); var k=document.createElement('span'); k.className='kind '+d.kind; k.textContent=d.kind.replace(/_/g,' ').toLowerCase();
+    body.appendChild(k); body.appendChild(document.createTextNode(d.incident_id+' '+d.summary+' '));
+    var h=document.createElement('span'); h.className='hs'; h.textContent=d.entry_hash.slice(0,17)+'…'; body.appendChild(h);
+    li.appendChild(sq); li.appendChild(body); log.appendChild(li);
   });
 })();
 </script>

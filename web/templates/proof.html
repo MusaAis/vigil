@@ -1,75 +1,120 @@
 {% extends "base.html" %}
 {% block title %}Proof{% endblock %}
+{% block css %}
+.head{padding:28px 0 4px}
+.head h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.04em}
+.snap{border-left:4px solid var(--seal);background:var(--panel);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+.toc{display:flex;gap:6px;overflow-x:auto;padding:8px 0;position:sticky;top:0;background:var(--paper);z-index:5;border-bottom:1px solid var(--line);margin:0 -18px;padding-left:18px;padding-right:18px}
+.toc a{white-space:nowrap;color:var(--mute);text-decoration:none;padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:14px;font-weight:600}
+.toc a:hover{color:var(--ink);background:var(--panel)}
+section{scroll-margin-top:56px}
+.src{color:var(--mute);font-size:13px;margin:0 0 8px}
+.anc{padding:9px 0;border-top:1px solid var(--line)}
+.seal{display:flex;gap:10px;align-items:flex-start}
+.seal .tick{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--seal);color:var(--on-seal);font-weight:800;font-size:13px}
+.seal.badc .tick{background:var(--void)}
+.run{padding:14px 0;border-top:1px solid var(--line)}
+.run .t{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline}
+.run .t b{font:800 1.35rem/1.2 var(--display)}
+.mx{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px 20px;margin:8px 0 0}
+.mx div{padding:6px 0}
+.mx dt{font-size:13px;color:var(--mute)}
+.mx dd{margin:0;font-weight:700}
+.bar{height:8px;background:var(--panel);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--seal)}
+.fails{margin:6px 0;padding-left:20px}
+.fails li{margin:4px 0}
+.ev{display:grid;grid-template-columns:1fr auto;gap:2px 14px;padding:9px 0;border-top:1px solid var(--line);align-items:baseline}
+.ev .lk{overflow-wrap:anywhere;text-align:right}
+.cmd{background:var(--ink);color:var(--paper);border-radius:10px;padding:14px 16px;font:13px/1.7 var(--mono);overflow-x:auto;white-space:pre}
+.kv2{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:0 20px}
+.kv2 dt{color:var(--mute);padding:8px 0;border-top:1px solid var(--line)}
+.kv2 dd{margin:0;padding:8px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+@media(max-width:560px){.kv2{grid-template-columns:1fr}.kv2 dt{border-top:1px solid var(--line);padding-bottom:0}.kv2 dd{border-top:0;padding-top:2px}}
+{% endblock %}
 {% block body %}
 {% set d = p.data %}
-<h1>Proof <span class="sim">SIMULATED</span></h1>
-<p>One page to check every claim. Every number and link below is generated from files and the chain database by
-<a href="/api/proof">/api/proof</a>; nothing is typed by hand. Entries without a real link show <b class="pending">PENDING</b>.</p>
-<div class="card mut">Snapshot <code>{{ p.snapshot_sha256 }}</code> (sha256 of the canonical JSON of <code>data</code>) · generated {{ p.generated_at }} · chain last verified {{ p.verified_at }}</div>
+<div class="head">
+<h1>Proof</h1>
+<p>One page to check every claim. Every number and link here is generated from files and the chain database by <a href="/api/proof">/api/proof</a>; nothing is typed by hand. Anything without a real link says <b class="pending">PENDING</b>.</p>
+<div class="snap"><b>Snapshot</b> <span class="hash">{{ p.snapshot_sha256 }}</span><br><span class="mut sm">sha256 of the canonical JSON of <code>data</code>. Generated {{ p.generated_at|ts }}, chain last verified {{ p.verified_at|ts }}.</span></div>
+</div>
+<nav class="toc" aria-label="Sections">
+  <a href="#chain">1 Chain</a><a href="#eval">2 Eval</a><a href="#tests">3 Tests</a><a href="#evidence">4 Evidence</a><a href="#simulated">5 Real or simulated</a><a href="#verify">6 Verify</a><a href="#limits">7 Limits</a><a href="#window">8 Commits</a>
+</nav>
 
-<h2>1. Chain status</h2>
-<p class="mut">source: {{ d.chain.source }} · generated {{ p.generated_at }}</p>
-<div class="card">Length <b>{{ d.chain.length }}</b> · head <code>{{ d.chain.head }}</code><br>
-verified <b class="{{ 'ok' if d.chain.verified_ok else 'bad' }}">{{ d.chain.verified_ok }}</b> ({{ d.chain.verify_mode }}, from genesis) · <code>{{ d.chain.verify_line }}</code></div>
-<div class="wrap"><table><tr><th>Anchored</th><th>Run</th><th>Seq</th><th>Head</th><th>Commit</th></tr>
-{% for a in d.chain.anchors %}<tr><td>{{ a.ts }}</td><td>{{ a.run }}</td><td>{{ a.seq }}</td><td><code>{{ a.head }}</code></td><td><a href="{{ a.commit_url }}">{{ a.git }}</a></td></tr>
-{% else %}<tr><td colspan="5">No anchors.</td></tr>{% endfor %}
-</table></div>
-<p class="mut">The anchors in anchors.txt were written for the eval runs; each eval chain is checked against its own anchors with <code>scripts/verify_chain --run LABEL</code>.</p>
+<section id="chain"><h2>1. Chain status</h2>
+<p class="src">source: {{ d.chain.source }}</p>
+<div class="seal {{ '' if d.chain.verified_ok else 'badc' }}"><span class="tick" aria-hidden="true">{{ "✓" if d.chain.verified_ok else "!" }}</span>
+<div><b>{{ d.chain.length }} entries, {{ "verified from genesis" if d.chain.verified_ok else "DOES NOT VERIFY" }}</b> ({{ d.chain.verify_mode }})<br>head <span class="hash">{{ d.chain.head }}</span><br><span class="hash mut">{{ d.chain.verify_line }}</span></div></div>
+<h3>Published anchors</h3>
+{% for a in d.chain.anchors %}<div class="anc"><b>{{ a.run }}</b>, seq {{ a.seq }}, commit <a href="{{ a.commit_url }}">{{ a.git }}</a>, <span class="mut">anchored {{ a.ts|ts }}</span><div class="hash">{{ a.head }}</div></div>
+{% else %}<p class="mut">No anchors yet.</p>{% endfor %}
+<p class="mut sm">These anchors were written for the eval runs. Each eval chain is checked against its own anchors with <code>scripts/verify_chain --run LABEL</code>.</p>
+</section>
 
-<h2>2. Eval results</h2>
-<p class="mut">source: {{ d.eval.source }} · generated {{ p.generated_at }}</p>
-<div class="wrap"><table>
-<tr><th>Label</th><th>Commit</th><th>Mode</th><th>Prompt</th><th>Correct</th><th>Unsafe executed</th><th>Recovery</th><th>Injection</th><th>Median steps</th><th>Cost / incident</th><th>File</th></tr>
+<section id="eval"><h2>2. Eval results</h2>
+<p class="src">source: {{ d.eval.source }}</p>
 {% for r in d.eval.runs %}
-<tr><td><b>{{ r.label }}</b></td><td>{{ r.git_sha }}</td><td>{{ r.mode }}</td><td>{{ r.prompt_version or "n/a" }}</td>
-<td>{{ r.n_correct }}/{{ r.n_total }} ({{ r.correct_resolution_pct|pct }})</td><td>{{ r.unsafe_actions_executed }}</td>
-<td>{{ r.n_fault_correct }}/{{ r.n_fault_scenarios }} ({{ r.recovery_pct|pct }})</td>
-<td>{{ r.n_injection_correct }}/{{ r.n_injection_scenarios }} ({{ r.injection_resistance_pct|pct }})</td>
-<td>{{ r.median_steps }}</td><td>{{ "not computed" if r.cost_per_incident_usd_micro is none else r.cost_per_incident_usd_micro ~ " micro-USD" }}</td>
-<td><a href="{{ r.file_url }}">{{ r.file }}</a></td></tr>
-{% else %}<tr><td colspan="11">No eval results found.</td></tr>{% endfor %}
-</table></div>
+<div class="run">
+  <div class="t"><b>{{ r.label }}</b><span class="mut">{{ r.mode }} run{% if r.model %}, {{ r.model }}{% endif %}{% if r.prompt_version %}, prompt {{ r.prompt_version }}{% endif %}, commit {{ r.git_sha }}</span></div>
+  <div class="bar" role="img" aria-label="{{ r.n_correct }} of {{ r.n_total }} correct"><i style="width:{{ r.n_correct|ratio(r.n_total) }}%"></i></div>
+  <dl class="mx">
+    <div><dt>Correct</dt><dd>{{ r.n_correct }} of {{ r.n_total }} ({{ r.correct_resolution_pct|pct }})</dd></div>
+    <div><dt>Unsafe actions executed</dt><dd>{{ r.unsafe_actions_executed }}</dd></div>
+    <div><dt>Recovered from tool faults</dt><dd>{{ r.n_fault_correct }} of {{ r.n_fault_scenarios }}</dd></div>
+    <div><dt>Resisted injection</dt><dd>{{ r.n_injection_correct }} of {{ r.n_injection_scenarios }}</dd></div>
+    <div><dt>Median steps</dt><dd>{{ r.median_steps }}</dd></div>
+    <div><dt>Cost per incident</dt><dd>{{ "not computed" if r.cost_per_incident_usd_micro is none else r.cost_per_incident_usd_micro ~ " micro-USD" }}</dd></div>
+  </dl>
+  <p class="mut sm">Result file: <a href="{{ r.file_url }}">{{ r.file }}</a></p>
+</div>
+{% else %}<p>No eval results found.</p>{% endfor %}
 <h3>Failures that remain (kept, never deleted)</h3>
-<ul>
-{% for r in d.eval.runs %}{% for f in r.failures %}<li><b>{{ r.label }} {{ f.id }}</b>: got {{ f.outcome }}, expected {{ f.expected_outcome }}. <span class="mut">{{ f.notes }}</span></li>{% endfor %}{% endfor %}
+<ul class="fails">
+{% for r in d.eval.runs %}{% for f in r.failures %}<li><b>{{ r.label }} {{ f.id }}</b>: got {{ f.outcome|lower }}, expected {{ f.expected_outcome|lower }}. <span class="mut">{{ f.notes }}</span></li>{% endfor %}{% endfor %}
 </ul>
+</section>
 
-<h2>3. Invariants and tests</h2>
-<p class="mut">source: {{ d.tests.source }} · generated {{ p.generated_at }}</p>
-<div class="card">
-Invariants enforced and property-tested: {{ d.tests.invariants|join(", ") }}.<br>
-Test functions found in tests/: <b>{{ d.tests.test_functions_total }}</b>, of which {{ d.tests.property_test_functions }} in the invariant property tests.<br>
-CI: {% if d.tests.ci_workflows %}<a href="{{ d.tests.ci_url }}">{{ d.tests.ci_workflows|join(", ") }}</a>{% else %}<b class="pending">PENDING</b> (no workflow in the repository yet){% endif %}
-· last CI run: <b class="pending">PENDING</b><br>
-<span class="mut">{{ d.tests.note }}</span></div>
+<section id="tests"><h2>3. Invariants and tests</h2>
+<p class="src">source: {{ d.tests.source }}</p>
+<p>Enforced in code and property-tested: {{ d.tests.invariants|join(", ") }}.</p>
+<p>Test functions found in <code>tests/</code>: <b>{{ d.tests.test_functions_total }}</b>, {{ d.tests.property_test_functions }} of them in the invariant property tests.</p>
+<p>CI: {% if d.tests.ci_workflows %}<a href="{{ d.tests.ci_url }}">{{ d.tests.ci_workflows|join(", ") }}</a>{% else %}<b class="pending">PENDING</b>, no workflow in the repository yet{% endif %}. Last CI run: <b class="pending">PENDING</b>.</p>
+<p class="mut sm">{{ d.tests.note }}</p>
+</section>
 
-<h2>4. Evidence links</h2>
-<p class="mut">source: {{ d.evidence.source }} · generated {{ p.generated_at }}</p>
-<div class="wrap"><table><tr><th>Claim</th><th>Kind</th><th>Link</th></tr>
-{% for e in d.evidence["items"] %}<tr><td>{{ e.claim }}</td><td>{{ e.kind or "" }}</td>
-<td>{% if e.url %}<a href="{{ e.url }}" rel="noopener">{{ e.url }}</a>{% else %}<b class="pending">PENDING</b>{% endif %}</td></tr>{% endfor %}
-</table></div>
+<section id="evidence"><h2>4. Evidence links</h2>
+<p class="src">source: {{ d.evidence.source }}</p>
+{% for e in d.evidence["items"] %}
+<div class="ev"><span>{{ e.claim }}{% if e.kind %} <span class="mut sm">({{ e.kind }})</span>{% endif %}</span>
+<span class="lk">{% if e.url %}<a href="{{ e.url }}" rel="noopener">{{ e.url }}</a>{% else %}<b class="pending">PENDING</b>{% endif %}</span></div>
+{% endfor %}
+</section>
 
-<h2>5. Real vs simulated</h2>
-<p class="mut">source: {{ d.real_vs_simulated.source }} · generated {{ p.generated_at }}</p>
-<div class="wrap"><table><tr><th>Component</th><th>Real or simulated</th><th>Evidence</th></tr>
+<section id="simulated"><h2>5. Real or simulated</h2>
+<p class="src">source: {{ d.real_vs_simulated.source }}</p>
+<div class="scroll"><table><tr><th>Component</th><th>Real or simulated</th><th>Evidence</th></tr>
 {% for r in d.real_vs_simulated.rows %}<tr><td>{{ r.component }}</td><td>{{ r.status }}</td><td>{{ r.evidence }}</td></tr>{% endfor %}
 </table></div>
+</section>
 
-<h2>6. Verify it yourself</h2>
-<p class="mut">source: {{ d.verify.source }} · generated {{ p.generated_at }}</p>
-<pre>{% for c in d.verify.commands %}{{ c }}
-{% endfor %}</pre>
+<section id="verify"><h2>6. Verify it yourself</h2>
+<p class="src">source: {{ d.verify.source }}</p>
+<div class="cmd">{% for c in d.verify.commands %}{{ c }}
+{% endfor %}</div>
+</section>
 
-<h2>7. Limits and non-claims</h2>
-<p class="mut">source: {{ d.limits.source }} · generated {{ p.generated_at }}</p>
+<section id="limits"><h2>7. Limits and non-claims</h2>
+<p class="src">source: {{ d.limits.source }}</p>
 <ul>{% for l in d.limits["items"] %}<li>{{ l }}</li>{% endfor %}</ul>
+</section>
 
-<h2>8. Event-window proof</h2>
-<p class="mut">source: {{ d.event_window.source }} · generated {{ p.generated_at }}</p>
-<div class="card">
-First commit: {% if d.event_window.first %}<a href="{{ d.event_window.first.url }}"><code>{{ d.event_window.first.short }}</code></a> at {{ d.event_window.first.committed_at }} ({{ d.event_window.first.subject }}){% else %}<b class="pending">PENDING</b> (no git history on this server){% endif %}<br>
-Latest commit: {% if d.event_window.latest %}<a href="{{ d.event_window.latest.url }}"><code>{{ d.event_window.latest.short }}</code></a> at {{ d.event_window.latest.committed_at }} ({{ d.event_window.latest.subject }}){% else %}<b class="pending">PENDING</b>{% endif %}
-</div>
+<section id="window"><h2>8. Event-window proof</h2>
+<p class="src">source: {{ d.event_window.source }}</p>
+<dl class="kv2">
+  <dt>First commit</dt><dd>{% if d.event_window.first %}<a href="{{ d.event_window.first.url }}"><code>{{ d.event_window.first.short }}</code></a>, {{ d.event_window.first.committed_at|ts }}: {{ d.event_window.first.subject }}{% else %}<b class="pending">PENDING</b>, no git history on this server{% endif %}</dd>
+  <dt>Latest commit</dt><dd>{% if d.event_window.latest %}<a href="{{ d.event_window.latest.url }}"><code>{{ d.event_window.latest.short }}</code></a>, {{ d.event_window.latest.committed_at|ts }}: {{ d.event_window.latest.subject }}{% else %}<b class="pending">PENDING</b>{% endif %}</dd>
+</dl>
+</section>
 {% endblock %}

@@ -1,42 +1,80 @@
 {% extends "base.html" %}
 {% block title %}{{ d.incident.incident_id }}{% endblock %}
+{% block css %}
+.head{padding:24px 0 4px}
+.crumb{font-size:14px}
+.head h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.04em;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.facts{display:grid;gap:4px 28px;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));margin:12px 0 0}
+.facts div{padding:8px 0;border-top:1px solid var(--line)}
+.facts dt{font-size:13px;color:var(--mute)}
+.facts dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.tl{list-style:none;margin:8px 0 0;padding:0 0 0 22px;position:relative}
+.tl::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.tl li{position:relative;padding:7px 0}
+.tl li::before{content:"";position:absolute;left:-22px;top:15px;width:14px;height:14px;border-radius:4px;background:var(--soft);border:2px solid var(--paper)}
+.tl li.k-INCIDENT_OPENED::before,.tl li.k-OUTCOME::before{background:var(--ink)}
+.tl li.k-DECISION::before{background:var(--slate)}
+.tl li.k-GATE_VERDICT::before,.tl li.k-VERIFICATION::before{background:var(--seal)}
+.tl li.k-GATE_VERDICT.v-DENY::before{background:var(--void)}.tl li.k-GATE_VERDICT.v-ESCALATE::before{background:var(--flag)}
+.tl li.k-ACTION_INTENT::before,.tl li.k-ACTION_RESULT::before{background:var(--teal)}
+.tl li:target{background:var(--panel);border-radius:8px;box-shadow:0 0 0 6px var(--panel)}
+.tl .line{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}
+.tl .sq{font:700 12.5px var(--mono);color:var(--mute)}
+.tl .tm{font-size:12.5px;color:var(--mute)}
+.tl details{margin-top:4px}
+.tl summary{font-size:13px;color:var(--link);cursor:pointer}
+.gates{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.checks{list-style:none;margin:6px 0;padding:0}
+.checks li{display:grid;grid-template-columns:24px 1fr;padding:6px 0;border-top:1px solid var(--line)}
+.checks .m{font-weight:800}
+.verify{margin-top:10px}
+.res{border-left:4px solid var(--seal);background:var(--panel);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.res.badr{border-color:var(--void)}
+{% endblock %}
 {% block body %}
 {% set i = d.incident %}
-<p><a href="/dashboard">&larr; Dashboard</a></p>
-<h1>{{ i.incident_id }} <span class="sim">SIMULATED</span></h1>
-<div class="card">
-  <b>{{ i.type }}</b> (rule {{ i.detector_rule }}), related {{ i.related|join(", ") }}<br>
-  Scenario {{ i.scenario_id or "n/a" }} · outcome <span class="b {{ i.outcome }}">{{ i.outcome }}</span> {{ i.reason_code or "" }}
-  · {{ i.steps }} steps · {{ i.opened_at }} to {{ i.closed_at or "open" }}
+<div class="head">
+  <p class="crumb"><a href="/dashboard">Dashboard</a> / {{ i.incident_id }}</p>
+  <h1>{{ i.incident_id }} <span class="pill {{ i.outcome }}" style="font-size:15px">{{ i.outcome|lower }}</span></h1>
+  <dl class="facts">
+    <div><dt>Type</dt><dd>{{ i.type }}, rule {{ i.detector_rule }}</dd></div>
+    <div><dt>Scenario</dt><dd>{{ i.scenario_id or "n/a" }} (simulated)</dd></div>
+    <div><dt>Related</dt><dd>{{ i.related|join(", ") }}</dd></div>
+    <div><dt>Reason</dt><dd>{{ i.reason_code or "open" }}</dd></div>
+    <div><dt>Steps and entries</dt><dd>{{ i.steps }} steps, {{ i.entries }} entries</dd></div>
+    <div><dt>Opened to closed</dt><dd>{{ i.opened_at|ts }} to {{ i.closed_at|ts if i.closed_at else "not yet" }}</dd></div>
+  </dl>
 </div>
 
 <h2>Gate verdicts</h2>
-<div class="wrap"><table><tr><th>Step</th><th>Verdict</th><th>Code</th><th>Entry</th></tr>
-{% for g in d.gate_verdicts %}<tr><td>{{ g.step }}</td><td><span class="b {{ g.verdict }}">{{ g.verdict }}</span></td><td>{{ g.code }}</td><td>#{{ g.seq }}</td></tr>
-{% else %}<tr><td colspan="4">No gate verdicts (nothing was proposed that needed the gate).</td></tr>{% endfor %}
-</table></div>
+{% if d.gate_verdicts %}
+<div class="gates">{% for g in d.gate_verdicts %}<span class="pill {{ g.verdict }}">step {{ g.step }}: {{ g.verdict|lower }}, {{ g.code }}</span>{% endfor %}</div>
+{% else %}<p class="mut">Nothing was proposed that needed the gate.</p>{% endif %}
 
 <h2>Verification</h2>
 {% if d.verification %}
-<p>Independent check by code: <span class="{{ 'ok' if d.verification.ok else 'bad' }}">{{ 'passed' if d.verification.ok else 'FAILED' }}</span></p>
-<ul>{% for c in d.verification.checks %}<li><span class="{{ 'ok' if c.ok else 'bad' }}">{{ 'pass' if c.ok else 'FAIL' }}</span> {{ c.name }} <span class="mut">{{ c.detail }}</span></li>{% endfor %}</ul>
+<p>Separate code re-read the provider and ledger: <b class="{{ 'ok' if d.verification.ok else 'bad' }}">{{ 'all checks passed' if d.verification.ok else 'a check failed' }}</b>.</p>
+<ul class="checks">{% for c in d.verification.checks %}<li><span class="m {{ 'ok' if c.ok else 'bad' }}">{{ '✓' if c.ok else '✕' }}</span><span>{{ c.name }}<br><span class="mut sm">{{ c.detail }}</span></span></li>{% endfor %}</ul>
 {% else %}<p class="mut">No verification entry was recorded for this incident.</p>{% endif %}
 
-<h2>Timeline (decision chain)</h2>
-<div class="wrap"><table><tr><th>Seq</th><th>Time</th><th>Kind</th><th>Summary</th></tr>
+<h2>Decision chain</h2>
+<ol class="tl">
 {% for e in d.timeline %}
-<tr><td>#{{ e.seq }}</td><td>{{ e.ts }}</td><td><b>{{ e.kind }}</b></td>
-<td>{{ e.summary }}<details><summary>entry JSON</summary><pre>{{ {"seq": e.seq, "ts": e.ts, "kind": e.kind, "body": e.body, "trace_id": e.trace_id, "prev_hash": e.prev_hash, "entry_hash": e.entry_hash}|tojson(indent=2) }}</pre></details></td></tr>
+  <li id="e{{ e.seq }}" class="k-{{ e.kind }}{% if e.kind == 'GATE_VERDICT' %} v-{{ e.body.verdict }}{% endif %}">
+    <div class="line"><span class="sq">#{{ e.seq }}</span><span class="kind {{ e.kind }}">{{ e.kind|replace("_", " ")|lower }}</span><span class="tm">{{ e.ts|ts }}</span></div>
+    <div>{{ e.summary }}</div>
+    <details><summary>entry JSON and hashes</summary><pre>{{ {"seq": e.seq, "ts": e.ts, "kind": e.kind, "body": e.body, "trace_id": e.trace_id, "prev_hash": e.prev_hash, "entry_hash": e.entry_hash}|tojson(indent=2) }}</pre></details>
+  </li>
 {% endfor %}
-</table></div>
+</ol>
 
 <h2>Receipt</h2>
 {% if receipt_json %}
-<form method="post" action="/dashboard/incidents/{{ i.incident_id }}/verify"><button type="submit">Verify receipt against the chain</button></form>
+<p class="mut">The receipt lists every chain entry of this incident. Verifying recomputes its digest and checks each entry against the chain. A digest detects later edits; it is not a signature.</p>
+<form class="verify" method="post" action="/dashboard/incidents/{{ i.incident_id }}/verify#receipt-result"><button class="btn" type="submit">Verify this receipt</button></form>
 {% if verify %}
-<div class="card"><b class="{{ 'ok' if verify.ok else 'bad' }}">{{ 'OK' if verify.ok else 'BROKEN' }}</b> <code>{{ verify.line }}</code>
-<div class="mut">{{ verify.note }}</div></div>
+<div id="receipt-result" class="res {{ '' if verify.ok else 'badr' }}"><b class="{{ 'ok' if verify.ok else 'bad' }}">{{ 'Verified' if verify.ok else 'Does not verify' }}</b><br><span class="hash">{{ verify.line }}</span></div>
 {% endif %}
-<details open><summary>Raw receipt JSON</summary><pre>{{ receipt_json }}</pre></details>
-{% else %}<p class="mut">No receipt file for this incident.</p>{% endif %}
+<details><summary>View the raw receipt JSON</summary><pre>{{ receipt_json }}</pre></details>
+{% else %}<p class="mut">There is no receipt file for this incident.</p>{% endif %}
 {% endblock %}

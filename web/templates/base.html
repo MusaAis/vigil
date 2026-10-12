@@ -2,46 +2,134 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}Vigil{% endblock %} · Vigil (SIMULATED)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eef3f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a1a21" media="(prefers-color-scheme: dark)">
+<title>{% block title %}Vigil{% endblock %} · Vigil (simulated)</title>
+<meta name="description" content="Vigil is a payment-ops agent that fixes payment failures and proves every fix. A policy gate decides what it may do, separate code verifies the result, and every decision sits in a SHA-256 hash chain anyone can check. All data is simulated.">
+<meta property="og:title" content="Vigil: fixes payment failures, proves every fix">
+<meta property="og:description" content="Policy gate, independent verifier and a hash-chained decision record you can check yourself. All data is simulated.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d2230'/%3E%3Cg fill='none' stroke='%2352d6a4' stroke-width='3'%3E%3Crect x='5' y='11' width='13' height='10' rx='5'/%3E%3Crect x='14' y='11' width='13' height='10' rx='5'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-:root{--bg:#fff;--fg:#14171c;--mut:#5b6573;--line:#d9dee5;--card:#f6f8fa;--ok:#0a7d33;--bad:#b3261e;--warn:#8a5a00;--acc:#1f4fd8;--sim:#7a3e00;--simbg:#fff1d6}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1318;--fg:#e6e9ee;--mut:#9aa5b4;--line:#2a323d;--card:#171c24;--ok:#4cc27a;--bad:#ff8a80;--warn:#e6b450;--acc:#8ab4ff;--sim:#ffd9a0;--simbg:#3a2a10}}
+:root{
+  --paper:#eef3f1; --panel:#e3ece9; --ink:#0d2230; --mute:#4a6270; --line:#c2d1cd; --seal:#07694a; --void:#a61e28; --flag:#8a5200;
+  --flagbg:#ffefc9; --link:#0b5aa6; --slate:#5f8296; --teal:#1b8a8f; --soft:#9ab6c3; --on-seal:#ffffff;
+  --guil:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40' viewBox='0 0 120 40'%3E%3Cg fill='none' stroke='%230d2230' stroke-opacity='.075'%3E%3Cpath d='M0 20Q15 0 30 20T60 20T90 20T120 20'/%3E%3Cpath d='M0 20Q15 40 30 20T60 20T90 20T120 20'/%3E%3Cpath d='M0 12Q15-8 30 12T60 12T90 12T120 12'/%3E%3Cpath d='M0 28Q15 48 30 28T60 28T90 28T120 28'/%3E%3C/g%3E%3C/svg%3E");
+  --display:"Avenir Next","Segoe UI Variable Display","Segoe UI",Roboto,"Helvetica Neue",Arial,system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0a1a21; --panel:#112730; --ink:#e4efeb; --mute:#9db4ba; --line:#244049; --seal:#52d6a4; --void:#ff8f86; --flag:#f5c15a;
+  --flagbg:#3a2a0b; --link:#8cc2ff; --slate:#7ea0b3; --teal:#46c0c5; --soft:#3d6372; --on-seal:#06241a;
+  --guil:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40' viewBox='0 0 120 40'%3E%3Cg fill='none' stroke='%23e4efeb' stroke-opacity='.06'%3E%3Cpath d='M0 20Q15 0 30 20T60 20T90 20T120 20'/%3E%3Cpath d='M0 20Q15 40 30 20T60 20T90 20T120 20'/%3E%3Cpath d='M0 12Q15-8 30 12T60 12T90 12T120 12'/%3E%3Cpath d='M0 28Q15 48 30 28T60 28T90 28T120 28'/%3E%3C/g%3E%3C/svg%3E");
+}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header,main,footer{max-width:1040px;margin:0 auto;padding:12px 16px}
-header{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;border-bottom:1px solid var(--line)}
-header b{font-size:18px}
-nav a{margin-right:14px;color:var(--acc);text-decoration:none}
-a{color:var(--acc)}
-.sim{background:var(--simbg);color:var(--sim);border:1px solid var(--sim);border-radius:4px;padding:1px 6px;font-size:12px;font-weight:700;letter-spacing:.04em}
-h1{font-size:22px;margin:.6em 0 .3em}h2{font-size:18px;margin:1.4em 0 .4em;border-bottom:1px solid var(--line);padding-bottom:4px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:10px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
-.num{font-size:26px;font-weight:700}.mut{color:var(--mut);font-size:13px}
-.wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--mut);text-transform:uppercase}
-code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px}
-pre{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px;overflow-x:auto;margin:6px 0}
-.b{display:inline-block;border-radius:4px;padding:0 6px;font-size:12px;font-weight:700;border:1px solid var(--line)}
-.RESOLVED,.ALLOW,.ok,.OK{color:var(--ok)}.ESCALATED,.DENY,.bad,.PENDING,.pending{color:var(--bad)}.SKIPPED{color:var(--warn)}
-.ESCALATE{color:var(--warn)}
-details summary{cursor:pointer;color:var(--acc)}
-footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);margin-top:24px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);font-variant-numeric:tabular-nums}
+a{color:var(--link);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--link);outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 12px;border-radius:6px;z-index:10}
+.skip:focus{left:8px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+header.top{border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding-top:12px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:9px;color:var(--ink);text-decoration:none;font:800 21px/1 var(--display);letter-spacing:-.03em}
+.brand svg{width:28px;height:28px;flex:none}
+.stamp{border:1.5px solid var(--flag);color:var(--flag);background:var(--flagbg);border-radius:3px;padding:1px 7px;font:700 11px/1.5 var(--body);letter-spacing:.09em}
+nav.main{display:flex;gap:4px;margin-left:auto;overflow-x:auto;max-width:100%}
+nav.main a{color:var(--mute);text-decoration:none;padding:7px 11px;border-radius:7px;font-weight:600;white-space:nowrap}
+nav.main a:hover{color:var(--ink);background:var(--panel)}
+@media(max-width:560px){nav.main{margin-left:0;width:100%}nav.main a{flex:1;text-align:center;padding:8px 4px}}
+nav.main a[aria-current=page]{color:var(--ink);background:var(--panel);box-shadow:inset 0 -2px 0 var(--seal)}
+main{padding-bottom:30px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;line-height:1.12;margin:0}
+h2{font-size:clamp(1.35rem,3.4vw,1.75rem);margin:2.2rem 0 .6rem}
+h3{font-size:1.05rem;margin:1.4rem 0 .4rem}
+p{margin:.5rem 0}
+.mut{color:var(--mute);font-size:14px}
+.sm{font-size:13px}
+.hash,code{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+.hash{word-break:break-all}
+pre{font:12.5px/1.5 var(--mono);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;margin:8px 0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--mute);font-weight:600}
+.pill{display:inline-block;border-radius:13px;padding:0 9px;font-size:13px;font-weight:700;border:1.5px solid currentColor;line-height:1.55}
+.RESOLVED,.ALLOW,.ok{color:var(--seal)}
+.ESCALATED,.ESCALATE{color:var(--flag)}
+.DENY,.bad,.pending{color:var(--void)}
+.SKIPPED{color:var(--slate)}
+.pending{font-weight:800}
+.btn{display:inline-block;background:var(--ink);color:var(--paper);border:0;border-radius:9px;padding:11px 18px;font:700 15px/1.2 var(--body);text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn:hover{filter:brightness(1.15)}
+.btn.alt:hover{background:var(--panel);filter:none}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+
+/* the chain ribbon: the real chain entries, one cell each */
+.ribbon{display:flex;flex-wrap:wrap;gap:22px 30px;margin:26px 0 8px}
+.grp{min-width:0}
+.grp .cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-bottom:8px;font-size:13px;color:var(--mute)}
+.grp .cap b{color:var(--ink);font-weight:700}
+.cells{display:flex;flex-wrap:wrap;gap:5px;position:relative;max-width:300px}
+.cell{width:17px;height:17px;border-radius:4px;background:var(--soft);display:block;position:relative;outline-offset:2px}
+.cell::after{content:"";position:absolute;left:100%;top:50%;width:5px;height:2px;background:var(--line)}
+.cell:last-child::after{display:none}
+.cell:hover{transform:scale(1.18)}
+.cell.INCIDENT_OPENED,.legend i.INCIDENT_OPENED{background:var(--ink)}
+.cell.OBSERVATION,.legend i.OBSERVATION{background:var(--soft)}
+.cell.DECISION,.legend i.DECISION{background:var(--slate)}
+.cell.GATE_ALLOW,.legend i.GATE_ALLOW{background:var(--seal)}
+.cell.GATE_DENY,.legend i.GATE_DENY{background:var(--void)}
+.cell.GATE_ESCALATE,.legend i.GATE_ESCALATE{background:var(--flag)}
+.cell.ACTION_INTENT,.legend i.ACTION_INTENT,.cell.ACTION_RESULT,.legend i.ACTION_RESULT{background:var(--teal)}
+.cell.VERIFICATION,.legend i.VERIFICATION{background:var(--paper);box-shadow:inset 0 0 0 3px var(--seal)}
+.cell.OUTCOME_RESOLVED,.legend i.OUTCOME_RESOLVED{background:var(--seal);width:30px}
+.cell.OUTCOME_ESCALATED,.legend i.OUTCOME_ESCALATED{background:var(--flag);width:30px}
+.cell.OUTCOME_SKIPPED,.legend i.OUTCOME_SKIPPED{background:var(--paper);box-shadow:inset 0 0 0 3px var(--slate);width:30px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;padding:0;list-style:none;font-size:13px;color:var(--mute)}
+.legend li{display:flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.legend i.OUTCOME_RESOLVED,.legend i.OUTCOME_ESCALATED,.legend i.OUTCOME_SKIPPED{width:12px}
+
+/* kind chips and dots shared by log and timeline */
+.kind{display:inline-block;min-width:92px;font:700 11.5px/1.7 var(--mono);color:var(--paper);background:var(--slate);border-radius:4px;padding:0 6px;text-align:center}
+.kind.INCIDENT_OPENED{background:var(--ink)}.kind.OBSERVATION{background:var(--soft);color:var(--ink)}
+.kind.GATE_VERDICT{background:var(--seal);color:var(--on-seal)}.kind.ACTION_INTENT,.kind.ACTION_RESULT{background:var(--teal);color:var(--paper)}
+.kind.VERIFICATION{background:var(--seal);color:var(--on-seal)}.kind.OUTCOME{background:var(--ink)}
+
+footer.bottom{border-top:1px solid var(--line);color:var(--mute);font-size:13px;margin-top:20px}
+footer.bottom .wrap{padding-top:16px;padding-bottom:28px}
+footer.bottom p{max-width:70ch}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+{% block css %}{% endblock %}
 </style>
 </head>
 <body>
-<header>
-  <b>Vigil</b><span class="sim">SIMULATED</span>
-  <nav><a href="/dashboard">Dashboard</a><a href="/proof">Proof</a><a href="/status">Status</a>
-  <a href="/api/health">/api/health</a><a href="/api/metrics">/api/metrics</a><a href="/api/proof">/api/proof</a></nav>
-</header>
-<main>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/" aria-label="Vigil overview">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--ink)"/><g fill="none" stroke="var(--seal)" stroke-width="3"><rect x="5" y="11" width="13" height="10" rx="5"/><rect x="14" y="11" width="13" height="10" rx="5"/></g></svg>
+    Vigil</a>
+  <span class="stamp">SIMULATED</span>
+  <nav class="main" aria-label="Main">
+    <a href="/"{% if active == "home" %} aria-current="page"{% endif %}>Overview</a>
+    <a href="/dashboard"{% if active == "dashboard" %} aria-current="page"{% endif %}>Dashboard</a>
+    <a href="/proof"{% if active == "proof" %} aria-current="page"{% endif %}>Proof</a>
+    <a href="/status"{% if active == "status" %} aria-current="page"{% endif %}>Status</a>
+  </nav>
+</div></header>
+<main id="content"><div class="wrap">
 {% block body %}{% endblock %}
-</main>
-<footer>
-Vigil fixes payment failures and proves every fix. All data on this site is simulated: no real money and no real customer data.
-The decision chain is tamper-evident, not tamper-proof. A receipt digest detects later edits; it is not a signature.
-</footer>
+</div></main>
+<footer class="bottom"><div class="wrap">
+  <p>All data on this site is simulated: a simulated payment provider and ledger, no real money, no real customers. The decision chain is tamper-evident, not tamper-proof. A receipt digest detects later edits; it is not a signature.</p>
+  <p>JSON: <a href="/api/health">health</a>, <a href="/api/metrics">metrics</a>, <a href="/api/proof">proof</a>, <a href="/api/incidents">incidents</a>.{% if repo_url %} Source: <a href="{{ repo_url }}">{{ repo_url|replace("https://", "") }}</a>.{% endif %}</p>
+</div></footer>
 </body>
 </html>

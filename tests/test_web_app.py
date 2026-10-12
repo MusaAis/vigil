@@ -60,10 +60,10 @@ def test_stream_replays_the_chain_as_sse(client):
 
 
 def test_pages_work_without_javascript(client):
-    for path in ("/dashboard", "/proof", "/status", "/dashboard/incidents/inc_0001"):
+    for path in ("/", "/dashboard", "/proof", "/status", "/dashboard/incidents/inc_0001"):
         r = client.get(path)
         assert r.status_code == 200 and "SIMULATED" in r.text, path
-    assert client.get("/", follow_redirects=False).headers["location"] == "/dashboard"
+    assert "Fixes payment failures. Proves every fix." in client.get("/").text
     # the verify button is a plain form post
     r = client.post("/dashboard/incidents/inc_0001/verify")
     assert r.status_code == 200 and "OK incident=inc_0001" in r.text

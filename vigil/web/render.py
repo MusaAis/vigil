@@ -29,11 +29,28 @@ def short(h: Optional[str], n: int = 14) -> str:
     return "n/a" if not h else (h if len(h) <= n + 7 else h[: 7 + n] + "…")
 
 
-_ENV.filters.update(money=money, pct=pct, short=short)
+def ratio(n: Optional[int], d: Optional[int]) -> int:
+    """Integer percent of n in d, clamped to 0..100 (bar widths). Integer arithmetic only."""
+    return 0 if not d or n is None else max(0, min(100, n * 100 // d))
+
+
+def ts(s: Optional[str]) -> str:
+    """2026-10-10T08:01:00Z -> 2026-10-10 08:01Z"""
+    return "n/a" if not s else s[:16].replace("T", " ") + "Z"
+
+
+_ENV.filters.update(money=money, pct=pct, short=short, ratio=ratio, ts=ts)
 
 
 def render(name: str, **ctx) -> str:
+    ctx.setdefault("active", "")
     return _ENV.get_template(name).render(**ctx)
+
+
+def home_html(svc: VigilService) -> str:
+    proof = svc.proof()["data"]
+    return render("home.html", active="home", chain=svc.chain_status(), strip=svc.chain_strip(), runs=proof["eval"]["runs"],
+                  commands=proof["verify"]["commands"], limits=proof["limits"]["items"], repo_url=svc.s.repo_url)
 
 
 def dashboard_html(svc: VigilService) -> str:
@@ -41,7 +58,7 @@ def dashboard_html(svc: VigilService) -> str:
     m = {x["name"]: x for x in svc.metrics()["data"]}
     ch = svc.chain_status()
     after = (ch["head_seq"] if ch["head_seq"] is not None else -1) - 20
-    return render("dashboard.html", incidents=inc, metrics=m, exposure=svc.exposure(), chain=ch,
+    return render("dashboard.html", active="dashboard", repo_url=svc.s.repo_url, incidents=inc, metrics=m, exposure=svc.exposure(), chain=ch,
                   recent=svc.stream_entries(after_seq=max(after, -1), limit=50))
 
 
@@ -51,13 +68,13 @@ def incident_html(svc: VigilService, incident_id: str, verify_result: Optional[d
         return None
     import json
     receipt_json = json.dumps(d["receipt"], indent=2, sort_keys=True, ensure_ascii=False) if d["receipt"] else None
-    return render("incident.html", d=d, receipt_json=receipt_json, verify=verify_result,
+    return render("incident.html", active="dashboard", repo_url=svc.s.repo_url, d=d, receipt_json=receipt_json, verify=verify_result,
                   currency=svc.exposure()["currency"])
 
 
 def proof_html(svc: VigilService) -> str:
-    return render("proof.html", p=svc.proof())
+    return render("proof.html", active="proof", p=svc.proof(), repo_url=svc.s.repo_url)
 
 
 def status_html(svc: VigilService) -> str:
-    return render("status.html", h=svc.health())
+    return render("status.html", active="status", repo_url=svc.s.repo_url, h=svc.health())

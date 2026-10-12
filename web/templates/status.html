@@ -1,22 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Status{% endblock %}
+{% block css %}
+.head{padding:28px 0 6px}
+.head h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.04em}
+.big{display:flex;align-items:center;gap:14px;margin:14px 0 6px}
+.big .tick{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--seal);color:var(--on-seal);font:800 24px/1 var(--display)}
+.big.badc .tick{background:var(--void)}
+.big b{font:800 1.5rem/1.15 var(--display);letter-spacing:-.03em}
+dl.kv{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:0 24px;margin:10px 0}
+dl.kv dt{color:var(--mute);padding:9px 0;border-top:1px solid var(--line)}
+dl.kv dd{margin:0;padding:9px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+@media(max-width:560px){dl.kv{grid-template-columns:1fr}dl.kv dt{border-bottom:0;padding-bottom:0}dl.kv dd{border-top:0;padding-top:2px}}
+{% endblock %}
 {% block body %}
-<h1>Status <span class="sim">SIMULATED</span></h1>
-<div class="card"><span class="num {{ 'ok' if h.ok else 'bad' }}">{{ 'OK' if h.ok else 'CHAIN DOES NOT VERIFY' }}</span>
-<div class="mut">Human view of <a href="/api/health">/api/health</a>.</div></div>
-<div class="wrap"><table>
-<tr><th>Field</th><th>Value</th></tr>
-<tr><td>Service / version</td><td>{{ h.service }} {{ h.version }}</td></tr>
-<tr><td>Git commit</td><td><code>{{ h.git_sha or "unknown" }}</code></td></tr>
-<tr><td>Built (commit time)</td><td>{{ h.built_at or "unknown" }}</td></tr>
-<tr><td>Mode</td><td>{{ h.mode }}</td></tr>
-<tr><td>Started / uptime</td><td>{{ h.started_at }} / {{ h.uptime_s }} s</td></tr>
-<tr><td>Chain length</td><td>{{ h.chain.length }}</td></tr>
-<tr><td>Chain head</td><td><code>{{ h.chain.head }}</code></td></tr>
-<tr><td>Chain verified</td><td><span class="{{ 'ok' if h.chain.verified_ok else 'bad' }}">{{ h.chain.verified_ok }}</span> ({{ h.chain.verify_mode }}) at {{ h.chain.verified_at }}</td></tr>
-<tr><td>Last eval</td><td>{% if h.last_eval %}{{ h.last_eval.label }} (commit {{ h.last_eval.git_sha }}), correct {{ h.last_eval.correct_resolution_pct|pct }}{% else %}none{% endif %}</td></tr>
-<tr><td>LLM on this site</td><td>{{ h.llm.provider }} ({{ h.llm.mode }})</td></tr>
-<tr><td>Policy sha256</td><td><code>{{ h.policy_sha256 }}</code></td></tr>
-</table></div>
-<p class="mut">The chain is fully verified at startup and again every 5 minutes.</p>
+<div class="head"><h1>Status</h1>
+<div class="big {{ '' if h.ok else 'badc' }}"><span class="tick" aria-hidden="true">{{ "✓" if h.ok else "!" }}</span><b>{{ "Running, and the decision chain verifies" if h.ok else "The decision chain does not verify" }}</b></div>
+<p class="mut">The same data as <a href="/api/health">/api/health</a>. The chain is fully verified at startup and again every five minutes.</p></div>
+<dl class="kv">
+  <dt>Service</dt><dd>{{ h.service }} {{ h.version }}</dd>
+  <dt>Git commit</dt><dd><code>{{ h.git_sha or "unknown" }}</code>{% if h.built_at %}, committed {{ h.built_at|ts }}{% endif %}</dd>
+  <dt>Mode</dt><dd>{{ h.mode }}</dd>
+  <dt>Started</dt><dd>{{ h.started_at|ts }}, up {{ h.uptime_s }} s</dd>
+  <dt>Chain length</dt><dd>{{ h.chain.length }} entries</dd>
+  <dt>Chain head</dt><dd class="hash">{{ h.chain.head }}</dd>
+  <dt>Last verification</dt><dd><span class="{{ 'ok' if h.chain.verified_ok else 'bad' }}">{{ "passed" if h.chain.verified_ok else "failed" }}</span> ({{ h.chain.verify_mode }}) at {{ h.chain.verified_at|ts }}</dd>
+  <dt>Latest eval</dt><dd>{% if h.last_eval %}{{ h.last_eval.label }} (commit {{ h.last_eval.git_sha }}), {{ h.last_eval.correct_resolution_pct|pct }} correct{% else %}none{% endif %}</dd>
+  <dt>Model on this site</dt><dd>{{ h.llm.provider }} ({{ h.llm.mode }}): no LLM is called here</dd>
+  <dt>Policy sha256</dt><dd class="hash">{{ h.policy_sha256 }}</dd>
+</dl>
 {% endblock %}

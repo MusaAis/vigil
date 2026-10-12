@@ -46,6 +46,12 @@ REAL_VS_SIMULATED = (
     {"component": "Traces", "status": "Real neatlogs traces in live eval runs (links in the evidence pack)",
      "evidence": "docs/evidence.json"},
 )
+CELL_LEGEND = (
+    ("INCIDENT_OPENED", "Incident opened"), ("OBSERVATION", "Read"), ("DECISION", "Decision"),
+    ("GATE_ALLOW", "Gate allows"), ("GATE_DENY", "Gate denies"), ("GATE_ESCALATE", "Gate escalates"),
+    ("ACTION_INTENT", "Intent committed"), ("ACTION_RESULT", "Action result"), ("VERIFICATION", "Verified"),
+    ("OUTCOME_RESOLVED", "Resolved"), ("OUTCOME_ESCALATED", "Escalated"), ("OUTCOME_SKIPPED", "Skipped"),
+)
 LIMITS = (
     "Everything here is simulated: the payment provider, the ledger and the incidents. No real money or customer data.",
     "The suite is small (a few scenarios per label) and the v1 prompt was tuned on the v0 failures of the same scenarios.",
@@ -54,12 +60,6 @@ LIMITS = (
     "Incidents on the dashboard are decided by an offline rule-based stub, so they say nothing about LLM quality; "
     "LLM numbers come only from the eval results above. The trace ids in the demo chain are offline-<n> placeholders, "
     "not neatlogs traces.",
-)
-VERIFY_COMMANDS = (
-    "make setup && make test",
-    ".venv/bin/python scripts/verify_chain --db data/vigil.db --run demo",
-    ".venv/bin/python scripts/verify_receipt receipts/web",
-    "make eval-check",
 )
 
 
@@ -284,6 +284,35 @@ class VigilService:
                 "n_entries": res.n_entries, "line": res.line(), "problems": res.problems,
                 "note": "The digest detects later edits. It is not a signature and does not prove who produced the receipt."}
 
+    # ------------------------------------------------------------ chain ribbon (landing page)
+    def chain_strip(self) -> dict:
+        """The real chain entries grouped by incident, one cell per entry, for the ribbon on the overview page."""
+        rows = {r["incident_id"]: r for r in self.incidents()["data"]}
+        groups: dict = {}
+        present: set = set()
+        for e in read_entries(self.s.db_path):
+            b = e["body"]
+            if e["kind"] == "GATE_VERDICT":
+                cls = f"GATE_{b.get('verdict')}"
+            elif e["kind"] == "OUTCOME":
+                cls = f"OUTCOME_{b.get('outcome')}"
+            else:
+                cls = e["kind"]
+            present.add(cls)
+            g = groups.setdefault(e["incident_id"], [])
+            g.append({"seq": e["seq"], "cls": cls, "label": f"#{e['seq']} {summarize_entry(e)}", "entry_hash": e["entry_hash"]})
+        out = []
+        for iid, cells in groups.items():
+            r = rows.get(iid, {})
+            out.append({"incident_id": iid, "scenario_id": r.get("scenario_id"), "type": r.get("type"),
+                        "outcome": r.get("outcome"), "cells": cells})
+        return {"source": SOURCE, "groups": out, "legend": [{"cls": c, "label": l} for c, l in CELL_LEGEND if c in present]}
+
+    def verify_commands(self) -> list:
+        return [f"git clone {self.s.repo_url} && cd vigil", "make setup", "make demo", "make eval-check",
+                ".venv/bin/python scripts/verify_chain --db data/eval-v1.db --run v1",
+                ".venv/bin/python scripts/verify_receipt --db data/eval-v1.db receipts/v1"]
+
     # ------------------------------------------------------------ stream
     def stream_entries(self, after_seq: int = -1, limit: int = 200) -> list:
         """Chain entries after after_seq in the SSE event shape (event name 'chain_entry')."""
@@ -295,6 +324,7 @@ class VigilService:
     def exposure(self) -> dict:
         pol = load_policy(self.s.policy_path)
         refunded: dict = {}
+        per_incident: dict = {}
         for iid in self._group():
             rec = self._receipt(iid)
             if not rec:
@@ -303,6 +333,7 @@ class VigilService:
                 if a["tool"] == "issue_refund" and a.get("executed") and a.get("amount_minor"):
                     day = rec["payload"]["closed_at"][:10]
                     refunded[day] = refunded.get(day, 0) + a["amount_minor"]
+                    per_incident[iid] = per_incident.get(iid, 0) + a["amount_minor"]
         intents: dict = {}
         for e in read_entries(self.s.db_path):
             if e["kind"] == "ACTION_INTENT" and e["body"].get("tool") != "escalate":
@@ -312,6 +343,7 @@ class VigilService:
                          "per_day_minor": pol.max_refund_per_day_minor,
                          "max_write_actions_per_incident": pol.max_write_actions_per_incident},
                 "refunded_by_utc_day_minor": refunded, "peak_day_refunded_minor": max(refunded.values(), default=0),
+                "peak_incident_refunded_minor": max(per_incident.values(), default=0),
                 "max_write_actions_in_one_incident": max(intents.values(), default=0),
                 "note": "Simulated chain on a virtual clock; days are virtual. Breaches are impossible by construction (gate)."}
 
@@ -331,7 +363,7 @@ class VigilService:
     def metrics(self) -> dict:
         evals = self.eval_results()
         c = self._counts()
-        demo = "Simulated incidents in the demo chain served by this instance (offline stub model); not customer usage"
+        demo = "Simulated incidents in this instance's demo chain (offline stub model); not customer usage"
         data = [
             {"name": "recorded_runs", "value": len(evals),
              "boundary": "Eval result files committed in eval/results (live recordings by the team, including early baselines); "
@@ -341,7 +373,7 @@ class VigilService:
             {"name": "eval_scenarios_correct", "value": sum(r["metrics"]["n_correct"] for r in evals),
              "boundary": "Executions whose outcome, final state and forbidden-action check matched ground truth, over all recorded runs"},
             {"name": "unsafe_actions_executed", "value": sum(r["metrics"]["unsafe_actions_executed"] for r in evals),
-             "boundary": "Across all recorded runs in eval/results; defined in docs/SPEC.md section 12.4; the demo chain is not included"},
+             "boundary": "Across all recorded eval runs; defined in docs/SPEC.md section 12.4; the demo chain is not counted"},
             {"name": "incidents_resolved", "value": c["outcomes"]["RESOLVED"], "boundary": demo},
             {"name": "incidents_escalated", "value": c["outcomes"]["ESCALATED"], "boundary": demo},
             {"name": "incidents_skipped", "value": c["outcomes"]["SKIPPED"], "boundary": demo},
@@ -442,7 +474,7 @@ class VigilService:
             "tests": {"source": "tests/ and .github/workflows", **self._tests_info()},
             "evidence": {"source": "docs/evidence.json", "items": self.evidence()},
             "real_vs_simulated": {"source": "SPEC TS-8", "rows": list(REAL_VS_SIMULATED)},
-            "verify": {"source": "repository scripts", "commands": list(VERIFY_COMMANDS)},
+            "verify": {"source": "repository scripts", "commands": self.verify_commands()},
             "limits": {"source": "README and SPEC", "items": list(LIMITS)},
             "event_window": {"source": "git history of the deployed checkout", **self._commits()},
         }

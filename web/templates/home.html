@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block css %}
+.hero{position:relative;margin:0 -18px;padding:44px 18px 30px;background:var(--guil);background-size:120px 40px}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:90px;background:linear-gradient(transparent,var(--paper));pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.ribbon{--c:clamp(18px,2.6vw,25px)}
+.ribbon .cell{width:var(--c);height:var(--c)}
+.ribbon .cell.OUTCOME_RESOLVED,.ribbon .cell.OUTCOME_ESCALATED,.ribbon .cell.OUTCOME_SKIPPED{width:calc(var(--c) * 1.8)}
+.ribbon .cells{max-width:none;gap:6px}
+.ribbon .cell::after{width:6px}
+.hero h1{font-size:clamp(2.35rem,8.4vw,4.5rem);font-weight:800;letter-spacing:-.045em;line-height:1;text-wrap:balance}
+.hero .lede{font-size:clamp(1.05rem,2.4vw,1.25rem);max-width:56ch;margin-top:18px;color:var(--ink)}
+.seal{display:flex;align-items:flex-start;gap:10px;margin-top:22px;font-size:14px}
+.seal>span:last-child{flex:1;min-width:0}
+.seal .tick{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--seal);color:var(--on-seal);font-weight:800;font-size:13px}
+.seal.badc .tick{background:var(--void)}
+.cell{opacity:0;animation:pop .35s ease-out forwards;animation-delay:calc(var(--i) * 28ms)}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.steps{list-style:none;margin:10px 0 0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:0 6px;padding:14px 0;border-top:1px solid var(--line)}
+.steps li::before{content:counter(s);font:800 26px/1.1 var(--display);color:var(--seal)}
+.steps b{display:block;font:700 17px/1.3 var(--display)}
+.steps span{color:var(--mute)}
+.runs{margin-top:8px}
+.run{display:grid;grid-template-columns:54px 1fr;gap:5px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.run b{font:800 18px/1 var(--display)}
+.bar{height:10px;background:var(--panel);border-radius:5px;overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--seal)}
+.run .what{grid-column:2;color:var(--mute);font-size:14px}
+.run .what strong{color:var(--ink)}
+.cols{display:grid;gap:8px 40px}
+.cols>div{min-width:0}
+@media(min-width:820px){.cols{grid-template-columns:1fr 1fr}.cols.wide{grid-template-columns:5fr 4fr}}
+.cmd{background:var(--ink);color:var(--paper);border-radius:10px;padding:14px 16px;font:13px/1.7 var(--mono);overflow-x:auto;white-space:pre}
+ul.lim{padding-left:20px;margin:6px 0}
+ul.lim li{margin:5px 0;max-width:68ch}
+{% endblock %}
+{% block body %}
+<section class="hero" aria-labelledby="h">
+  <h1 id="h">Fixes payment failures. Proves every fix.</h1>
+  <p class="lede">Vigil is a payment-ops agent. It finds duplicate charges, missing webhooks and stuck payouts, fixes them only through a policy gate, checks the result with separate code, and writes every step into a hash chain you can verify yourself.</p>
+
+  <div class="ribbon" role="list" aria-label="The decision chain, one cell per entry">
+  {% set ns = namespace(i=0) %}
+  {% for g in strip.groups %}
+    <div class="grp" role="listitem">
+      <div class="cap"><b>{{ g.incident_id }}</b> scenario {{ g.scenario_id or "n/a" }}, {{ g.type }}, <span class="{{ g.outcome }}">{{ g.outcome|lower }}</span></div>
+      <div class="cells">
+      {% for c in g.cells %}{% set ns.i = ns.i + 1 %}<a class="cell {{ c.cls }}" style="--i:{{ ns.i }}" href="/dashboard/incidents/{{ g.incident_id }}#e{{ c.seq }}" title="{{ c.label }}" aria-label="{{ c.label }}"></a>{% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+  <ul class="legend" aria-label="Legend">{% for l in strip.legend %}<li><i class="{{ l.cls }}"></i>{{ l.label }}</li>{% endfor %}</ul>
+
+  <div class="seal {{ '' if chain.ok else 'badc' }}">
+    <span class="tick" aria-hidden="true">{{ "✓" if chain.ok else "!" }}</span>
+    <span>{% if chain.ok %}Chain verified from genesis: {{ chain.length }} entries, head <span class="hash">{{ chain.head|short(18) }}</span>{% else %}<b class="bad">Chain does not verify.</b> {{ chain.line }}{% endif %}</span>
+  </div>
+  <div class="actions"><a class="btn" href="/dashboard">Open the dashboard</a><a class="btn alt" href="/proof">Read the proof</a></div>
+</section>
+
+<h2>How one fix is made</h2>
+<ol class="steps">
+  <li><div><b>Detect</b><span>Plain code watches the simulated provider and ledger and opens an incident. No model is involved.</span></div></li>
+  <li><div><b>Investigate</b><span>The agent reads the provider and ledger with read-only tools. Free text from customers is fenced off and never used as evidence.</span></div></li>
+  <li><div><b>Pass the gate</b><span>Every write goes through a policy gate written in code: spending caps, an idempotency key, evidence that really exists, and a check specific to the incident type. The model's own words never reach it.</span></div></li>
+  <li><div><b>Act</b><span>The intent is committed to the chain before the action runs, so nothing happens that the record does not show.</span></div></li>
+  <li><div><b>Verify</b><span>Separate code re-reads the provider and ledger. Only it can close an incident. The model saying "done" counts for nothing.</span></div></li>
+  <li><div><b>Record</b><span>Each step is a hash-linked entry, and every incident gets a receipt anyone can re-check against the chain.</span></div></li>
+</ol>
+
+<div class="cols wide">
+<div>
+<h2>What the runs show</h2>
+<p class="mut">Real model runs (claude-haiku) on simulated incidents. Labels after v1 ran the same prompt on new scenarios; v1 itself was tuned on the failures of v0. Failures stay listed on the <a href="/proof#eval">proof page</a>.</p>
+<div class="runs">
+{% for r in runs %}
+  <div class="run">
+    <b>{{ r.label }}</b>
+    <div class="bar" role="img" aria-label="{{ r.n_correct }} of {{ r.n_total }} scenarios correct"><i style="width:{{ r.n_correct|ratio(r.n_total) }}%"></i></div>
+    <span class="what"><strong>{{ r.n_correct }} of {{ r.n_total }} correct</strong>, {{ r.unsafe_actions_executed }} unsafe actions executed. {{ r.mode|capitalize }} run{% if r.prompt_version %}, prompt {{ r.prompt_version }}{% endif %}.</span>
+  </div>
+{% endfor %}
+</div>
+</div>
+<div>
+<h2>Check it yourself</h2>
+<p class="mut">Nothing here needs a key. These commands rebuild the chain and verify it on your machine.</p>
+<div class="cmd">{% for c in commands %}{{ c }}
+{% endfor %}</div>
+<p class="mut sm">The decision chain proves what was recorded and that it was not edited afterwards. It does not prove the simulation matches the real world.</p>
+</div>
+</div>
+
+<h2>What this does not claim</h2>
+<ul class="lim">{% for l in limits %}<li>{{ l }}</li>{% endfor %}</ul>
+{% endblock %}

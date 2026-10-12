@@ -1,6 +1,7 @@
 """Web service tests (SPEC TS-3 to TS-8). Framework-free: these run without FastAPI."""
 import json
 import os
+import re
 import sqlite3
 
 import pytest
@@ -213,10 +214,11 @@ def test_evidence_pending_rules(tmp_path):
 
 def test_pages_render_and_are_labelled(tmp_path):
     svc = make(tmp_path)
-    for html in (render.dashboard_html(svc), render.proof_html(svc), render.status_html(svc),
+    for html in (render.home_html(svc), render.dashboard_html(svc), render.proof_html(svc), render.status_html(svc),
                  render.incident_html(svc, "inc_0001", svc.verify_receipt_for("inc_0001"))):
         assert "SIMULATED" in html and "tamper-evident, not tamper-proof" in html
-        assert "src=\"http" not in html and "<link" not in html  # self-contained
+        assert "src=\"http" not in html and "<script src" not in html  # self-contained
+        assert all(h.startswith("data:") for h in re.findall(r'<link[^>]*href="([^"]*)"', html))  # only an inline icon
     assert render.incident_html(svc, "inc_9999") is None
     assert "PENDING" in render.proof_html(svc)
     assert "OK incident=inc_0001" in render.incident_html(svc, "inc_0001", svc.verify_receipt_for("inc_0001"))
@@ -262,3 +264,83 @@ def test_receipt_lookup_cannot_escape_the_receipts_directory(tmp_path):
     assert os.path.exists(os.path.join(svc.s.receipts_dir, "..", "secret.json"))
     for bad in ("../secret", "..%2Fsecret", "inc_0001/../../secret"):
         assert svc.receipt(bad) is None and svc.verify_receipt_for(bad) is None and svc.incident(bad) is None
+
+
+# ---------------------------------------------------------------- redesign: overview page, ribbon, accessibility basics
+def test_chain_strip_is_the_real_chain(tmp_path):
+    svc = make(tmp_path)
+    strip = svc.chain_strip()
+    assert strip["source"] == "simulated"
+    seqs = [c["seq"] for g in strip["groups"] for c in g["cells"]]
+    assert seqs == list(range(svc.chain_status()["length"]))
+    assert [(g["incident_id"], g["scenario_id"], g["outcome"]) for g in strip["groups"]] == [
+        ("inc_0001", "D1", "RESOLVED"), ("inc_0002", "D2", "ESCALATED"), ("inc_0003", "D3", "SKIPPED")]
+    classes = {c["cls"] for g in strip["groups"] for c in g["cells"]}
+    assert {x["cls"] for x in strip["legend"]} == classes  # the legend lists exactly the kinds that appear
+    assert "GATE_ESCALATE" in classes and "GATE_DENY" not in classes and "OUTCOME_RESOLVED" in classes
+    heads = {c["seq"]: c["entry_hash"] for g in strip["groups"] for c in g["cells"]}
+    assert heads[0] == [e for e in svc.stream_entries(-1, 1)][0]["entry_hash"]
+
+
+def test_overview_shows_every_chain_entry_and_real_numbers(tmp_path):
+    svc = make(tmp_path)
+    html = render.home_html(svc)
+    assert html.count('class="cell ') == svc.chain_status()["length"]
+    assert 'href="/dashboard/incidents/inc_0002#e21"' in html  # each cell links to its entry
+    for r in svc.proof()["data"]["eval"]["runs"]:
+        assert f"{r['n_correct']} of {r['n_total']} correct" in html
+    assert svc.chain_status()["head"][:25] in html and "Chain verified from genesis" in html
+
+
+def test_overview_warns_when_the_chain_does_not_verify(tmp_path):
+    svc = make(tmp_path)
+    tamper(svc.s.db_path)
+    svc.verify_chain()
+    html = render.home_html(svc)
+    assert "Chain does not verify." in html and "Chain verified from genesis" not in html
+
+
+def test_verify_commands_come_from_the_repo_url(tmp_path):
+    svc = make(tmp_path, repo_url="https://github.com/example/vigil-fork")
+    assert svc.verify_commands()[0] == "git clone https://github.com/example/vigil-fork && cd vigil"
+    assert "https://github.com/example/vigil-fork" in render.home_html(svc)
+    assert svc.proof()["data"]["verify"]["commands"] == svc.verify_commands()
+
+
+def test_exposure_reports_the_largest_refund_in_one_incident(tmp_path):
+    ex = make(tmp_path).exposure()
+    assert ex["peak_incident_refunded_minor"] == 2500000 <= ex["caps"]["per_incident_minor"]
+
+
+def test_pages_have_basic_accessibility_structure(tmp_path):
+    svc = make(tmp_path)
+    pages = {"home": render.home_html(svc), "dashboard": render.dashboard_html(svc), "proof": render.proof_html(svc),
+             "status": render.status_html(svc), "incident": render.incident_html(svc, "inc_0001")}
+    for name, html in pages.items():
+        assert '<html lang="en">' in html and 'name="viewport"' in html, name
+        assert 'class="skip" href="#content"' in html and '<main id="content">' in html, name
+        assert html.count("<h1") == 1, name
+        assert "prefers-reduced-motion" in html and "focus-visible" in html, name
+        assert html.count('aria-current="page"') == 1 or name == "incident", name
+    assert 'href="/proof" aria-current="page"' in pages["proof"]
+    # the live log is the only script, and it builds nodes with textContent (no innerHTML from stream data)
+    assert "innerHTML" not in pages["dashboard"] and pages["dashboard"].count("<script") == 1
+    assert all("<script" not in pages[n] for n in ("home", "proof", "status", "incident"))
+
+
+def test_timeline_classes_do_not_collide_with_ribbon_colours(tmp_path):
+    html = render.incident_html(make(tmp_path), "inc_0001")
+    assert 'class="k-DECISION"' in html and 'class="DECISION"' not in html
+
+
+def test_hostile_text_in_the_chain_is_escaped_on_every_page(tmp_path):
+    svc = make(tmp_path)
+    con = sqlite3.connect(svc.s.db_path)
+    con.execute("DROP TRIGGER chain_no_update")
+    body = json.loads(con.execute("SELECT body_json FROM decision_chain WHERE seq=30").fetchone()[0])
+    body["result_summary"] = "<script>alert(1)</script>"
+    con.execute("UPDATE decision_chain SET body_json=? WHERE seq=30", (json.dumps(body, sort_keys=True, separators=(",", ":")),))
+    con.commit()
+    con.close()
+    for html in (render.home_html(svc), render.dashboard_html(svc), render.incident_html(svc, "inc_0003")):
+        assert "<script>alert(1)" not in html and "&lt;script&gt;alert(1)&lt;/script&gt;" in html

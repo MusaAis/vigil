@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import FastAPI, Path, Query
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from vigil.web import render
 from vigil.web.service import VigilService
@@ -95,9 +95,9 @@ def create_app(service: Optional[VigilService] = None, *, background: bool = Tru
                                  headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
     # ------------------------------------------------------------ pages
-    @app.get("/", include_in_schema=False)
-    def root():
-        return RedirectResponse("/dashboard")
+    @app.get("/", response_class=HTMLResponse)
+    def home():
+        return html(render.home_html(svc))
 
     @app.get("/dashboard", response_class=HTMLResponse)
     def dashboard():
